@@ -106,6 +106,11 @@ class FLAT:
       f.write("\n")
 
   @classmethod
+  def edit(cls, note):
+    cmd = f"emacsclient {cls.to_path(note)} & disown > /dev/null"
+    os.system(cmd)
+
+  @classmethod
   def make_new(cls):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
@@ -196,10 +201,15 @@ class RENDER:
     backlinks.append("\n--- BACKLINKS ---\n")
     backlinks.append("\n".join(map(backlink, acc)))
 
+    # create bar
+    bar = list()
+    bar.append(f'<form method="post"><button name="edit" value="{note}">edit</button></form>')
+    bar = "".join(bar)
+
     # compose html
     title = note
     result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
-                      f"<body><pre>{content}{''.join(backlinks)}</pre></body></html>"])
+                      f"<body><pre>{bar}{content}{''.join(backlinks)}</pre></body></html>"])
     return Response(result, mimetype="text/html")
 
 
@@ -257,12 +267,14 @@ def recents():
 def daily():
   return RENDER.TEXT("daily", "daily")
 
-@app.route("/note/<note>")
+@app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
-  if note.endswith(".note"):
-    return RENDER.NOTE(note)
+  if request.method == 'POST':
+    FLAT.edit(note)
+    return Response('', 204)
   else:
-    return RENDER.TEXTFILE(note)
+    assert note.endswith(".note")
+    return RENDER.NOTE(note)
 
 @app.route("/rm/<rm>")
 def get_rm(rm):
