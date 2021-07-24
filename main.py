@@ -129,7 +129,8 @@ class FLAT:
           if l.startswith("---") and l.endswith("---\n"):
             reading = False
             continue
-          acc.append(l[:-1])
+          if l.strip() != "":
+            acc.append(l[:-1])
 
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
     pprint(result)
