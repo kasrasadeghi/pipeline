@@ -104,70 +104,75 @@ class TAG:
 
 # RENDER
 
-def TEXT(title, content):
-  return Response(f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>"
-                  + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
+class RENDER:
+  @classmethod
+  def TEXT(_, title, content):
+    return Response(f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>"
+                    + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
 
-def TEXTFILE(note):
-  with open(FLAT.to_path(note)) as f:
-    return TEXT(note, f.read())
+  @classmethod
+  def TEXTFILE(cls, note):
+    with open(FLAT.to_path(note)) as f:
+      return cls.TEXT(note, f.read())
 
-def NOTE(note):
-  # read file
+  @classmethod
+  def NOTE(_, note):
+    # read file
 
-  path = FLAT.to_path(note)
-  content = list()
+    path = FLAT.to_path(note)
+    content = list()
 
-  if os.path.isfile(path):
-    with open(path) as f:
-      c = f.read()
-      if not c.endswith("\n"):
-        content.append("\n")
-      content.append(c)
-  content = "".join(content)
+    if os.path.isfile(path):
+      with open(path) as f:
+        c = f.read()
+        if not c.endswith("\n"):
+          content.append("\n")
+        content.append(c)
+    content = "".join(content)
 
-  # parse references and links in file
-  content = FLAT.parse(content)
+    # parse references and links in file
+    content = FLAT.parse(content)
 
-  # parse backlinks
-  note_tag = note.split('.')[0]
+    # parse backlinks
+    note_tag = note.split('.')[0]
 
-  acc = list()
-  for N in FLAT.listabs():
-    with open(N) as f:
-      for l in f:
-        if "=>" in l:
-          if note_tag in TAG.parse(l):
-            acc.append(util.basename(N))
+    acc = list()
+    for N in FLAT.listabs():
+      with open(N) as f:
+        for l in f:
+          if "=>" in l:
+            if note_tag in TAG.parse(l):
+              acc.append(util.basename(N))
 
-  def backlink(note):
-    link = FLAT.to_url(note)
-    return f'- <a href="/{link}">{note}</a>'
+    def backlink(note):
+      link = FLAT.to_url(note)
+      return f'- <a href="/{link}">{note}</a>'
 
-  backlinks = list()
-  backlinks.append("\n--- BACKLINKS ---\n")
-  backlinks.append("\n".join(map(backlink, acc)))
+    backlinks = list()
+    backlinks.append("\n--- BACKLINKS ---\n")
+    backlinks.append("\n".join(map(backlink, acc)))
 
-  # compose html
-  title = note
-  result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
-                    f"<body><pre>{content}{''.join(backlinks)}</pre></body></html>"])
-  return Response(result, mimetype="text/html")
+    # compose html
+    title = note
+    result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
+                      f"<body><pre>{content}{''.join(backlinks)}</pre></body></html>"])
+    return Response(result, mimetype="text/html")
 
 
-def LIST(items, title, linkfunc, colsfunc=lambda x: tuple()):
-  """
-  @param colsfunc - returns content for the other columns in this item's row
-  """
-  style="<style>* { font-family: monospace}</style>"
-  header = f"<!DOCTYPE html><html><head><title>{title}</title></head><body>"
-  body = "<table>"
-  for i in items:
-    columns = "".join(map(lambda x: "<td>" + x + "</td>", colsfunc(i)))
-    body += f'<tr><td><a href="{linkfunc(i)}">{i}</a></td>{columns}</li>'
-  body += "</ul>"
-  footer = "</body></html>"
-  return Response(header + body + footer, mimetype="text/html")
+  @classmethod
+  def LIST(_, items, title, linkfunc, colsfunc=lambda x: tuple()):
+    """
+    @param colsfunc - returns content for the other columns in this item's row
+    """
+    style="<style>* { font-family: monospace}</style>"
+    header = f"<!DOCTYPE html><html><head><title>{title}</title></head><body>"
+    body = "<table>"
+    for i in items:
+      columns = "".join(map(lambda x: "<td>" + x + "</td>", colsfunc(i)))
+      body += f'<tr><td><a href="{linkfunc(i)}">{i}</a></td>{columns}</li>'
+    body += "</ul>"
+    footer = "</body></html>"
+    return Response(header + body + footer, mimetype="text/html")
 
 # END RENDER
 
@@ -184,7 +189,7 @@ def get_root():
 @app.route("/all")
 def get_all():
   print(len(FLAT.list()))
-  return LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url)
+  return RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url)
 
 @app.route("/recents")
 def recents():
@@ -192,7 +197,7 @@ def recents():
     mtime = os.stat(FLAT.path + "/" + x).st_mtime
     return datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%d")
 
-  return LIST(reversed(util.sort_recent(files=FLAT.list(),
+  return RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
               title="Recent Notes",
               linkfunc=lambda x: "note/" + x,
@@ -200,14 +205,14 @@ def recents():
 
 @app.route("/daily")
 def daily():
-  return TEXT("daily", "daily")
+  return RENDER.TEXT("daily", "daily")
 
 @app.route("/note/<note>")
 def get_note(note):
   if note.endswith(".note"):
-    return NOTE(note)
+    return RENDER.NOTE(note)
   else:
-    return TEXTFILE(note)
+    return RENDER.TEXTFILE(note)
 
 @app.route("/rm/<rm>")
 def get_rm(rm):
