@@ -5,7 +5,9 @@ import json  # load, dump
 from functools import cache
 from datetime import datetime, timezone
 
-from flask import Flask, Response, render_template, escape
+from flask import Flask, Response, render_template, escape, request, redirect
+
+from pprint import pprint
 
 app = Flask(__name__)
 
@@ -92,6 +94,16 @@ class FLAT:
 
     return "\n".join(acc)
 
+  @classmethod
+  def make_new(cls):
+    with open("/proc/sys/kernel/random/uuid") as uuid:
+      f = uuid.read().strip() + ".note"
+    if os.path.isfile(cls.to_path(f)):
+      return "/try-again"
+    else:
+      with open(cls.to_path(f), "w+") as new_note:
+        new_note.write("")
+      return cls.to_url(f)
 
 class TAG:
   @classmethod
@@ -184,6 +196,8 @@ def to_root():
 
 @app.route("/")
 def get_root():
+  if 'note' in request.args and request.args['note'] == 'new':
+    return redirect(FLAT.make_new(), code=302)
   return render_template("index.html")
 
 @app.route("/all")
@@ -197,10 +211,13 @@ def recents():
     mtime = os.stat(FLAT.path + "/" + x).st_mtime
     return datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%d")
 
+
+  pprint(FLAT.list())
+
   return RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
               title="Recent Notes",
-              linkfunc=lambda x: "note/" + x,
+              linkfunc=FLAT.to_url,
               colsfunc=lambda x: (flat_date(x),))
 
 @app.route("/daily")
