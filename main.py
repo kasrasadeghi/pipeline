@@ -139,14 +139,12 @@ class FLAT:
             acc.append(l[:-1])
 
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
-    pprint(result)
     return result
 
 class TAG:
   @classmethod
   def parse(_, l):
     tags = set(map(lambda s: s.strip(), l.split("=>", 1)[1].split(",")))
-    print(tags)
     return tags
 
 # END LIB
