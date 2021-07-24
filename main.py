@@ -237,8 +237,9 @@ def get_root():
 
 @app.route("/all")
 def get_all():
-  print(len(FLAT.list()))
-  return RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url)
+  return RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url,
+                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
+                     namefunc=lambda x: FLAT.metadata(x)['Title'])
 
 @app.route("/recents")
 def recents():
