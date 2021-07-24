@@ -116,6 +116,25 @@ class FLAT:
       cls.init_note(note)
       return cls.to_url(note)
 
+  @classmethod
+  def metadata(cls, note):
+    with open(cls.to_path(note)) as f:
+      reading = False
+      acc = list()
+      for l in f:
+        if l == "--- METADATA ---\n":
+          reading = True
+          continue
+        if reading == True:
+          if l.startswith("---") and l.endswith("---\n"):
+            reading = False
+            continue
+          acc.append(l[:-1])
+
+    result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
+    pprint(result)
+    return result
+
 class TAG:
   @classmethod
   def parse(_, l):
