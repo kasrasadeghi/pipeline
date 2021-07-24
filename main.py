@@ -251,9 +251,6 @@ def recents():
     mtime = os.stat(FLAT.path + "/" + x).st_mtime
     return datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%d")
 
-
-  pprint(FLAT.list())
-
   return RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
                      title="Recent Notes",
