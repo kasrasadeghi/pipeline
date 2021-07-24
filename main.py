@@ -4,6 +4,7 @@ import sys  # argv
 import json  # load, dump
 from functools import cache
 from datetime import datetime, timezone
+from subprocess import check_output
 
 from flask import Flask, Response, render_template, escape, request, redirect
 
@@ -95,15 +96,25 @@ class FLAT:
     return "\n".join(acc)
 
   @classmethod
+  def init_note(cls, note):
+    datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs kaz/current-time
+    with open(cls.to_path(note), "w+") as f:
+      f.write("--- METADATA ---\n")
+      f.write("Date: ")
+      f.write(check_output(datecmd).decode('latin-1'))
+      f.write("\n")
+
+  @classmethod
   def make_new(cls):
     with open("/proc/sys/kernel/random/uuid") as uuid:
-      f = uuid.read().strip() + ".note"
-    if os.path.isfile(cls.to_path(f)):
+      note = uuid.read().strip() + ".note"
+    if os.path.isfile(cls.to_path(note)):
       return "/try-again"
     else:
-      with open(cls.to_path(f), "w+") as new_note:
+      with open(cls.to_path(note), "w+") as new_note:
         new_note.write("")
-      return cls.to_url(f)
+      cls.init_note(note)
+      return cls.to_url(note)
 
 class TAG:
   @classmethod
