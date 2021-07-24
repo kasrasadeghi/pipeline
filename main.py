@@ -54,8 +54,8 @@ class util:
     return filename.rsplit("/", 1)[1]
 
 
-class FlatNoteManager:
-  path = "/home/kasra/notes/flat"
+class FLAT:
+  path = "/home/kasra/notes/new"
 
   @classmethod
   def list(cls):
@@ -92,7 +92,6 @@ class FlatNoteManager:
 
     return "\n".join(acc)
 
-FLAT = FlatNoteManager
 
 class TAG:
   @classmethod
