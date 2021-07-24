@@ -158,11 +158,6 @@ class RENDER:
                     + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
 
   @classmethod
-  def TEXTFILE(cls, note):
-    with open(FLAT.to_path(note)) as f:
-      return cls.TEXT(note, f.read())
-
-  @classmethod
   def NOTE(_, note):
     # read file
 
