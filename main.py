@@ -58,7 +58,7 @@ class util:
 
 
 class FLAT:
-  path = "/home/kasra/notes/new"
+  path = "/home/kasra/notes"
 
   @classmethod
   def list(cls):
