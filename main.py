@@ -102,6 +102,7 @@ class FLAT:
       f.write("--- METADATA ---\n")
       f.write("Date: ")
       f.write(check_output(datecmd).decode('latin-1'))
+      f.write("Title: Untitled\n")
       f.write("\n")
 
   @classmethod
