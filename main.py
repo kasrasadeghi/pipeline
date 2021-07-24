@@ -202,7 +202,7 @@ class RENDER:
 
 
   @classmethod
-  def LIST(_, items, title, linkfunc, colsfunc=lambda x: tuple()):
+  def LIST(_, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
     """
     @param colsfunc - returns content for the other columns in this item's row
     """
@@ -211,7 +211,7 @@ class RENDER:
     body = "<table>"
     for i in items:
       columns = "".join(map(lambda x: "<td>" + x + "</td>", colsfunc(i)))
-      body += f'<tr><td><a href="{linkfunc(i)}">{i}</a></td>{columns}</li>'
+      body += f'<tr><td><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li>'
     body += "</ul>"
     footer = "</body></html>"
     return Response(header + body + footer, mimetype="text/html")
@@ -246,9 +246,10 @@ def recents():
 
   return RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
-              title="Recent Notes",
-              linkfunc=FLAT.to_url,
-              colsfunc=lambda x: (flat_date(x),))
+                     title="Recent Notes",
+                     linkfunc=FLAT.to_url,
+                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
+                     namefunc=lambda x: FLAT.metadata(x)['Title'])
 
 @app.route("/daily")
 def daily():
