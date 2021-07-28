@@ -206,7 +206,7 @@ class RENDER:
     # compose html
     title = note
     result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
-                      f"<body>{bar}<pre>{content}{''.join(backlinks)}</pre></body></html>"])
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>{content}{''.join(backlinks)}</pre></body></html>"])
     return Response(result, mimetype="text/html")
 
 
