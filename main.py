@@ -97,14 +97,13 @@ class FLAT:
     return "\n".join(acc)
 
   @classmethod
-  def init_note(cls, note):
+  def init_note(cls, note, title):
     datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs kaz/current-time
     with open(cls.to_path(note), "w+") as f:
       f.write("--- METADATA ---\n")
       f.write("Date: ")
       f.write(check_output(datecmd).decode('latin-1'))
-      f.write("Title: Untitled\n")
-      f.write("\n")
+      f.write(f"Title: {title}\n")
 
   @classmethod
   def edit(cls, note):
@@ -112,7 +111,7 @@ class FLAT:
     os.system(cmd)
 
   @classmethod
-  def make_new(cls):
+  def make_new(cls, title):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
     if os.path.isfile(cls.to_path(note)):
@@ -120,7 +119,7 @@ class FLAT:
     else:
       with open(cls.to_path(note), "w+") as new_note:
         new_note.write("")
-      cls.init_note(note)
+      cls.init_note(note, title)
       return cls.to_url(note)
 
   @classmethod
@@ -236,8 +235,8 @@ def to_root():
 
 @app.route("/")
 def get_root():
-  if 'note' in request.args and request.args['note'] == 'new':
-    return redirect(FLAT.make_new(), code=302)
+  if 'note' in request.args and len(request.args['title'].strip()) != 0:
+    return redirect(FLAT.make_new(title=request.args['title'].strip()), code=302)
   return render_template("index.html")
 
 @app.route("/all")
