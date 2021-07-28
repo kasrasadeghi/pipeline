@@ -198,8 +198,8 @@ class RENDER:
     # create bar
     bar = list()
     bar.append(f'<div style="display: flex;align-items:baseline">')
-    bar.append(f'<form method="post"><button name="edit" value="{note}">edit</button><button onclick="copy()">copy uuid</button></form>')
-    bar.append(f'')
+    bar.append(f'<form method="post"><button name="edit" value="{note}">edit</button></form>')
+    bar.append(f'<button onclick="copy()">copy uuid</button>')
     bar.append(f'</div>')
     bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
     bar = "".join(bar)
