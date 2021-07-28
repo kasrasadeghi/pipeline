@@ -62,11 +62,11 @@ class FLAT:
 
   @classmethod
   def list(cls):
-    return [x for x in os.listdir(cls.path) if os.path.isfile(cls.path + "/" + x)]
+    return [x for x in os.listdir(cls.path) if os.path.isfile(cls.path + "/" + x) and not (x[0] == '#' and x[-1] == '#')]
 
   @classmethod
   def listabs(cls):
-    return list(filter(os.path.isfile, map(lambda x: cls.path + "/" + x, os.listdir(cls.path))))
+    return list(map(lambda x: cls.path + "/" + x, cls.list()))
 
   @classmethod
   def to_url(_, note):
