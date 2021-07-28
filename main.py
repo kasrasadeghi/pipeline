@@ -235,7 +235,7 @@ def to_root():
 
 @app.route("/")
 def get_root():
-  if 'note' in request.args and len(request.args['title'].strip()) != 0:
+  if 'title' in request.args and len(request.args['title'].strip()) != 0:
     return redirect(FLAT.make_new(title=request.args['title'].strip()), code=302)
   return render_template("index.html")
 
