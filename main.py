@@ -82,13 +82,14 @@ class FLAT:
     acc = list()
     for L in lines:
 
-      if "- note:" in L:
+      if "- note: " in L and len(L.split("- note:", 1)) == 2:
         before, note = L.split("- note: ", 1)
         acc.append(f'{before}- note: <a href="{cls.to_url(note)}">{note}</a>')
         continue
 
-      if "- link:" in L:
-        L.split("- link: ", 1)[1]
+      if "- link: " in L and len(L.split("- link:", 1)) == 2:
+        before, link = L.split("- link: ", 1)
+        acc.append(f'{before}- link: <a href="{link}">{link}</a>')
         continue
 
       acc.append(L)
