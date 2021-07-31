@@ -120,7 +120,7 @@ class FLAT:
       with open(cls.to_path(note), "w+") as new_note:
         new_note.write("")
       cls.init_note(note, title)
-      return cls.to_url(note)
+      return note
 
   @classmethod
   def metadata(cls, note):
@@ -236,7 +236,7 @@ def to_root():
 @app.route("/")
 def get_root():
   if 'title' in request.args and len(request.args['title'].strip()) != 0:
-    return redirect(FLAT.make_new(title=request.args['title'].strip()), code=302)
+    return redirect(FLAT.to_url(FLAT.make_new(title=request.args['title'].strip())), code=302)
   return render_template("index.html")
 
 @app.route("/all")
