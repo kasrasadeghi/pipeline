@@ -199,6 +199,7 @@ class RENDER:
     bar.append(f'<div style="display: flex;align-items:baseline">')
     bar.append(f'<form method="post"><button name="edit" value="{note}">edit</button></form>')
     bar.append(f'<button onclick="copy()">copy uuid</button>')
+    bar.append(f'<a href="/">root</a>')
     bar.append(f'</div>')
     bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
     bar = "".join(bar)
@@ -281,5 +282,5 @@ def get_rm(rm):
 # MAIN
 
 # don't run flask app in interactive prompt
-if __name__ == "__main__" and not sys.__stdin__.isatty():
+if __name__ == "__main__" and not sys.__stdin__.isatty() and not 'EXEC_IMPORT' in dir():
   app.run()
