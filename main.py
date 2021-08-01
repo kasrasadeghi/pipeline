@@ -97,6 +97,21 @@ class FLAT:
     return "\n".join(acc)
 
   @classmethod
+  def collect_refs(cls, note):
+    """@returns a set of notes this note references"""
+    with open(cls.to_path(note)) as f:
+      lines = f.readlines()
+
+    acc = set()
+    for L in lines:
+      if "- note: " in L and len(L.split("- note:", 1)) == 2:
+        note = L.split("- note: ", 1)[1].rstrip()
+        acc.add(note)
+        continue
+
+    return acc
+
+  @classmethod
   def init_note(cls, note, title):
     datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
     with open(cls.to_path(note), "w+") as f:
@@ -271,6 +286,81 @@ def get_note(note):
   else:
     assert note.endswith(".note")
     return RENDER.NOTE(note)
+
+@app.route("/graph")
+def get_graph():
+  refmap = dict()
+  for note in FLAT.list():
+    refmap[note] = list(FLAT.collect_refs(note))
+
+  backlinks = dict()
+  for note, refs in refmap.items():
+    for ref in refs:
+      if ref not in backlinks:
+        backlinks[ref] = set()
+      backlinks[ref].add(note)
+
+  def title(note):
+    if note in FLAT.list():
+      return FLAT.metadata(note)['Title']
+    else:
+      return note
+
+  def link(note):
+    if note in FLAT.list():
+      t = FLAT.metadata(note)['Title']
+      return f'<a href="{FLAT.to_url(note)}">{t}</a>'
+    else:
+      return note
+
+  def legible_setdict(d):
+    legible_result = list()
+    for key, value in d.items():
+      print(link(key))
+      legible_result.append(link(key) + ":\n")
+      ps = [(link(x), title(x)) for x in value]
+      ps.sort(key=lambda p: p[1])
+      for p in ps:
+        legible_result.append("  " + p[0] + "\n")
+    return "".join(legible_result)
+
+  def legible_flatdict(d):
+    legible_result = list()
+    for key, value in d.items():
+      print(link(key))
+      legible_result.append(link(key) + " -> ")
+      legible_result.append(link(value) + "\n")
+    return "".join(legible_result)
+
+  limit = len(refmap)
+  if 'limit' in request.args:
+    limit = int(request.args.get('limit'))
+
+  actual = list(refmap)[0:limit]
+
+  unionfind = {x: str(i) for i, x in enumerate(actual)}
+
+  for note in actual:
+    for other in refmap[note]:
+      if other in actual and unionfind[note] != unionfind[other]:
+        unionfind[other] = unionfind[note]
+
+    if note in backlinks:
+      for other in backlinks[note]:
+        if other in actual and unionfind[note] != unionfind[other]:
+          unionfind[other] = unionfind[note]
+
+  result = dict()
+  for key, value in unionfind.items():
+    if value not in result:
+      result[value] = set()
+    result[value].add(key)
+
+  from pprint import pformat
+
+  return RENDER.TEXT("refs", legible_flatdict(unionfind))
+  # return RENDER.TEXT("refs", legible_setdict(result))
+  # return RENDER.TEXT("refs", pformat(backlinks, indent=1))
 
 @app.route("/rm/<rm>")
 def get_rm(rm):
