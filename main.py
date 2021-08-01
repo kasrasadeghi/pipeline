@@ -98,7 +98,7 @@ class FLAT:
 
   @classmethod
   def init_note(cls, note, title):
-    datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs kaz/current-time
+    datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
     with open(cls.to_path(note), "w+") as f:
       f.write("--- METADATA ---\n")
       f.write("Date: ")
