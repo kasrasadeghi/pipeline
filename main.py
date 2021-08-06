@@ -151,7 +151,7 @@ class FLAT:
             reading = False
             continue
           if l.strip() != "":
-            acc.append(l[:-1])
+            acc.append(l.rstrip())
 
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
     return result
