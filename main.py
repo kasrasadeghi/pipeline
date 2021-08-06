@@ -171,6 +171,10 @@ class FLAT:
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
     return result
 
+  @classmethod
+  def title(cls, note):
+    return cls.metadata(note)['Title']
+
 class TAG:
   @classmethod
   def parse(_, l):
@@ -235,7 +239,7 @@ class RENDER:
     bar = "".join(bar)
 
     # compose html
-    title = note
+    title = FLAT.title(note)
     result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
                       f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>{content}{''.join(backlinks)}</pre></body></html>"])
     return Response(result, mimetype="text/html")
@@ -274,7 +278,7 @@ def get_root():
 def get_all():
   return RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=lambda x: FLAT.metadata(x)['Title'])
+                     namefunc=FLAT.title)
 
 @app.route("/recents")
 def recents():
@@ -287,7 +291,7 @@ def recents():
                      title="Recent Notes",
                      linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=lambda x: FLAT.metadata(x)['Title'])
+                     namefunc=Flat.title)
 
 @app.route("/daily")
 def daily():
@@ -308,14 +312,13 @@ def get_graph():
 
   def title(note):
     if note in FLAT.list():
-      return FLAT.metadata(note)['Title']
+      return FLAT.title(note)
     else:
       return note
 
   def link(note):
     if note in FLAT.list():
-      t = FLAT.metadata(note)['Title']
-      return f'<a href="{FLAT.to_url(note)}">{t}</a>'
+      return f'<a href="{FLAT.to_url(note)}">{FLAT.title(note)}</a>'
     else:
       return note
 
