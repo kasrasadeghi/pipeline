@@ -98,15 +98,15 @@ class FLAT:
 
   @classmethod
   def collect_refs(cls, note):
-    """@returns a set of notes this note references"""
+    """@returns a list of notes this note references in the order they appear"""
     with open(cls.to_path(note)) as f:
       lines = f.readlines()
 
-    acc = set()
+    acc = list()
     for L in lines:
       if "- note: " in L and len(L.split("- note:", 1)) == 2:
         note = L.split("- note: ", 1)[1].rstrip()
-        acc.add(note)
+        acc.append(note)
         continue
 
     return acc
@@ -209,24 +209,26 @@ class RENDER:
     # parse references and links in file
     content = FLAT.parse(content)
 
-    # parse backlinks
-    note_tag = note.split('.')[0]
-
-    acc = list()
-    for N in FLAT.listabs():
-      with open(N) as f:
-        for l in f:
-          if "=>" in l:
-            if note_tag in TAG.parse(l):
-              acc.append(util.basename(N))
-
-    def backlink(note):
+    # parse forward links
+    def render_link(note):
       link = FLAT.to_url(note)
-      return f'- <a href="/{link}">{note}</a>'
+      return f'- <a href="{link}">{FLAT.title(note)}</a>'
 
-    backlinks = list()
-    backlinks.append("\n--- BACKLINKS ---\n")
-    backlinks.append("\n".join(map(backlink, acc)))
+    forward_links = ""
+    forward_link_list = FLAT.collect_refs(note)
+    if 0 != len(forward_link_list):
+      forward_links = list()
+      forward_links.append("\n\n--- LINKS ---\n")
+      forward_links.append("\n".join(map(render_link, FLAT.collect_refs(note))))
+      forward_links = "".join(forward_links)
+
+    backlink_map = FLAT.backlinks_refmap()[0]
+    backlinks = ""
+    if note in backlink_map:
+      backlinks = list()
+      backlinks.append("\n\n--- BACKLINKS ---\n")
+      backlinks.append("\n".join(map(render_link, list(backlink_map[note]))))
+      backlinks = "".join(backlinks)
 
     # create bar
     bar = list()
@@ -241,7 +243,7 @@ class RENDER:
     # compose html
     title = FLAT.title(note)
     result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
-                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>{content}{''.join(backlinks)}</pre></body></html>"])
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>{content}{forward_links}{backlinks}</pre></body></html>"])
     return Response(result, mimetype="text/html")
 
 
@@ -291,7 +293,7 @@ def recents():
                      title="Recent Notes",
                      linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=Flat.title)
+                     namefunc=FLAT.title)
 
 @app.route("/daily")
 def daily():
