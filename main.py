@@ -112,6 +112,21 @@ class FLAT:
     return acc
 
   @classmethod
+  def backlinks_refmap(cls):
+    refmap = dict()
+    for note in FLAT.list():
+      refmap[note] = list(set(FLAT.collect_refs(note)))
+
+    backlinks = dict()  # maps from note to set of referrers
+    for note, refs in refmap.items():
+      for ref in refs:
+        if ref not in backlinks:
+          backlinks[ref] = set()
+        backlinks[ref].add(note)
+
+    return backlinks, refmap
+
+  @classmethod
   def init_note(cls, note, title):
     datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
     with open(cls.to_path(note), "w+") as f:
@@ -289,16 +304,7 @@ def get_note(note):
 
 @app.route("/graph")
 def get_graph():
-  refmap = dict()
-  for note in FLAT.list():
-    refmap[note] = list(FLAT.collect_refs(note))
-
-  backlinks = dict()
-  for note, refs in refmap.items():
-    for ref in refs:
-      if ref not in backlinks:
-        backlinks[ref] = set()
-      backlinks[ref].add(note)
+  backlinks, refmap = FLAT.backlinks_refmap()
 
   def title(note):
     if note in FLAT.list():
