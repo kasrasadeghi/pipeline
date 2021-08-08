@@ -3,7 +3,7 @@ import os.path  # isfile
 import sys  # argv
 import json  # load, dump
 from functools import cache
-from datetime import datetime, timezone
+import datetime
 from subprocess import check_output
 
 from flask import Flask, Response, render_template, escape, request, redirect
@@ -175,6 +175,13 @@ class FLAT:
   def title(cls, note):
     return cls.metadata(note)['Title']
 
+  @classmethod
+  def list_by_create_date(cls):
+    def time_metadata(n):
+      """get create time from metadata, translated from date '+%a %b %e %T %Z %Y' """
+      return datetime.datetime.strptime(FLAT.metadata(n)['Date'], "%a %b %d %H:%M:%S %Z %Y")
+    return [p[0] for p in sorted([(n, time_metadata(n)) for n in cls.list()], key = lambda p: p[1])]
+
 class TAG:
   @classmethod
   def parse(_, l):
@@ -292,10 +299,6 @@ def get_all():
 
 @app.route("/recents")
 def recents():
-  def flat_date(x):
-    mtime = os.stat(FLAT.path + "/" + x).st_mtime
-    return datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%d")
-
   return RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
                      title="Recent Notes",
@@ -303,6 +306,14 @@ def recents():
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
                      namefunc=FLAT.title)
 
+@app.route("/creation")
+def creation():
+  """returns a list of notes by creation date"""
+  return RENDER.LIST(reversed(FLAT.list_by_create_date()),
+                     title="Recent Notes",
+                     linkfunc=FLAT.to_url,
+                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
+                     namefunc=FLAT.title)
 @app.route("/daily")
 def daily():
   return RENDER.TEXT("daily", "daily")
