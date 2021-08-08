@@ -376,9 +376,16 @@ def get_graph():
   return RENDER.TEXT("refs", legible_setdict(result))
 
 
+@app.route("/rm/")
+def get_rm_root():
+  with open(f"/home/kasra/projects/remarkable-kaz/dist/index.html") as f:
+    return Response(f.read(), mimetype="html")
+
 @app.route("/rm/<rm>")
 def get_rm(rm):
-  with open(f"/home/kasra/projects/remarkable-kaz/dist/{note}.svg") as f:
+  with open(f"/home/kasra/projects/remarkable-kaz/dist/{rm}") as f:
+    if rm.endswith("html"):
+      return Response(f.read(), mimetype="html")
     return Response(f.read(), mimetype="image/svg+xml")
 
 # END ROUTES
