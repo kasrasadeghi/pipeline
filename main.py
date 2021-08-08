@@ -187,12 +187,20 @@ class TAG:
 
 class RENDER:
   @classmethod
-  def TEXT(_, title, content):
-    return Response(f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>"
+  def STYLE(_):
+    return """<style>
+       * { font-size: clamp(2vmin, 1rem + 2vw, 24px); }
+       body { margin: 1% 2%; }
+     </style>"""
+
+
+  @classmethod
+  def TEXT(R, title, content):
+    return Response(f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>"
                     + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
 
   @classmethod
-  def NOTE(_, note):
+  def NOTE(R, note):
     # read file
 
     path = FLAT.to_path(note)
@@ -242,22 +250,22 @@ class RENDER:
 
     # compose html
     title = FLAT.title(note)
-    result = "".join([f"<!DOCTYPE hmtl><html><head><title>{title}</title></head>",
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>{content}{forward_links}{backlinks}</pre></body></html>"])
     return Response(result, mimetype="text/html")
 
 
   @classmethod
-  def LIST(_, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
+  def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
     """
     @param colsfunc - returns content for the other columns in this item's row
     """
-    style="<style>* { font-family: monospace}</style>"
-    header = f"<!DOCTYPE html><html><head><title>{title}</title></head><body>"
-    body = "<table>"
+    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+    body = """<table style="table-layout: fixed; width: 100%">"""
     for i in items:
-      columns = "".join(map(lambda x: "<td>" + x + "</td>", colsfunc(i)))
-      body += f'<tr><td><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li>'
+      td_style = '"text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"'
+      columns = "".join(map(lambda x: f"<td style={td_style}>" + x + "</td>", colsfunc(i)))
+      body += f'<tr><td style={td_style}><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li>'
     body += "</ul>"
     footer = "</body></html>"
     return Response(header + body + footer, mimetype="text/html")
@@ -274,7 +282,7 @@ def to_root():
 def get_root():
   if 'title' in request.args and len(request.args['title'].strip()) != 0:
     return redirect(FLAT.to_url(FLAT.make_new(title=request.args['title'].strip())), code=302)
-  return render_template("index.html")
+  return render_template("index.html", style=RENDER.STYLE())
 
 @app.route("/all")
 def get_all():
