@@ -310,8 +310,6 @@ def get_note(note):
 
 @app.route("/graph")
 def get_graph():
-  backlinks, refmap = FLAT.backlinks_refmap()
-
   def title(note):
     if note in FLAT.list():
       return FLAT.title(note)
@@ -327,7 +325,6 @@ def get_graph():
   def legible_setdict(d):
     legible_result = list()
     for key, value in d.items():
-      print(link(key))
       legible_result.append(link(key) + ":\n")
       ps = [(link(x), title(x)) for x in value]
       ps.sort(key=lambda p: p[1])
@@ -335,31 +332,40 @@ def get_graph():
         legible_result.append("  " + p[0] + "\n")
     return "".join(legible_result)
 
-  def legible_flatdict(d):
-    legible_result = list()
-    for key, value in d.items():
-      print(link(key))
-      legible_result.append(link(key) + " -> ")
-      legible_result.append(link(value) + "\n")
-    return "".join(legible_result)
+  backlinks, refmap = FLAT.backlinks_refmap()
 
   limit = len(refmap)
   if 'limit' in request.args:
     limit = int(request.args.get('limit'))
-
   actual = list(refmap)[0:limit]
 
-  unionfind = {x: str(i) for i, x in enumerate(actual)}
+
+  unionfind = {x: x for x in actual}
+
+  def find(note):
+    if note == unionfind[note]:
+      return note
+    return find(unionfind[note])
+
+  def union(note, other):
+    other_rep = find(other)
+    children = set()
+    for child, parent in unionfind.items():
+      if parent == other_rep:
+        children.add(child)
+    note_rep = find(note)
+    for child in children:
+      unionfind[child] = note_rep
 
   for note in actual:
     for other in refmap[note]:
-      if other in actual and unionfind[note] != unionfind[other]:
-        unionfind[other] = unionfind[note]
+      if other in actual and find(note) != find(other):
+        union(note, other)
 
     if note in backlinks:
       for other in backlinks[note]:
-        if other in actual and unionfind[note] != unionfind[other]:
-          unionfind[other] = unionfind[note]
+        if other in actual and find(note) != find(other):
+          union(note, other)
 
   result = dict()
   for key, value in unionfind.items():
@@ -367,11 +373,8 @@ def get_graph():
       result[value] = set()
     result[value].add(key)
 
-  from pprint import pformat
+  return RENDER.TEXT("refs", legible_setdict(result))
 
-  return RENDER.TEXT("refs", legible_flatdict(unionfind))
-  # return RENDER.TEXT("refs", legible_setdict(result))
-  # return RENDER.TEXT("refs", pformat(backlinks, indent=1))
 
 @app.route("/rm/<rm>")
 def get_rm(rm):
