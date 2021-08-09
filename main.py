@@ -325,7 +325,21 @@ def journal_list():
 
 @app.route("/daily")
 def daily():
-  return RENDER.TEXT("daily", "daily")
+  day_of_month = check_output(["date", "+%e"]).decode('latin-1').strip()
+  day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
+  month, year = check_output(["date", "+%B %Y"]).decode('latin-1').rstrip().split()
+  title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
+
+  for n in FLAT.list():
+    if title == FLAT.title(n):
+      return redirect(FLAT.to_url(n), code=302)
+
+  new_note = FLAT.make_new(title=title)
+  with open(FLAT.to_path(new_note)) as f:
+    content = f.read()
+  with open(FLAT.to_path(new_note), "w") as f:
+    f.write(f"# {month} {day_of_month}\n\n" + content + "Tags: Journal\n")
+  return redirect(FLAT.to_url(new_note), code=302)
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
@@ -366,7 +380,6 @@ def get_graph():
   if 'limit' in request.args:
     limit = int(request.args.get('limit'))
   actual = list(refmap)[0:limit]
-
 
   unionfind = {x: x for x in actual}
 
