@@ -257,8 +257,11 @@ class RENDER:
 
     # compose html
     title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>{content}{forward_links}{backlinks}</pre></body></html>"])
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>"
+                      f'<h1 style="{title_style}">{title}</h1>'
+                      f"{content}{forward_links}{backlinks}</pre></body></html>"])
     return Response(result, mimetype="text/html")
 
 
