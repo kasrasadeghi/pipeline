@@ -137,7 +137,7 @@ class FLAT:
 
   @classmethod
   def edit(cls, note):
-    cmd = f"emacsclient {cls.to_path(note)} & disown > /dev/null"
+    cmd = f"emacsclient -c '{cls.to_path(note)}' & disown > /dev/null"
     os.system(cmd)
 
   @classmethod
