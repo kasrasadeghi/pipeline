@@ -20,23 +20,19 @@ class RemarkableNoteManager:
   def _temp(self, filename):
     return self.root + "/temp/" + filename
 
-  @cache
   def namemap(self):
     with open(self._temp("namemap.data")) as f:
       namemap = json.load(f)
       uuidmap = {v: k for k, v in namemap.items()}
       return (namemap, uuidmap)
 
-  @cache
   def notebooks(self):
     with open(self._temp("notebooks.data")) as f:
       return json.load(f)
 
-  @cache
   def copied_uuids(self):
     return [x[:-len(".metadata")] for x in os.listdir("temp") if x.endswith("metadata")]
 
-  @cache
   def pages(self):
     result = dict()
     for notebook_uuid in self.copied_uuids():
