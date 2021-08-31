@@ -136,8 +136,13 @@ class FLAT:
       f.write(f"Title: {title}\n")
 
   @classmethod
+  def open(cls, note):
+    cmd = f"emacsclient -ca '{cls.to_path(note)}' & disown > /dev/null"
+    os.system(cmd)
+
+  @classmethod
   def edit(cls, note):
-    cmd = f"emacsclient -c '{cls.to_path(note)}' & disown > /dev/null"
+    cmd = f"emacsclient '{cls.to_path(note)}' & disown > /dev/null"
     os.system(cmd)
 
   @classmethod
@@ -248,7 +253,10 @@ class RENDER:
     # create bar
     bar = list()
     bar.append(f'<div style="display: flex;align-items:baseline">')
-    bar.append(f'<form method="post"><button name="edit" value="{note}">edit</button></form>')
+    bar.append(f'<form method="post">')
+    bar.append(f'<button name="edit" value="{note}">edit</button>')
+    bar.append(f'<button name="open" value="{note}">open</button>')
+    bar.append(f'</form>')
     bar.append(f'<button onclick="copy()">copy uuid</button>')
     bar.append(f'<a href="/">root</a>')
     bar.append(f'</div>')
@@ -366,7 +374,10 @@ def yesterday():
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
   if request.method == 'POST':
-    FLAT.edit(note)
+    if 'open' in request.form:
+      FLAT.open(note)
+    if 'edit' in request.form:
+      FLAT.edit(note)
     return Response('', 204)
   else:
     assert note.endswith(".note")
