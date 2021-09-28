@@ -52,6 +52,11 @@ class util:
   def basename(_, filename):
     return filename.rsplit("/", 1)[1]
 
+  @classmethod
+  def get_current_time(_):
+    datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
+    return check_output(datecmd).decode('latin-1')
+
 
 class FLAT:
   path = "/home/kasra/notes"
@@ -124,11 +129,10 @@ class FLAT:
 
   @classmethod
   def init_note(cls, note, title):
-    datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
     with open(cls.to_path(note), "w+") as f:
       f.write("--- METADATA ---\n")
       f.write("Date: ")
-      f.write(check_output(datecmd).decode('latin-1'))
+      f.write(util.get_current_time())
       f.write(f"Title: {title}\n")
 
   @classmethod
