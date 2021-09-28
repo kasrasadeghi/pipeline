@@ -142,6 +142,11 @@ class FLAT:
     os.system(cmd)
 
   @classmethod
+  def chrome(cls, note):
+    cmd = f"google-chrome-stable --app=http://localhost:5000" + cls.to_url(note)
+    os.system(cmd)
+
+  @classmethod
   def make_new(cls, title):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
