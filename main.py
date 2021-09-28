@@ -57,6 +57,10 @@ class util:
     datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
     return check_output(datecmd).decode('latin-1')
 
+  @classmethod
+  def parse_time(_, time):
+    """ translated from date '+%a %b %e %T %Z %Y' """
+    return datetime.datetime.strptime(time, "%a %b %d %H:%M:%S %Z %Y")
 
 class FLAT:
   path = "/home/kasra/notes"
@@ -74,13 +78,21 @@ class FLAT:
     return "/note/" + note
 
   @classmethod
+  def to_disc(_, note):
+    return note[:-len(".note")] + ".disc"
+
+  @classmethod
   def to_path(cls, note):
     return cls.path + "/" + note
 
   @classmethod
-  def parse(cls, content):
+  def parse(cls, content, mode="NOTE"):
     lines = content.splitlines()
     acc = list()
+
+    parse_msg = False
+    msg = ""
+
     for L in lines:
 
       if "- note: " in L and len(L.split("- note:", 1)) == 2:
@@ -92,6 +104,21 @@ class FLAT:
         before, link = L.split("- link: ", 1)
         acc.append(f'{before}- link: <a href="{link}">{link}</a>')
         continue
+
+      if mode == "DISC":
+        if L.startswith("- msg: "):
+          msg = L.split("- msg: ")[1]
+          parse_msg = True
+          continue
+
+        if parse_msg:
+          assert L.startswith("  - Date: ")
+          date = util.parse_time(L.split("- Date: ")[1])
+          date = datetime.datetime.strftime(date, "%H:%M:%S")
+          acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{msg}</div></div>')
+          parse_msg = False
+          msg = ""
+          continue
 
       acc.append(L)
 
@@ -188,8 +215,8 @@ class FLAT:
   @classmethod
   def list_by_create_date(cls):
     def time_metadata(n):
-      """get create time from metadata, translated from date '+%a %b %e %T %Z %Y' """
-      return datetime.datetime.strptime(FLAT.metadata(n)['Date'], "%a %b %d %H:%M:%S %Z %Y")
+      """get create time from metadata"""
+      return util.parse_time(FLAT.metadata(n)['Date'])
     return [p[0] for p in sorted([(n, time_metadata(n)) for n in cls.list()], key = lambda p: p[1])]
 
   @classmethod
@@ -233,7 +260,6 @@ class FLAT:
     msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n"
 
     # read note
-    print(FLAT.to_path(note))
     with open(FLAT.to_path(note), "r") as f:
       lines = f.readlines()
 
@@ -264,9 +290,14 @@ class TAG:
 class RENDER:
   @classmethod
   def STYLE(_):
+    # old font size: clamp(2vmin, 1rem + 2vw, 24px);
     return """<style>
-       * { font-size: clamp(2vmin, 1rem + 2vw, 24px); }
+       * { font-size: 0.9375rem; }
        body { margin: 1% 2%; }
+       pre { margin: 0px; display: flex; flex-direction: column; align-content: stretch; align-items: flex-start; }
+       .msg { display: flex; align-items: flex-start; margin: 3px; }
+       .msg_timestamp { margin-right: 5px; padding: 7px 0px 8px 0px; border-radius: 18px; color: rgb(230, 50, 120); }
+       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250); overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; }
      </style>"""
 
 
@@ -333,11 +364,11 @@ class RENDER:
     content = R._read_file(note)
 
     # parse references and links in file
-    content = FLAT.parse(content)
+    content = FLAT.parse(content, mode="NOTE")
 
     forward_links = R._section_forward_links(note)
     backlinks = R._section_backward_links(note)
-    discussion = note[:-len(".note")] + ".disc"
+    discussion = FLAT.to_disc(note)
     bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{discussion}">disc</a>')
 
     # compose html
@@ -354,7 +385,7 @@ class RENDER:
     content = R._read_file(note)
 
     # parse references and links in file
-    content = FLAT.parse(content)
+    content = FLAT.parse(content, mode="DISC")
 
     forward_links = R._section_forward_links(note)
     backlinks = R._section_backward_links(note)
@@ -453,7 +484,6 @@ def get_note(note):
 
     # handle messages
     if request.method == 'POST':
-      print(note, request.form['msg'])
       FLAT.handle_msg(note, request.form)
       return redirect(f"/note/{disc}", code=302)
 
