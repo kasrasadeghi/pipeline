@@ -228,6 +228,29 @@ class FLAT:
       f.write(f"# {month} {day_of_month}\n\n" + content + "Tags: Journal\n")
     return new_note
 
+  @classmethod
+  def handle_msg(_, note, form):
+    msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n"
+
+    # read note
+    print(FLAT.to_path(note))
+    with open(FLAT.to_path(note), "r") as f:
+      lines = f.readlines()
+
+    # find metadata
+    metadata_linenum = -1
+    for i, l in reversed(list(enumerate(lines))):
+      if l == "--- METADATA ---\n":
+        metadata_linenum = i
+    assert(metadata_linenum != -1)
+
+    # write note with msg
+    with open(FLAT.to_path(note), "w") as f:
+      f.write("".join(lines[:metadata_linenum]))
+      f.write(msg)
+      f.write("".join(lines[metadata_linenum:]))
+
+
 class TAG:
   @classmethod
   def parse(_, l):
@@ -253,45 +276,42 @@ class RENDER:
                     + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
 
   @classmethod
-  def NOTE(R, note):
-    # read file
+  def _read_file(R, note):
+    acc = list()
 
     path = FLAT.to_path(note)
-    content = list()
-
     if os.path.isfile(path):
       with open(path) as f:
         c = f.read()
         if not c.endswith("\n"):
-          content.append("\n")
-        content.append(c)
-    content = "".join(content)
+          acc.append("\n")
+        acc.append(c)
+    return "".join(acc)
 
-    # parse references and links in file
-    content = FLAT.parse(content)
+  @classmethod
+  def _render_link(R, note):
+    link = FLAT.to_url(note)
+    title = FLAT.title(note)
+    return f'- <a href="{link}">{title}</a>'
 
-    # parse forward links
-    def render_link(note):
-      link = FLAT.to_url(note)
-      return f'- <a href="{link}">{FLAT.title(note)}</a>'
-
-    forward_links = ""
+  @classmethod
+  def _section_forward_links(R, note):
     forward_link_list = FLAT.collect_refs(note)
     if 0 != len(forward_link_list):
-      forward_links = list()
-      forward_links.append("\n\n--- LINKS ---\n")
-      forward_links.append("\n".join(map(render_link, FLAT.collect_refs(note))))
-      forward_links = "".join(forward_links)
+      return "\n\n--- LINKS ---\n" + "\n".join([R._render_link(L) for L in forward_link_list])
+    else:
+      return ""
 
+  @classmethod
+  def _section_backward_links(R, note):
     backlink_map = FLAT.backlinks_refmap()[0]
-    backlinks = ""
     if note in backlink_map:
-      backlinks = list()
-      backlinks.append("\n\n--- BACKLINKS ---\n")
-      backlinks.append("\n".join(map(render_link, list(backlink_map[note]))))
-      backlinks = "".join(backlinks)
+      return "\n\n--- BACKLINKS ---\n" + "\n".join([R._render_link(L) for L in backlink_map[note]])
+    else:
+      return ""
 
-    # create bar
+  @classmethod
+  def _bar(R, note, *extras):
     bar = list()
     bar.append(f'<div style="display: flex;align-items:baseline">')
     bar.append(f'<form method="post">')
@@ -299,25 +319,63 @@ class RENDER:
     bar.append(f'<button name="open" value="{note}">open</button>')
     bar.append(f'</form>')
     bar.append(f'<button onclick="copy()">copy uuid</button>')
-    bar.append(f'<a href="/">root</a>')
-    bar.append(f'</div>')
+    bar.append(f'<a style="margin-left: 10px" href="/">root</a>')
     bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
-    bar = "".join(bar)
+
+    for extra in extras:
+      bar.append(extra)
+
+    bar.append(f'</div>')
+    return "".join(bar)
+
+  @classmethod
+  def NOTE(R, note):
+    content = R._read_file(note)
+
+    # parse references and links in file
+    content = FLAT.parse(content)
+
+    forward_links = R._section_forward_links(note)
+    backlinks = R._section_backward_links(note)
+    discussion = note[:-len(".note")] + ".disc"
+    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{discussion}">disc</a>')
 
     # compose html
     title = FLAT.title(note)
     title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>"
-                      f'<h1 style="{title_style}">{title}</h1>'
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f'<h1 style="{title_style}">{title}</h1>',
                       f"{content}{forward_links}{backlinks}</pre></body></html>"])
+    return Response(result, mimetype="text/html")
+
+  @classmethod
+  def DISCUSSION(R, note):
+    content = R._read_file(note)
+
+    # parse references and links in file
+    content = FLAT.parse(content)
+
+    forward_links = R._section_forward_links(note)
+    backlinks = R._section_backward_links(note)
+    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{note}">note</a>')
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f"{content}{forward_links}{backlinks}</pre>",
+                      f'<form method="post"><input autofocus autocomplete="off" type="text" name="msg"></form>',
+                      f"</body></html>"])
     return Response(result, mimetype="text/html")
 
 
   @classmethod
   def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
     """
-    @param colsfunc - returns content for the other columns in this item's row
+    @param colsfunc - returns content for the other columns in this item's row in a list
     """
     header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
     body = """<table style="table-layout: fixed; width: 100%">"""
@@ -385,15 +443,37 @@ def yesterday():
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
-  if request.method == 'POST':
-    if 'open' in request.form:
-      FLAT.open(note)
-    if 'edit' in request.form:
-      FLAT.edit(note)
-    return Response('', 204)
-  else:
-    assert note.endswith(".note")
+
+  # handle discussion
+  if note.endswith(".disc"):
+    note_id = note[:-len(".disc")]
+    note = note_id + ".note"
+    disc = note_id + ".disc"
+    is_discussion = True
+
+    # handle messages
+    if request.method == 'POST':
+      print(note, request.form['msg'])
+      FLAT.handle_msg(note, request.form)
+      return redirect(f"/note/{disc}", code=302)
+
+    # default case: handle rendering
+    return RENDER.DISCUSSION(note)
+
+  # handle notes
+  if note.endswith(".note"):
+    if request.method == 'POST':
+      if 'open' in request.form:
+        FLAT.open(note)
+      if 'edit' in request.form:
+        FLAT.edit(note)
+      return Response('', 204)
+
+    # default case: handle rendering
     return RENDER.NOTE(note)
+
+  # neither discussion nor note
+  assert(False)
 
 @app.route("/graph")
 def get_graph():

@@ -6,3 +6,11 @@ host:
 
 shell:
 	FLASK_ENV=development FLASK_APP=main.py flask shell
+
+port:
+	sudo netstat -nlp | grep 5000
+	sudo netstat -nlp | grep 5001
+
+killports:
+	sudo fuser -k 5000/tcp
+	sudo fuser -k 5001/tcp
