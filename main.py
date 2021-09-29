@@ -86,45 +86,6 @@ class FLAT:
     return cls.path + "/" + note
 
   @classmethod
-  def parse(cls, content, mode="NOTE"):
-    lines = content.splitlines()
-    acc = list()
-
-    parse_msg = False
-    msg = ""
-
-    for L in lines:
-
-      if "- note: " in L and len(L.split("- note:", 1)) == 2:
-        before, note = L.split("- note: ", 1)
-        acc.append(f'{before}- note: <a href="{cls.to_url(note)}">{note}</a>')
-        continue
-
-      if "- link: " in L and len(L.split("- link:", 1)) == 2:
-        before, link = L.split("- link: ", 1)
-        acc.append(f'{before}- link: <a href="{link}">{link}</a>')
-        continue
-
-      if mode == "DISC":
-        if L.startswith("- msg: "):
-          msg = L.split("- msg: ")[1]
-          parse_msg = True
-          continue
-
-        if parse_msg:
-          assert L.startswith("  - Date: ")
-          date = util.parse_time(L.split("- Date: ")[1])
-          date = datetime.datetime.strftime(date, "%H:%M:%S")
-          acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{msg}</div></div>')
-          parse_msg = False
-          msg = ""
-          continue
-
-      acc.append(L)
-
-    return "\n".join(acc)
-
-  @classmethod
   def collect_refs(cls, note):
     """@returns a list of notes this note references in the order they appear"""
     with open(cls.to_path(note)) as f:
@@ -276,6 +237,86 @@ class FLAT:
       f.write(msg)
       f.write("".join(lines[metadata_linenum:]))
 
+class PARSER:
+
+  @classmethod
+  def parse_ref(cls, L):
+    tag = "- note: "
+    if tag in L and len(L.split(tag, 1)) == 2:
+      before, note = L.split(tag, 1)
+      return True, f'{before}{tag}<a href="{FLAT.to_url(note)}">{note}</a>'
+    else:
+      return False, L
+
+  @classmethod
+  def parse_link(cls, L):
+    tag = "- link: "
+    if tag in L and len(L.split(tag, 1)) == 2:
+      before, link = L.split(tag, 1)
+      return True, f'{before}{tag}<a href="{link}">{link}</a>'
+    else:
+      return False, L
+
+  @classmethod
+  def parse(cls, content):
+    lines = content.splitlines()
+    acc = list()
+
+    for L in lines:
+
+      if (result := cls.parse_ref(L))[0]:
+        acc.append(result[1])
+        continue
+
+      if (result := cls.parse_link(L))[0]:
+        acc.append(result[1])
+        continue
+
+      acc.append(L)
+
+    return "\n".join(acc)
+
+  @classmethod
+  def parse_disc(cls, content):
+    lines = content.splitlines()
+    acc = list()
+
+    parse_msg = False
+    msg = ""
+    tmp_acc = list()
+
+    for L in lines:
+
+      if (result := cls.parse_ref(L))[0]:
+        tmp_acc.append(result[1])
+        continue
+
+      if (result := cls.parse_link(L))[0]:
+        tmp_acc.append(result[1])
+        continue
+
+      if L.startswith("- msg: "):
+        acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+        tmp_acc = list()
+
+        msg = L.split("- msg: ")[1]
+        parse_msg = True
+        continue
+
+      if parse_msg:
+        assert L.startswith("  - Date: ")
+        date = util.parse_time(L.split("- Date: ")[1])
+        date = datetime.datetime.strftime(date, "%H:%M:%S")
+        acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{msg}</div></div>')
+        parse_msg = False
+        msg = ""
+        continue
+
+      tmp_acc.append(L)
+
+    acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+    return "\n".join(acc)
+
 # END LIB
 
 # RENDER
@@ -284,13 +325,33 @@ class RENDER:
   @classmethod
   def STYLE(_):
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
+    # .msg_content: overflow: hidden; text-overflow: ellipsis;
+    # .msg: overflow: hidden; max-width: 100%;
     return """<style>
-       * { font-size: 0.9375rem; }
+       * { font-size: 18px; }
        body { margin: 1% 2%; }
-       pre { margin: 0px; display: flex; flex-direction: column; align-content: stretch; align-items: flex-start; }
-       .msg { display: flex; align-items: flex-start; margin: 3px; }
-       .msg_timestamp { margin-right: 5px; padding: 7px 0px 8px 0px; border-radius: 18px; color: rgb(230, 50, 120); }
-       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250); overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; }
+       .msgbox { margin: 0px;
+             display: flex; flex-direction: column;
+             align-content: stretch; align-items: flex-start; overflow: hidden; }
+       pre { margin: 0px; }
+       .msg { display: flex; margin: 3px; font-family: monospace; }
+       .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
+       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250);  }
+
+       .msg_input { width: -webkit-fill-available; margin: 5px}
+
+       /* phones */
+       @media (max-width: 1000px) {
+         .msg { flex-direction: column; align-items: flex-start; }
+         .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
+         * { font-size: 35px }
+       }
+
+       /* desktop */
+       @media (min-width: 1000px) {
+         .msg { flex-direction: row; align-items: baseline; }
+         .msg_timestamp { margin: 0px 5px 0px 0px; }
+       }
      </style>"""
 
 
@@ -357,7 +418,7 @@ class RENDER:
     content = R._read_file(note)
 
     # parse references and links in file
-    content = FLAT.parse(content, mode="NOTE")
+    content = PARSER.parse(content)
 
     forward_links = R._section_forward_links(note)
     backlinks = R._section_backward_links(note)
@@ -376,9 +437,7 @@ class RENDER:
   @classmethod
   def DISCUSSION(R, note):
     content = R._read_file(note)
-
-    # parse references and links in file
-    content = FLAT.parse(content, mode="DISC")
+    content = PARSER.parse_disc(content)
 
     forward_links = R._section_forward_links(note)
     backlinks = R._section_backward_links(note)
@@ -388,10 +447,10 @@ class RENDER:
     title = FLAT.title(note)
     title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f"<body>{bar}<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
-                      f"{content}{forward_links}{backlinks}</pre>",
-                      f'<form method="post"><input autofocus autocomplete="off" type="text" name="msg"></form>',
+                      f"{content}<pre>{forward_links}{backlinks}</pre></div>",
+                      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
 
