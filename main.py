@@ -276,13 +276,6 @@ class FLAT:
       f.write(msg)
       f.write("".join(lines[metadata_linenum:]))
 
-
-class TAG:
-  @classmethod
-  def parse(_, l):
-    tags = set(map(lambda s: s.strip(), l.split("=>", 1)[1].split(",")))
-    return tags
-
 # END LIB
 
 # RENDER
