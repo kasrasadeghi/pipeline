@@ -174,7 +174,7 @@ class FLAT:
 
   @classmethod
   def chrome(cls, note):
-    cmd = f"google-chrome-stable --app=http://localhost:5000" + cls.to_url(note)
+    cmd = f"google-chrome-stable --app=http://localhost:5000" + FLAT.to_url(note)
     os.system(cmd)
 
   @classmethod
