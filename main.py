@@ -527,6 +527,16 @@ def yesterday():
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
 
+  # handle bar, which is in both discussion and note
+  if request.method == 'POST':
+    if 'open' in request.form:
+      FLAT.open(request.form['open'])
+      return Response('', 204)
+    if 'edit' in request.form:
+      FLAT.edit(request.form['edit'])
+      return Response('', 204)
+
+
   # handle discussion
   if note.endswith(".disc"):
     note_id = note[:-len(".disc")]
@@ -542,17 +552,12 @@ def get_note(note):
     # default case: handle rendering
     return RENDER.DISCUSSION(note)
 
+
   # handle notes
   if note.endswith(".note"):
-    if request.method == 'POST':
-      if 'open' in request.form:
-        FLAT.open(note)
-      if 'edit' in request.form:
-        FLAT.edit(note)
-      return Response('', 204)
-
     # default case: handle rendering
     return RENDER.NOTE(note)
+
 
   # neither discussion nor note
   assert(False)
