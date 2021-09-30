@@ -353,6 +353,14 @@ class RENDER:
          .msg_timestamp { margin: 0px 5px 0px 0px; }
        }
      </style>"""
+     </style>""" + f"""<script>
+       fetch("http://{request.headers['Host']}/receive_info",
+         {{ method: "POST",
+            headers: {{ 'Content-Type': 'application/json'}},
+            body: JSON.stringify({{width: window.screen.width, height: window.screen.height, dpr: window.devicePixelRatio }})
+         }}
+       )
+     </script>"""
 
 
   @classmethod
@@ -640,6 +648,12 @@ def get_rm(rm):
     if rm.endswith("html"):
       return Response(f.read(), mimetype="html")
     return Response(f.read(), mimetype="image/svg+xml")
+
+@app.route("/receive_info", methods=['POST'])
+def receive_info():
+  print(request.headers)
+  print(request.json)
+  return Response('', 204)
 
 # END ROUTES
 
