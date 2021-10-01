@@ -327,8 +327,9 @@ class RENDER:
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
     # .msg_content: overflow: hidden; text-overflow: ellipsis;
     # .msg: overflow: hidden; max-width: 100%;
-    return """<style>
-       * { font-size: 18px; }
+    return """
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <style>
        body { margin: 1% 2%; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
@@ -337,6 +338,7 @@ class RENDER:
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
        .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250);  }
+       * { font-size: 18px; }
 
        .msg_input { width: -webkit-fill-available; margin: 5px}
 
@@ -344,7 +346,6 @@ class RENDER:
        @media (max-width: 1000px) {
          .msg { flex-direction: column; align-items: flex-start; }
          .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
-         * { font-size: 35px }
        }
 
        /* desktop */
@@ -352,7 +353,6 @@ class RENDER:
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 0px; }
        }
-     </style>"""
      </style>""" + f"""<script>
        fetch("http://{request.headers['Host']}/receive_info",
          {{ method: "POST",
