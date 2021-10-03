@@ -484,6 +484,23 @@ class RENDER:
     footer = "</body></html>"
     return Response(header + body + footer, mimetype="text/html")
 
+  @classmethod
+  def GIT(R):
+    title = "Git Status"
+    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir('/home/kasra/notes')
+    status = check_output(['git', 'status']).decode('latin-1').strip()
+    diff = check_output(['git', 'diff']).decode('latin-1').strip()
+    os.chdir(currdir)
+    content = (f"<pre>{escape(status)}</pre>" +
+               "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
+               f"<pre>{escape(diff)}</pre>")
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
+
+
 # END RENDER
 
 # ROUTES
@@ -537,6 +554,10 @@ def tag(tag):
                      linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
                      namefunc=FLAT.title)
+
+@app.route("/git")
+def git_status():
+  return RENDER.GIT()
 
 @app.route("/today")
 def today():
