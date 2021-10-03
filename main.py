@@ -296,7 +296,9 @@ class PARSER:
         continue
 
       if L.startswith("- msg: "):
-        acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+        if tmp_acc and "".join(tmp_acc) != "":
+          print(tmp_acc)
+          acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
         tmp_acc = list()
 
         msg = L.split("- msg: ")[1]
@@ -314,7 +316,9 @@ class PARSER:
 
       tmp_acc.append(L)
 
-    acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+    if tmp_acc:
+      acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+
     return "\n".join(acc)
 
 # END LIB
