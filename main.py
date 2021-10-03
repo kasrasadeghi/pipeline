@@ -530,11 +530,11 @@ def journal_list():
 
 @app.route("/today")
 def today():
-  return redirect(FLAT.to_url(FLAT.today()), code=302)
+  return redirect(FLAT.to_url(FLAT.to_disc(FLAT.today())), code=302)
 
 @app.route("/yesterday")
 def yesterday():
-  return redirect(FLAT.to_url(FLAT.yesterday()), code=302)
+  return redirect(FLAT.to_url(FLAT.to_disc(FLAT.yesterday())), code=302)
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
