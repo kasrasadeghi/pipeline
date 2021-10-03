@@ -417,6 +417,8 @@ class RENDER:
     bar.append(f'</form>')
     bar.append(f'<button onclick="copy()">copy uuid</button>')
     bar.append(f'<a style="margin-left: 10px" href="/">root</a>')
+    bar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
+    bar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>')
     bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
 
     for extra in extras:
