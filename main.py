@@ -309,7 +309,7 @@ class PARSER:
         assert L.startswith("  - Date: ")
         date = util.parse_time(L.split("- Date: ")[1])
         date = datetime.datetime.strftime(date, "%H:%M:%S")
-        acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{msg}</div></div>')
+        acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{escape(msg)}</div></div>')
         parse_msg = False
         msg = ""
         continue
