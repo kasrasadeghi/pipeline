@@ -485,18 +485,59 @@ class RENDER:
     return Response(header + body + footer, mimetype="text/html")
 
   @classmethod
+  def _parse_color(R, s):
+    original = s
+
+    acc = list()
+
+    # chomp until the needle in the haystack
+    def chomp(needle):
+      before, after = s.split(needle, 1)
+      acc.append(before)
+      return after
+
+    D = {'31m': '<span style="color:red">',
+         'm': '</span>',
+         '1m': '<span style="font-weight: bold">',
+         '36m': '<span style="color:blue">',
+         '32m': '<span style="color:green">',
+         }
+
+    ANSI = '\x1B['
+    while True:
+      s = chomp(ANSI)
+      for code, replacement in D.items():
+        if s.startswith(code):
+          acc.append(replacement)
+          s = s[len(code):]
+          break
+      else:
+        print(f"ERROR: did not find replacement for ANSI code '{s[:5]}'")
+        return original
+
+      if s.find(ANSI) == -1:
+        break
+
+    return "".join(acc)
+
+
+  @classmethod
   def GIT(R):
     title = "Git Status"
     header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
-    status = check_output(['git', 'status']).decode('latin-1').strip()
-    diff = check_output(['git', 'diff']).decode('latin-1').strip()
+    # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
+    status = check_output(['git', '-c', 'color.status=always', 'status']).decode('utf8').strip()
+    diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
+
+    status = R._parse_color(str(escape(status)))
+    diff   = R._parse_color(str(escape(diff)))
     os.chdir(currdir)
-    content = (f"<pre>{escape(status)}</pre>" +
+    content = (f"<pre>{status}</pre>" +
                "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
-               f"<pre>{escape(diff)}</pre>")
+               f"<pre>{diff}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
