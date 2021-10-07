@@ -531,13 +531,27 @@ class RENDER:
     # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
     status = check_output(['git', '-c', 'color.status=always', 'status']).decode('utf8').strip()
     diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
+    untracked_filenames = check_output(["git", "ls-files", "--others", "--exclude-standard"]).decode('utf8').strip()
+    os.chdir(currdir)
 
     status = R._parse_color(str(escape(status)))
     diff   = R._parse_color(str(escape(diff)))
-    os.chdir(currdir)
-    content = (f"<pre>{status}</pre>" +
+
+
+    untracked_files = list()
+    for l in untracked_filenames.splitlines():
+      with open(FLAT.to_path(l)) as f:
+        untracked_files.append(f.read())
+      untracked_files[-1] = ('<span style="font-weight: bold">' + str(escape(l)) + "</span>\n" +
+                             '<span style="color: green">' + str(escape(untracked_files[-1])) + "</span>\n")
+    untracked = "".join(untracked_files)
+    print(untracked_filenames)
+
+    content = (f"<pre><h1>$ git status</h1>{status}</pre>" +
                "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
-               f"<pre>{diff}</pre>")
+               f"<pre><h1>$ git diff</h1>{diff}</pre>" +
+               "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
+               f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
