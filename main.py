@@ -297,7 +297,6 @@ class PARSER:
 
       if L.startswith("- msg: "):
         if tmp_acc and "".join(tmp_acc) != "":
-          print(tmp_acc)
           acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
         tmp_acc = list()
 
@@ -522,21 +521,29 @@ class RENDER:
 
 
   @classmethod
+  def _git_status(R):
+    # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
+    status = check_output(['git', '-c', 'color.status=always', 'status']).decode('utf8').strip()
+    status = R._parse_color(str(escape(status)))
+    return status
+
+  @classmethod
+  def _git_diff(R):
+    diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
+    diff = R._parse_color(str(escape(diff)))
+    return diff
+
+  @classmethod
   def GIT(R):
     title = "Git Status"
     header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
-    # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
-    status = check_output(['git', '-c', 'color.status=always', 'status']).decode('utf8').strip()
-    diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
+    status = R._git_status()
+    diff = R._git_diff()
     untracked_filenames = check_output(["git", "ls-files", "--others", "--exclude-standard"]).decode('utf8').strip()
     os.chdir(currdir)
-
-    status = R._parse_color(str(escape(status)))
-    diff   = R._parse_color(str(escape(diff)))
-
 
     untracked_files = list()
     for l in untracked_filenames.splitlines():
@@ -545,7 +552,6 @@ class RENDER:
       untracked_files[-1] = ('<span style="font-weight: bold">' + str(escape(l)) + "</span>\n" +
                              '<span style="color: green">' + str(escape(untracked_files[-1])) + "</span>\n")
     untracked = "".join(untracked_files)
-    print(untracked_filenames)
 
     content = (f"<pre><h1>$ git status</h1>{status}</pre>" +
                "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
