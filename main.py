@@ -521,6 +521,28 @@ class RENDER:
 
 
   @classmethod
+  def _git_porcelain(R):
+    status = check_output(['git', 'status', '--porcelain']).decode('utf8').strip()
+
+    acc = list()
+
+    for l in status.splitlines():
+      if (i := l.rfind(".note")) != -1:
+        before, uuid = l[:3], l[3:]  # 3 is the length of the annotation that git porcelain gives us
+        acc.append((before, uuid))
+
+    acc_sorted = reversed(sorted(acc, key=lambda p: util.parse_time(FLAT.metadata(p[1])['Date'])))
+
+    acc = list()
+    for (before, uuid) in acc_sorted:
+      acc.append(before + f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>')
+
+    status = "\n".join(acc)
+
+    return status
+
+
+  @classmethod
   def _git_status(R):
     status = check_output(['git', 'status']).decode('utf8').strip()
 
@@ -569,6 +591,21 @@ class RENDER:
                f"<pre><h1>$ git diff</h1>{diff}</pre>" +
                "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
                f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
+
+  @classmethod
+  def GIT_MENU(R):
+    title = "Git Status"
+    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir('/home/kasra/notes')
+    status = R._git_porcelain()
+    os.chdir(currdir)
+
+    content = (
+      f"<pre><h1>$ git status --porcelain</h1>{status}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -630,6 +667,10 @@ def tag(tag):
 @app.route("/git")
 def git_status():
   return RENDER.GIT()
+
+@app.route("/git/menu")
+def git_menu():
+  return RENDER.GIT_MENU()
 
 @app.route("/today")
 def today():
