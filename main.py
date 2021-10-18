@@ -522,13 +522,24 @@ class RENDER:
 
   @classmethod
   def _git_status(R):
-    # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
-    status = check_output(['git', '-c', 'color.status=always', 'status']).decode('utf8').strip()
-    status = R._parse_color(str(escape(status)))
+    status = check_output(['git', 'status']).decode('utf8').strip()
+
+    UUID_LEN = len("2e62fd14-9b3a-4275-9a39-7bf3d6b488c7.note") # off by one lol
+
+    acc = list()
+    for l in status.splitlines():
+      if (i := l.rfind(".note")) != -1:
+        before, uuid = l[:-UUID_LEN], l[-UUID_LEN:]
+        acc.append(before + f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>')
+      else:
+        acc.append(str(escape(l)))
+    status = "\n".join(acc)
+
     return status
 
   @classmethod
   def _git_diff(R):
+    # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
     diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
     diff = R._parse_color(str(escape(diff)))
     return diff
