@@ -523,7 +523,7 @@ class RENDER:
 
   @classmethod
   def _git_porcelain(R):
-    status = check_output(['git', 'status', '--porcelain']).decode('utf8').strip()
+    status = check_output(['git', 'status', '--porcelain']).decode('utf-8')  # NO .strip() !
 
     acc = list()
 
