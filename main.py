@@ -765,6 +765,7 @@ def get_note(note):
     if 'edit' in request.form:
       FLAT.edit(request.form['edit'])
       return Response('', 204)
+    assert note.endswith(".disc")
 
 
   # handle discussion
