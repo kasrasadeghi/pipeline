@@ -504,6 +504,9 @@ class RENDER:
 
     ANSI = '\x1B['
     while True:
+      if -1 == s.find(ANSI):
+        break
+
       s = chomp(ANSI)
       for code, replacement in D.items():
         if s.startswith(code):
@@ -514,8 +517,6 @@ class RENDER:
         print(f"ERROR: did not find replacement for ANSI code '{s[:5]}'")
         return original
 
-      if s.find(ANSI) == -1:
-        break
 
     return "".join(acc)
 
@@ -534,10 +535,25 @@ class RENDER:
     acc_sorted = reversed(sorted(acc, key=lambda p: util.parse_time(FLAT.metadata(p[1])['Date'])))
 
     acc = list()
+    acc_untracked = list()
     for (before, uuid) in acc_sorted:
-      acc.append(before + f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>')
+      if '??' in before:
+        el = (
+          before +
+          f'(add) '
+          f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>'
+        )
+        acc_untracked.append(el)
+      else:
+        el = (
+          before +
+          f'<a href="/git/diff/{uuid}">work</a> <(unstage) (add)> '
+          f'<a href="/git/diff-staged/{uuid}">stage</a>   '
+          f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>'
+        )
+        acc.append(el)
 
-    status = "\n".join(acc)
+    status = "\n".join(acc_untracked + acc)
 
     return status
 
@@ -560,11 +576,33 @@ class RENDER:
     return status
 
   @classmethod
+  def _git_diff_single(R, note):
+    """the diff between working and stage"""
+    diff = check_output(['git', '-c', 'color.ui=always', 'diff', note]).decode('utf8').strip()
+    diff = R._parse_color(str(escape(diff)))
+    return diff
+
+  @classmethod
+  def _git_diff_staged(R, note):
+    """the diff between working and stage"""
+    diff = check_output(['git', '-c', 'color.ui=always', 'diff', '--staged', note]).decode('utf8').strip()
+    diff = R._parse_color(str(escape(diff)))
+    return diff
+
+  @classmethod
   def _git_diff(R):
     # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
     diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
     diff = R._parse_color(str(escape(diff)))
     return diff
+
+  @classmethod
+  def _git_stage(R):
+    """show the stage as the diff between it and HEAD"""
+    diff = check_output(['git', '-c', 'color.ui=always', 'diff', '--staged']).decode('utf8').strip()
+    diff = R._parse_color(str(escape(diff)))
+    return diff
+
 
   @classmethod
   def GIT(R):
@@ -596,19 +634,39 @@ class RENDER:
 
   @classmethod
   def GIT_MENU(R):
-    title = "Git Status"
+    title = "Git Menu"
     header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
-    status = R._git_porcelain()
+    output = R._git_porcelain()
     os.chdir(currdir)
 
     content = (
-      f"<pre><h1>$ git status --porcelain</h1>{status}</pre>")
+      f"<pre><h1>$ git status --porcelain</h1>{output}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
+  @classmethod
+  def GIT_DIFF(R, note, staged):
+    title = "Git Diff: " + FLAT.title(note)
+    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir('/home/kasra/notes')
+    if staged:
+      output = R._git_diff_staged(note)
+    else:
+      output = R._git_diff_single(note)
+    menu = R._git_porcelain()
+    os.chdir(currdir)
+
+    content = (
+      f"<pre><h1>$ git status --porcelain</h1>{menu}</pre>"
+      "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
+      f"<pre><h1>$ git diff '{FLAT.title(note)}'</h1>{output}</pre>")
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
 
 # END RENDER
 
@@ -671,6 +729,14 @@ def git_status():
 @app.route("/git/menu")
 def git_menu():
   return RENDER.GIT_MENU()
+
+@app.route("/git/diff/<note>")
+def git_diff(note):
+  return RENDER.GIT_DIFF(note, staged=False)
+
+@app.route("/git/diff-staged/<note>")
+def git_diff_staged(note):
+  return RENDER.GIT_DIFF(note, staged=True)
 
 @app.route("/today")
 def today():
