@@ -67,7 +67,7 @@ class FLAT:
 
   @classmethod
   def list(cls):
-    return [x for x in os.listdir(cls.path) if os.path.isfile(cls.path + "/" + x) and not (x[0] == '#' and x[-1] == '#')]
+    return [x for x in os.listdir(cls.path) if cls.exists(cls.path + "/" + x) and not (x[0] == '#' and x[-1] == '#')]
 
   @classmethod
   def listabs(cls):
@@ -84,6 +84,10 @@ class FLAT:
   @classmethod
   def to_path(cls, note):
     return cls.path + "/" + note
+
+  @classmethod
+  def exists(cls, note):
+    return os.path.isfile(cls.to_path(note))
 
   @classmethod
   def collect_refs(cls, note):
@@ -142,7 +146,7 @@ class FLAT:
   def make_new(cls, title):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
-    if os.path.isfile(cls.to_path(note)):
+    if cls.exists(cls.to_path(note)):
       return "/try-again"
     else:
       with open(cls.to_path(note), "w+") as new_note:
@@ -373,15 +377,19 @@ class RENDER:
 
   @classmethod
   def _read_file(R, note):
+
+    if not FLAT.exists(note):
+      print(f"ERROR: reading note that does not exist: '{note}'")
+      return ""
+
     acc = list()
 
     path = FLAT.to_path(note)
-    if os.path.isfile(path):
-      with open(path) as f:
-        c = f.read()
-        if not c.endswith("\n"):
-          acc.append("\n")
-        acc.append(c)
+    with open(path) as f:
+      c = f.read()
+      if not c.endswith("\n"):
+        acc.append("\n")
+      acc.append(c)
     return "".join(acc)
 
   @classmethod
