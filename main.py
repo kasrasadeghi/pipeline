@@ -241,6 +241,38 @@ class FLAT:
       f.write(msg)
       f.write("".join(lines[metadata_linenum:]))
 
+  @classmethod
+  def _git_add(cls, note):
+    currdir = os.getcwd()
+    os.chdir(cls.path)
+
+    if cls.exists(note):
+      check_output(['git', 'add', note]).decode('utf8').strip()
+
+      os.chdir(currdir)
+      return redirect(f"/git/diff-staged/{note}", code=302)
+
+    else:
+      print(f"ERROR: note '{note}' doesn't exist to 'git add'")
+      os.chdir(currdir)
+      return Response('', 204)
+
+  @classmethod
+  def _git_unstage(cls, note):
+    currdir = os.getcwd()
+    os.chdir(cls.path)
+
+    if cls.exists(note):
+      check_output(['git', 'restore', '--staged', note]).decode('utf8').strip()
+
+      os.chdir(currdir)
+      return redirect(f"/git/diff/{note}", code=302)
+
+    else:
+      print(f"ERROR: note '{note}' doesn't exist to 'git add'")
+      os.chdir(currdir)
+      return Response('', 204)
+
 class PARSER:
 
   @classmethod
@@ -346,6 +378,18 @@ class RENDER:
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
        .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250);  }
        * { font-size: 18px; }
+
+       .link-button {
+         background: none;
+         color: blue;
+         cursor: pointer;
+         font-family: monospace;
+         border: blue 1px solid;
+         margin: 2px;
+         padding: 6px 6px 4px 6px;
+       }
+       .link-button:focus { outline: none; }
+       .link-button:active { color:red; }
 
        .msg_input { width: -webkit-fill-available; margin: 5px}
 
@@ -508,6 +552,7 @@ class RENDER:
          '1m': '<span style="font-weight: bold">',
          '36m': '<span style="color:blue">',
          '32m': '<span style="color:green">',
+         '7;31m': '<span style="background-color:red">',
          }
 
     ANSI = '\x1B['
@@ -548,14 +593,20 @@ class RENDER:
       if '??' in before:
         el = (
           before +
-          f'(add) '
+          f'<form style="display:inline "action="/git" method="post">'
+          f'<button class="link-button" name="add" value="{uuid}">add</button> '
+          f'</form>'
           f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>'
         )
         acc_untracked.append(el)
       else:
         el = (
           before +
-          f'<a href="/git/diff/{uuid}">work</a> <(unstage) (add)> '
+          f'<a href="/git/diff/{uuid}">work</a> '
+          f'<form style="display:inline "action="/git" method="post">'
+          f'<button class="link-button" name="unstage" value="{uuid}">{str(escape("<"))}unstage</button> '
+          f'<button class="link-button" name="add" value="{uuid}">add{str(escape(">"))}</button> '
+          f'</form>'
           f'<a href="/git/diff-staged/{uuid}">stage</a>   '
           f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>'
         )
@@ -672,7 +723,7 @@ class RENDER:
     content = (
       f"<pre><h1>$ git status --porcelain</h1>{menu}</pre>"
       "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
-      f"<pre><h1>$ git diff '{FLAT.title(note)}'</h1>{output}</pre>")
+      f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{FLAT.title(note)}'</h1>{output}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -730,8 +781,19 @@ def tag(tag):
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
                      namefunc=FLAT.title)
 
-@app.route("/git")
+@app.route("/git", methods=['GET', 'POST'])
 def git_status():
+  if 'POST' == request.method:
+    if 'add' in request.form:
+      return FLAT._git_add(request.form['add'])
+
+    if 'unstage' in request.form:
+      return FLAT._git_unstage(request.form['unstage'])
+
+    print("ERROR: unhandled request with form: ")
+    pprint(request.form)
+    return Response('', 204)
+
   return RENDER.GIT()
 
 @app.route("/git/menu")
