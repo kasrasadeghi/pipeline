@@ -222,6 +222,10 @@ class FLAT:
 
   @classmethod
   def handle_msg(_, note, form):
+    # ignore empty messages
+    if '' == form['msg']:
+      return
+
     msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n"
 
     # read note
