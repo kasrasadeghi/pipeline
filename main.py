@@ -185,10 +185,7 @@ class FLAT:
 
   @classmethod
   def list_by_create_date(cls):
-    def time_metadata(n):
-      """get create time from metadata"""
-      return util.parse_time_to_utc(FLAT.metadata(n)['Date'])
-    return [p[0] for p in sorted([(n, time_metadata(n)) for n in cls.list()], key = lambda p: p[1])]
+    return sorted(cls.list(), key=lambda n: util.parse_time_to_utc(FLAT.metadata(n)['Date']))
 
   @classmethod
   def today(cls):
