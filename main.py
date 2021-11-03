@@ -59,7 +59,10 @@ class util:
 
   @classmethod
   def parse_time_to_utc(_, time):
-    """ translated from date '+%a %b %e %T %Z %Y' """
+    """
+    translated from date '+%a %b %e %T %Z %Y'
+    - used for comparisons and sorting
+    """
     # convert the timezone to UTC because datetime in python doesn't handle timezones, omegalul
     clean_time = check_output(["date", "-d", time, "-u", "+%a %b %d %T %Z %Y"]).decode('utf8').strip()
     return datetime.datetime.strptime(clean_time, "%a %b %d %H:%M:%S %Z %Y")
