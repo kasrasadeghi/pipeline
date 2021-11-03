@@ -58,9 +58,15 @@ class util:
     return check_output(datecmd).decode('latin-1')
 
   @classmethod
-  def parse_time(_, time):
+  def parse_time_to_utc(_, time):
     """ translated from date '+%a %b %e %T %Z %Y' """
-    return datetime.datetime.strptime(time, "%a %b %d %H:%M:%S %Z %Y")
+    # convert the timezone to UTC because datetime in python doesn't handle timezones, omegalul
+    clean_time = check_output(["date", "-d", time, "-u", "+%a %b %d %T %Z %Y"]).decode('utf8').strip()
+    return datetime.datetime.strptime(clean_time, "%a %b %d %H:%M:%S %Z %Y")
+
+  @classmethod
+  def date_cmd(_, *l):
+    return check_output(["date", *l]).decode('utf8').strip()
 
 class FLAT:
   path = "/home/kasra/notes"
@@ -181,7 +187,7 @@ class FLAT:
   def list_by_create_date(cls):
     def time_metadata(n):
       """get create time from metadata"""
-      return util.parse_time(FLAT.metadata(n)['Date'])
+      return util.parse_time_to_utc(FLAT.metadata(n)['Date'])
     return [p[0] for p in sorted([(n, time_metadata(n)) for n in cls.list()], key = lambda p: p[1])]
 
   @classmethod
@@ -346,8 +352,9 @@ class PARSER:
 
       if parse_msg:
         assert L.startswith("  - Date: ")
-        date = util.parse_time(L.split("- Date: ")[1])
-        date = datetime.datetime.strftime(date, "%H:%M:%S")
+
+        # use `date` to translate to current timezone because datetime in python sucks at timezones
+        date = util.date_cmd("-d", L.split("- Date: ")[1], "+%T")
         acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{escape(msg)}</div></div>')
         parse_msg = False
         msg = ""
@@ -589,7 +596,7 @@ class RENDER:
         before, uuid = l[:3], l[3:]  # 3 is the length of the annotation that git porcelain gives us
         acc.append((before, uuid))
 
-    acc_sorted = reversed(sorted(acc, key=lambda p: util.parse_time(FLAT.metadata(p[1])['Date'])))
+    acc_sorted = reversed(sorted(acc, key=lambda p: util.parse_time_to_utc(FLAT.metadata(p[1])['Date'])))
 
     acc = list()
     acc_untracked = list()
