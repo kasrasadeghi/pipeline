@@ -542,8 +542,6 @@ class RENDER:
     content = R._read_file(note)
     content = PARSER.parse_disc(content)
 
-    forward_links = R._section_forward_links(note)
-    backlinks = R._section_backward_links(note)
     bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{note}">note</a>')
 
     # compose html
@@ -552,7 +550,7 @@ class RENDER:
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
-                      f"{content}<pre>{forward_links}{backlinks}</pre></div>",
+                      f"{content}<pre></pre></div>",
                       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
