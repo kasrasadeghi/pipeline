@@ -827,8 +827,8 @@ def today():
 def yesterday():
   return redirect(FLAT.to_url(FLAT.to_disc(FLAT.yesterday())), code=302)
 
-@app.route("/note/<note>", methods=['GET', 'POST'])
-def get_note(note):
+@app.route("/note/<note_kind>", methods=['GET', 'POST'])
+def get_note(note_kind):
 
   # handle bar, which is in both discussion and note
   if request.method == 'POST':
@@ -838,27 +838,22 @@ def get_note(note):
     if 'edit' in request.form:
       FLAT.edit(request.form['edit'])
       return Response('', 204)
-    assert note.endswith(".disc")
+    assert note_kind.endswith(".disc")
 
+  note = note_kind[:note_kind.rfind('.')] + ".note"  # chop off extension, like ".blog" or ".disc"
 
   # handle discussion
-  if note.endswith(".disc"):
-    note_id = note[:-len(".disc")]
-    note = note_id + ".note"
-    disc = note_id + ".disc"
-    is_discussion = True
-
+  if note_kind.endswith(".disc"):
     # handle messages
     if request.method == 'POST':
       FLAT.handle_msg(note, request.form)
-      return redirect(f"/note/{disc}", code=302)
+      return redirect(f"/note/{note_kind}", code=302)
 
     # default case: handle rendering
     return RENDER.DISCUSSION(note)
 
-
   # handle notes
-  if note.endswith(".note"):
+  if note_kind.endswith(".note"):
     # default case: handle rendering
     return RENDER.NOTE(note)
 
