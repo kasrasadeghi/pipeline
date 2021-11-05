@@ -99,6 +99,10 @@ class FLAT:
     return os.path.isfile(cls.to_path(note))
 
   @classmethod
+  def get_index(cls):
+    return "4e0ce4ff-1663-49f9-8ced-30f91202ae08.note"  # hardcoded value, CONSIDER looking for "index" in Tags
+
+  @classmethod
   def collect_refs(cls, note):
     """@returns a list of notes this note references in the order they appear"""
     with open(cls.to_path(note)) as f:
@@ -511,6 +515,29 @@ class RENDER:
     return Response(result, mimetype="text/html")
 
   @classmethod
+  def INDEX(R):
+    note = FLAT.get_index()
+
+    content = R._read_file(note)
+
+    # parse references and links in file
+    content = PARSER.parse(content)
+
+    discussion = FLAT.to_disc(note)
+    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{discussion}">disc</a>')
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f"{content}{backlinks}</pre>",
+                      f'<form><input style="width: 80%" type="text" name="title"><input type="submit" value="New Note"/></form>'
+                      f"</body></html>"])
+    return Response(result, mimetype="text/html")
+
+  @classmethod
   def DISCUSSION(R, note):
     content = R._read_file(note)
     content = PARSER.parse_disc(content)
@@ -750,7 +777,9 @@ def to_root():
 def get_root():
   if 'title' in request.args and len(request.args['title'].strip()) != 0:
     return redirect(FLAT.to_url(FLAT.make_new(title=request.args['title'].strip())), code=302)
-  return render_template("index.html", style=RENDER.STYLE())
+
+  return RENDER.INDEX()
+
 
 @app.route("/all")
 def get_all():
