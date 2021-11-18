@@ -496,7 +496,9 @@ class RENDER:
     bar.append(f'<span> </span>')
     bar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
     bar.append(f'<span> </span>')
-    bar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>')
+    bar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>'
+               f'<span> </span>'
+               f'<a style="margin-left: 10px" href="/git/menu">git</a>')
     bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
 
     for extra in extras:
@@ -590,8 +592,6 @@ class RENDER:
                  f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
                  f'<span> </span>',
                  f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>'
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/git/menu">git</a>'
                  )
 
     line_height = 23;
