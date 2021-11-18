@@ -555,6 +555,39 @@ class RENDER:
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
 
+  @classmethod
+  def EDIT(R, note):
+    content = R._read_file(note)
+
+    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{note}">note</a>')
+
+    line_height = 23;
+
+    textarea_resize_script = """
+    function textarea_resize(el) {
+
+      // https://stackoverflow.com/questions/15195209/how-to-get-font-size-in-html
+      // https://stackoverflow.com/a/15195345
+      fontsize = window.getComputedStyle(el, null).getPropertyValue('font-size');
+      linecount = el.innerHTML.split(/\\n/).length;
+      el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
+    }
+    window.onload = () => { textarea_resize(document.getElementsByTagName("textarea")[0]); };
+    """
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f'<script>{textarea_resize_script}</script>'
+                      f'<form method="post">'
+                      f'<textarea oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      f'<input type="submit" value="Submit"/></form>',
+                      f"</body></html>"])
+    return Response(result, mimetype="text/html")
+
 
   @classmethod
   def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
