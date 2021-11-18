@@ -387,11 +387,11 @@ class RENDER:
        body { margin: 1% 2%; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
-             align-content: stretch; align-items: flex-start; overflow: hidden; }
+             align-content: stretch; align-items: flex-start; }
        pre { margin: 0px; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
-       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250);  }
+       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250); overflow-wrap: anywhere;}
        * { font-size: 18px; }
 
        .link-button {
@@ -507,7 +507,7 @@ class RENDER:
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
@@ -528,11 +528,11 @@ class RENDER:
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
-                      f"{content}{backlinks}</pre>",
+                      f"{content}</pre>",
                       f'<form><input style="width: 80%" type="text" name="title"><input type="submit" value="New Note"/></form>'
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
@@ -546,7 +546,7 @@ class RENDER:
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px"
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
