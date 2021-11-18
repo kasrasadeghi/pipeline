@@ -799,7 +799,7 @@ class RENDER:
     os.chdir(currdir)
 
     content = (
-      f"<pre><h1>$ git status --porcelain</h1>{output}</pre>")
+      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{output}</pre>')
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -818,7 +818,7 @@ class RENDER:
     os.chdir(currdir)
 
     content = (
-      f"<pre><h1>$ git status --porcelain</h1>{menu}</pre>"
+      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{output}</pre>'
       "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
       f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{FLAT.title(note)}'</h1>{output}</pre>")
 
