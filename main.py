@@ -854,8 +854,11 @@ def today():
 def yesterday():
   return redirect(FLAT.to_url(FLAT.to_disc(FLAT.yesterday())), code=302)
 
-@app.route("/note/<note_kind>", methods=['GET', 'POST'])
-def get_note(note_kind):
+@app.route("/note/<note>", methods=['GET', 'POST'])
+def get_note(note):
+
+  if not note.endswith(".note"): # /note/UUID.disc -> /disc/UUID.note
+    return redirect("/" + note[-4:] + "/" + note[:-5] + ".note")
 
   # handle bar, which is in both discussion and note
   if request.method == 'POST':
@@ -865,28 +868,31 @@ def get_note(note_kind):
     if 'edit' in request.form:
       FLAT.edit(request.form['edit'])
       return Response('', 204)
-    assert note_kind.endswith(".disc")
 
-  note = note_kind[:note_kind.rfind('.')] + ".note"  # chop off extension, like ".blog" or ".disc"
+    print("ERROR: unhandled POST request with form:")
+    pprint(request.form)
+    return Response('', 500)
 
-  # handle discussion
-  if note_kind.endswith(".disc"):
-    # handle messages
-    if request.method == 'POST':
-      FLAT.handle_msg(note, request.form)
-      return redirect(f"/note/{note_kind}", code=302)
+  # default case: handle rendering
+  return RENDER.NOTE(note)
 
-    # default case: handle rendering
-    return RENDER.DISCUSSION(note)
+@app.route("/blog/<note>")
+def get_blog(note):
+  return RENDER.BLOG(note)
 
-  # handle notes
-  if note_kind.endswith(".note"):
-    # default case: handle rendering
-    return RENDER.NOTE(note)
+@app.route("/disc/<note>", methods=["GET", "POST"])
+def get_disc(note):
+  # handle messages
+  if request.method == 'POST':
+    FLAT.handle_msg(note, request.form)
+    return redirect(f"/note/{note_kind}", code=302)
 
+  # default case: handle rendering
+  return RENDER.DISCUSSION(note)
 
-  # neither discussion nor note
-  assert(False)
+@app.route("/edit/<note>")
+def route_edit(note):
+  return RENDER.EDIT(note)
 
 @app.route("/graph")
 def get_graph():
