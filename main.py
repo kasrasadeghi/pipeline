@@ -71,6 +71,7 @@ class util:
   def date_cmd(_, *l):
     return check_output(["date", *l]).decode('utf8').strip()
 
+
 class FLAT:
   path = "/home/kasra/notes"
 
@@ -294,6 +295,7 @@ class FLAT:
       os.chdir(currdir)
       return Response('', 204)
 
+
 class PARSER:
 
   @classmethod
@@ -378,11 +380,13 @@ class PARSER:
 
     return "\n".join(acc)
 
+
 # END LIB
 
 # RENDER
 
 class RENDER:
+
   @classmethod
   def STYLE(_):
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
@@ -434,7 +438,6 @@ class RENDER:
          }}
        )
      </script>"""
-
 
   @classmethod
   def TEXT(R, title, content):
@@ -594,7 +597,6 @@ class RENDER:
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
 
-
   @classmethod
   def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
     """
@@ -648,7 +650,6 @@ class RENDER:
 
     return "".join(acc)
 
-
   @classmethod
   def _git_porcelain(R):
     status = check_output(['git', 'status', '--porcelain']).decode('utf-8')  # NO .strip() !
@@ -690,7 +691,6 @@ class RENDER:
     status = "\n".join(acc_untracked + acc)
 
     return status
-
 
   @classmethod
   def _git_status(R):
@@ -736,7 +736,6 @@ class RENDER:
     diff = check_output(['git', '-c', 'color.ui=always', 'diff', '--staged']).decode('utf8').strip()
     diff = R._parse_color(str(escape(diff)))
     return diff
-
 
   @classmethod
   def GIT(R):
@@ -802,6 +801,7 @@ class RENDER:
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
+
 # END RENDER
 
 # ROUTES
@@ -858,6 +858,7 @@ def tag(tag):
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
                      namefunc=FLAT.title)
 
+
 @app.route("/git", methods=['GET', 'POST'])
 def git_status():
   if 'POST' == request.method:
@@ -885,6 +886,7 @@ def git_diff(note):
 def git_diff_staged(note):
   return RENDER.GIT_DIFF(note, staged=True)
 
+
 @app.route("/today")
 def today():
   return redirect(FLAT.to_url(FLAT.to_disc(FLAT.today())), code=302)
@@ -892,6 +894,7 @@ def today():
 @app.route("/yesterday")
 def yesterday():
   return redirect(FLAT.to_url(FLAT.to_disc(FLAT.yesterday())), code=302)
+
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
@@ -932,6 +935,7 @@ def route_edit(note):
     return redirect(f"/edit/{note}", code=302)
 
   return RENDER.EDIT(note)
+
 
 @app.route("/graph")
 def get_graph():
@@ -1012,10 +1016,11 @@ def get_rm(rm):
       return Response(f.read(), mimetype="html")
     return Response(f.read(), mimetype="image/svg+xml")
 
+
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
-  print(request.headers)
-  print(request.json)
+  # print(request.headers)
+  # print(request.json)
   return Response('', 204)
 
 # END ROUTES
