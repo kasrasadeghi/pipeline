@@ -256,6 +256,13 @@ class FLAT:
       f.write("".join(lines[metadata_linenum:]))
 
   @classmethod
+  def handle_edit(_, note, form):
+
+    # read note
+    with open(FLAT.to_path(note), "w") as f:
+      f.write(form['text'])
+
+  @classmethod
   def _git_add(cls, note):
     currdir = os.getcwd()
     os.chdir(cls.path)
@@ -568,7 +575,6 @@ class RENDER:
 
       // https://stackoverflow.com/questions/15195209/how-to-get-font-size-in-html
       // https://stackoverflow.com/a/15195345
-      fontsize = window.getComputedStyle(el, null).getPropertyValue('font-size');
       linecount = el.innerHTML.split(/\\n/).length;
       el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
     }
@@ -583,7 +589,7 @@ class RENDER:
                       f'<h1 style="{title_style}">{title}</h1>',
                       f'<script>{textarea_resize_script}</script>'
                       f'<form method="post">'
-                      f'<textarea oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
                       f'<input type="submit" value="Submit"/></form>',
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
@@ -918,13 +924,17 @@ def get_disc(note):
   # handle messages
   if request.method == 'POST':
     FLAT.handle_msg(note, request.form)
-    return redirect(f"/note/{note_kind}", code=302)
+    return redirect(f"/disc/{note}", code=302)
 
   # default case: handle rendering
   return RENDER.DISCUSSION(note)
 
-@app.route("/edit/<note>")
+@app.route("/edit/<note>", methods=['GET', 'POST'])
 def route_edit(note):
+  if request.method == 'POST':
+    FLAT.handle_edit(note, request.form)
+    return redirect(f"/edit/{note}", code=302)
+
   return RENDER.EDIT(note)
 
 @app.route("/graph")
