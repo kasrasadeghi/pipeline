@@ -915,10 +915,6 @@ def get_note(note):
   # default case: handle rendering
   return RENDER.NOTE(note)
 
-@app.route("/blog/<note>")
-def get_blog(note):
-  return RENDER.BLOG(note)
-
 @app.route("/disc/<note>", methods=["GET", "POST"])
 def get_disc(note):
   # handle messages
