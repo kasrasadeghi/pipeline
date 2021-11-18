@@ -493,7 +493,9 @@ class RENDER:
     bar.append(f'</form>')
     bar.append(f'<button onclick="copy()">copy uuid</button>')
     bar.append(f'<a style="margin-left: 10px" href="/">root</a>')
+    bar.append(f'<span> </span>')
     bar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
+    bar.append(f'<span> </span>')
     bar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>')
     bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
 
@@ -512,8 +514,13 @@ class RENDER:
 
     forward_links = R._section_forward_links(note)
     backlinks = R._section_backward_links(note)
-    discussion = FLAT.to_disc(note)
-    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{discussion}">disc</a>')
+
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>',
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>',
+                 )
 
     # compose html
     title = FLAT.title(note)
@@ -533,8 +540,12 @@ class RENDER:
     # parse references and links in file
     content = PARSER.parse(content)
 
-    discussion = FLAT.to_disc(note)
-    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{discussion}">disc</a>')
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>',
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>',
+                 )
 
     # compose html
     title = FLAT.title(note)
@@ -552,7 +563,12 @@ class RENDER:
     content = R._read_file(note)
     content = PARSER.parse_disc(content)
 
-    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{note}">note</a>')
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
+                 f'<span> </span>'
+                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>'
+                 )
 
     # compose html
     title = FLAT.title(note)
@@ -569,7 +585,14 @@ class RENDER:
   def EDIT(R, note):
     content = R._read_file(note)
 
-    bar = R._bar(note, f'<a style="margin-left: 10px" href="/note/{note}">note</a>')
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>'
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/git/menu">git</a>'
+                 )
 
     line_height = 23;
 
