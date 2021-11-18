@@ -550,7 +550,7 @@ class RENDER:
     result = "".join([f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
-                      f"{content}<pre></pre></div>",
+                      f"{content}</div>",
                       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
