@@ -680,34 +680,47 @@ class RENDER:
     acc = list()
 
     for l in status.splitlines():
-      if (i := l.rfind(".note")) != -1:
+      if (i := l.rfind(".note")) != -1 and '/' not in l:
         before, uuid = l[:3], l[3:]  # 3 is the length of the annotation that git porcelain gives us
-        acc.append((before, uuid))
+        acc.append((before, uuid, "uuid"))
 
-    acc_sorted = reversed(sorted(acc, key=lambda p: util.parse_time_to_utc(FLAT.metadata(p[1])['Date'])))
+    def comparable_date(p):
+      return util.parse_time_to_utc(FLAT.metadata(p[1])['Date'])
+
+    acc_sorted = list(reversed(sorted(acc, key=comparable_date)))
+
+    # gather the non-uuid notes (for example in raw/)
+    for l in status.splitlines():
+      if l.rfind(".note") == -1 or '/' in l:
+        before, filename = l[:3], l[3:]
+        acc_sorted.append((before, filename, "non-uuid"))
 
     acc = list()
     acc_untracked = list()
-    for (before, uuid) in acc_sorted:
+    for (before, filename, is_uuid) in acc_sorted:
+      filename_repr = f'<a href="/note/{filename}">{FLAT.title(filename)}</a>' \
+        if is_uuid == 'uuid' else filename
+
       if '??' in before:
         el = (
           before +
           f'<form style="display:inline "action="/git" method="post">'
-          f'<button class="link-button" name="add" value="{uuid}">add</button> '
-          f'</form>'
-          f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>'
+          f'<button class="link-button" name="add" value="{filename}">add</button> '
+          f'</form>' +
+          filename_repr
         )
         acc_untracked.append(el)
+
       else:
         el = (
           before +
-          f'<a href="/git/diff/{uuid}">work</a> '
+          f'<a href="/git/diff/{filename}">work</a> '
           f'<form style="display:inline "action="/git" method="post">'
-          f'<button class="link-button" name="unstage" value="{uuid}">{str(escape("<"))}unstage</button> '
-          f'<button class="link-button" name="add" value="{uuid}">add{str(escape(">"))}</button> '
+          f'<button class="link-button" name="unstage" value="{filename}">{str(escape("<"))}unstage</button> '
+          f'<button class="link-button" name="add" value="{filename}">add{str(escape(">"))}</button> '
           f'</form>'
-          f'<a href="/git/diff-staged/{uuid}">stage</a>   '
-          f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>'
+          f'<a href="/git/diff-staged/{filename}">stage</a>   ' +
+          filename_repr
         )
         acc.append(el)
 
@@ -795,32 +808,34 @@ class RENDER:
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
-    output = R._git_porcelain()
+    menu = R._git_porcelain()
     os.chdir(currdir)
 
     content = (
-      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{output}</pre>')
+      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>')
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
   @classmethod
-  def GIT_DIFF(R, note, staged):
-    title = "Git Diff: " + FLAT.title(note)
+  def GIT_DIFF(R, filename, staged):
+    is_uuid = not ('/' in filename or not filename.endswith('.note'))
+    filename_title = (FLAT.title(filename) if is_uuid else filename)
+    title = "Git Diff: " + filename_title
     header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
     if staged:
-      output = R._git_diff_staged(note)
+      output = R._git_diff_staged(filename)
     else:
-      output = R._git_diff_single(note)
+      output = R._git_diff_single(filename)
     menu = R._git_porcelain()
     os.chdir(currdir)
 
     content = (
-      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{output}</pre>'
+      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>'
       "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
-      f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{FLAT.title(note)}'</h1>{output}</pre>")
+      f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{filename_title}'</h1>{output}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -901,13 +916,13 @@ def git_status():
 def git_menu():
   return RENDER.GIT_MENU()
 
-@app.route("/git/diff/<note>")
-def git_diff(note):
-  return RENDER.GIT_DIFF(note, staged=False)
+@app.route("/git/diff/<path:filename>")
+def git_diff(filename):
+  return RENDER.GIT_DIFF(filename, staged=False)
 
-@app.route("/git/diff-staged/<note>")
-def git_diff_staged(note):
-  return RENDER.GIT_DIFF(note, staged=True)
+@app.route("/git/diff-staged/<path:filename>")
+def git_diff_staged(filename):
+  return RENDER.GIT_DIFF(filename, staged=True)
 
 
 @app.route("/today")
