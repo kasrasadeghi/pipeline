@@ -604,7 +604,7 @@ class RENDER:
       linecount = el.innerHTML.split(/\\n/).length;
       el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
     }
-    window.onload = () => { textarea_resize(document.getElementsByTagName("textarea")[0]); };
+    // window.onload = () => { textarea_resize(document.getElementsByTagName("textarea")[0]); };
     """
 
     # compose html
@@ -615,7 +615,8 @@ class RENDER:
                       f'<h1 style="{title_style}">{title}</h1>',
                       f'<script>{textarea_resize_script}</script>'
                       f'<form method="post">'
-                      f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      f'<textarea name="text" style="height: calc(85vh);line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
                       f'<input type="submit" value="Submit"/></form>',
                       f"</body></html>"])
     return Response(result, mimetype="text/html")
