@@ -2,7 +2,6 @@ import os  # listdir, stat
 import os.path  # isfile
 import sys  # argv
 import json  # load, dump
-from functools import cache
 import datetime
 from subprocess import check_output
 
