@@ -11,35 +11,11 @@ from pprint import pprint
 
 app = Flask(__name__)
 
+def kaz_import(filepath):
+  with open(filepath) as f:
+    exec(f.read(), globals())
+
 # LIB
-
-class RemarkableNoteManager:
-  root = "/home/kasra/projects/remarkable-kaz"
-
-  def _temp(self, filename):
-    return self.root + "/temp/" + filename
-
-  def namemap(self):
-    with open(self._temp("namemap.data")) as f:
-      namemap = json.load(f)
-      uuidmap = {v: k for k, v in namemap.items()}
-      return (namemap, uuidmap)
-
-  def notebooks(self):
-    with open(self._temp("notebooks.data")) as f:
-      return json.load(f)
-
-  def copied_uuids(self):
-    return [x[:-len(".metadata")] for x in os.listdir("temp") if x.endswith("metadata")]
-
-  def pages(self):
-    result = dict()
-    for notebook_uuid in self.copied_uuids():
-      with open(self._temp(f"{notebook_uuid}.content")) as f:
-        data[notebook_uuid] = json.load(f)["pages"]
-    return result
-
-RM = RemarkableNoteManager()
 
 # this class is a namespace
 class util:
@@ -974,86 +950,8 @@ def route_edit(note):
 
   return RENDER.EDIT(note)
 
-
-@app.route("/graph")
-def get_graph():
-  def title(note):
-    if note in FLAT.list():
-      return FLAT.title(note)
-    else:
-      return note
-
-  def link(note):
-    if note in FLAT.list():
-      return f'<a href="{FLAT.to_url(note)}">{FLAT.title(note)}</a>'
-    else:
-      return note
-
-  def legible_setdict(d):
-    legible_result = list()
-    for key, value in d.items():
-      legible_result.append(link(key) + ":\n")
-      ps = [(link(x), title(x)) for x in value]
-      ps.sort(key=lambda p: p[1])
-      for p in ps:
-        legible_result.append("  " + p[0] + "\n")
-    return "".join(legible_result)
-
-  backlinks, refmap = FLAT.backlinks_refmap()
-
-  limit = len(refmap)
-  if 'limit' in request.args:
-    limit = int(request.args.get('limit'))
-  actual = list(refmap)[0:limit]
-
-  unionfind = {x: x for x in actual}
-
-  def find(note):
-    if note == unionfind[note]:
-      return note
-    return find(unionfind[note])
-
-  def union(note, other):
-    other_rep = find(other)
-    children = set()
-    for child, parent in unionfind.items():
-      if parent == other_rep:
-        children.add(child)
-    note_rep = find(note)
-    for child in children:
-      unionfind[child] = note_rep
-
-  for note in actual:
-    for other in refmap[note]:
-      if other in actual and find(note) != find(other):
-        union(note, other)
-
-    if note in backlinks:
-      for other in backlinks[note]:
-        if other in actual and find(note) != find(other):
-          union(note, other)
-
-  result = dict()
-  for key, value in unionfind.items():
-    if value not in result:
-      result[value] = set()
-    result[value].add(key)
-
-  return RENDER.TEXT("refs", legible_setdict(result))
-
-
-@app.route("/rm/")
-def get_rm_root():
-  with open(f"/home/kasra/projects/remarkable-kaz/dist/index.html") as f:
-    return Response(f.read(), mimetype="html")
-
-@app.route("/rm/<rm>")
-def get_rm(rm):
-  with open(f"/home/kasra/projects/remarkable-kaz/dist/{rm}") as f:
-    if rm.endswith("html"):
-      return Response(f.read(), mimetype="html")
-    return Response(f.read(), mimetype="image/svg+xml")
-
+kaz_import('graph.py')
+kaz_import('rm.py')
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
