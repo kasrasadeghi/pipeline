@@ -416,7 +416,7 @@ class RENDER:
 
   @classmethod
   def TEXT(R, title, content):
-    return Response(f"<!DOCTYPE hmtl><html><head>{R.STYLE()}<title>{title}</title></head>"
+    return Response(f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>"
                     + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
 
   @classmethod
@@ -649,6 +649,8 @@ class RENDER:
 
     return "".join(acc)
 
+
+class GIT:
   @classmethod
   def _git_porcelain(R):
     status = check_output(['git', 'status', '--porcelain']).decode('utf-8')  # NO .strip() !
@@ -750,9 +752,9 @@ class RENDER:
     return diff
 
   @classmethod
-  def GIT(R):
+  def RENDER_GIT(R):
     title = "Git Status"
-    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
@@ -778,9 +780,9 @@ class RENDER:
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
   @classmethod
-  def GIT_MENU(R):
+  def RENDER_GIT_MENU(R):
     title = "Git Menu"
-    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
@@ -793,11 +795,11 @@ class RENDER:
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
   @classmethod
-  def GIT_DIFF(R, filename, staged):
+  def RENDER_GIT_DIFF(R, filename, staged):
     is_uuid = not ('/' in filename or not filename.endswith('.note'))
     filename_title = (FLAT.title(filename) if is_uuid else filename)
     title = "Git Diff: " + filename_title
-    header = f"<!DOCTYPE html><html><head>{R.STYLE()}<title>{title}</title></head><body>"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
     os.chdir('/home/kasra/notes')
@@ -814,7 +816,6 @@ class RENDER:
       f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{filename_title}'</h1>{output}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
-
 
 # END RENDER
 
@@ -879,19 +880,19 @@ def git_status():
     pprint(request.form)
     return Response('', 204)
 
-  return RENDER.GIT()
+  return GIT.RENDER_GIT()
 
 @app.route("/git/menu")
 def git_menu():
-  return RENDER.GIT_MENU()
+  return GIT.RENDER_GIT_MENU()
 
 @app.route("/git/diff/<path:filename>")
 def git_diff(filename):
-  return RENDER.GIT_DIFF(filename, staged=False)
+  return GIT.RENDER_GIT_DIFF(filename, staged=False)
 
 @app.route("/git/diff-staged/<path:filename>")
 def git_diff_staged(filename):
-  return RENDER.GIT_DIFF(filename, staged=True)
+  return GIT.RENDER_GIT_DIFF(filename, staged=True)
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):
