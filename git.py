@@ -1,6 +1,42 @@
-# RENDER
 
 class GIT:
+  # HANDLE
+
+  @classmethod
+  def _handle_add(cls, note):
+    currdir = os.getcwd()
+    os.chdir(cls.path)
+
+    if cls.exists(note):
+      check_output(['git', 'add', note]).decode('utf8').strip()
+
+      os.chdir(currdir)
+      return redirect(f"/git/diff-staged/{note}", code=302)
+
+    else:
+      print(f"ERROR: note '{note}' doesn't exist to 'git add'")
+      os.chdir(currdir)
+      return Response('', 204)
+
+  @classmethod
+  def _handle_unstage(cls, note):
+    currdir = os.getcwd()
+    os.chdir(cls.path)
+
+    if cls.exists(note):
+      check_output(['git', 'restore', '--staged', note]).decode('utf8').strip()
+
+      os.chdir(currdir)
+      return redirect(f"/git/diff/{note}", code=302)
+
+    else:
+      print(f"ERROR: note '{note}' doesn't exist to 'git add'")
+      os.chdir(currdir)
+      return Response('', 204)
+
+  # END HANDLE
+
+  # RENDER
   @classmethod
   def _git_porcelain(R):
     status = check_output(['git', 'status', '--porcelain']).decode('utf-8')  # NO .strip() !
@@ -167,7 +203,7 @@ class GIT:
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
-# END RENDER
+  # END RENDER
 
 # ROUTES
 
@@ -175,10 +211,10 @@ class GIT:
 def git_status():
   if 'POST' == request.method:
     if 'add' in request.form:
-      return FLAT._git_add(request.form['add'])
+      return GIT._handle_add(request.form['add'])
 
     if 'unstage' in request.form:
-      return FLAT._git_unstage(request.form['unstage'])
+      return GIT._handle_unstage(request.form['unstage'])
 
     print("ERROR: unhandled request with form: ")
     pprint(request.form)
