@@ -275,15 +275,200 @@ class FLAT_PARSER:
     return "\n".join(acc)
 # END FLAT_PARSER
 
+
+class FLAT_RENDER:
+
+  @classmethod
+  def TEXT(R, title, content):
+    return Response(f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>"
+                    + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
+
+  @classmethod
+  def _render_link(R, note):
+    link = FLAT.to_url(note)
+    title = FLAT.title(note)
+    return f'- <a href="{link}">{title}</a>'
+
+  @classmethod
+  def _section_forward_links(R, note):
+    forward_link_list = FLAT.collect_refs(note)
+    if 0 != len(forward_link_list):
+      return "\n\n--- LINKS ---\n" + "\n".join([R._render_link(L) for L in forward_link_list])
+    else:
+      return ""
+
+  @classmethod
+  def _section_backward_links(R, note):
+    backlink_map = FLAT.backlinks_refmap()[0]
+    if note in backlink_map:
+      return "\n\n--- BACKLINKS ---\n" + "\n".join([R._render_link(L) for L in backlink_map[note]])
+    else:
+      return ""
+
+  @classmethod
+  def _bar(R, note, *extras):
+    bar = list()
+    bar.append(f'<div style="display: flex;align-items:baseline">')
+    bar.append(f'<form method="post">')
+    bar.append(f'<button name="edit" value="{note}">edit</button>')
+    bar.append(f'<button name="open" value="{note}">open</button>')
+    bar.append(f'</form>')
+    bar.append(f'<button onclick="copy()">copy uuid</button>')
+    bar.append(f'<a style="margin-left: 10px" href="/">root</a>')
+    bar.append(f'<span> </span>')
+    bar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
+    bar.append(f'<span> </span>')
+    bar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>'
+               f'<span> </span>'
+               f'<a style="margin-left: 10px" href="/git/menu">git</a>')
+    bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
+
+    for extra in extras:
+      bar.append(extra)
+
+    bar.append(f'</div>')
+    return "".join(bar)
+
+  @classmethod
+  def NOTE(R, note):
+    content = util.read_file(FLAT.to_path(note))
+
+    # parse references and links in file
+    content = FLAT_PARSER.parse(content)
+
+    forward_links = R._section_forward_links(note)
+    backlinks = R._section_backward_links(note)
+
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>',
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>',
+                 )
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f"{content}{forward_links}{backlinks}</pre></body></html>"])
+    return Response(result, mimetype="text/html")
+
+  @classmethod
+  def INDEX(R):
+    note = FLAT.get_index()
+
+    content = util.read_file(FLAT.to_path(note))
+
+    # parse references and links in file
+    content = FLAT_PARSER.parse(content)
+
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>',
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>',
+                 )
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f"{content}</pre>",
+                      f'<form><input style="width: 80%" type="text" name="title"><input type="submit" value="New Note"/></form>'
+                      f"</body></html>"])
+    return Response(result, mimetype="text/html")
+
+  @classmethod
+  def DISCUSSION(R, note):
+    content = util.read_file(FLAT.to_path(note))
+    content = FLAT_PARSER.parse_disc(content)
+
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
+                 f'<span> </span>'
+                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>'
+                 )
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f"{content}</div>",
+                      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
+                      f"</body></html>"])
+    return Response(result, mimetype="text/html")
+
+  @classmethod
+  def EDIT(R, note):
+    content = util.read_file(FLAT.to_path(note))
+
+    bar = R._bar(note,
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
+                 f'<span> </span>',
+                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>'
+                 )
+
+    line_height = 23;
+
+    textarea_resize_script = """
+    function textarea_resize(el) {
+
+      // https://stackoverflow.com/questions/15195209/how-to-get-font-size-in-html
+      // https://stackoverflow.com/a/15195345
+      linecount = el.innerHTML.split(/\\n/).length;
+      el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
+    }
+    // window.onload = () => { textarea_resize(document.getElementsByTagName("textarea")[0]); };
+    """
+
+    # compose html
+    title = FLAT.title(note)
+    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
+    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
+                      f"<body>{bar}",
+                      f'<h1 style="{title_style}">{title}</h1>',
+                      f'<script>{textarea_resize_script}</script>'
+                      f'<form method="post">'
+                      #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      f'<textarea name="text" style="height: calc(85vh);line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      f'<input type="submit" value="Submit"/></form>',
+                      f"</body></html>"])
+    return Response(result, mimetype="text/html")
+
+  @classmethod
+  def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
+    """
+    @param colsfunc - returns content for the other columns in this item's row in a list
+    """
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
+    body = """<table style="table-layout: fixed; width: 100%">"""
+    for i in items:
+      td_style = '"text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"'
+      columns = "".join(map(lambda x: f"<td style={td_style}>" + x + "</td>", colsfunc(i)))
+      body += f'<tr><td style={td_style}><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li>'
+    body += "</ul>"
+    footer = "</body></html>"
+    return Response(header + body + footer, mimetype="text/html")
+
+# END FLAT RENDER
+
 @app.route("/all")
 def get_all():
-  return RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url,
+  return FLAT_RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
                      namefunc=FLAT.title)
 
 @app.route("/recents")
 def recents():
-  return RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
+  return FLAT_RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
                      title="Recent Notes",
                      linkfunc=FLAT.to_url,
@@ -293,7 +478,7 @@ def recents():
 @app.route("/creation")
 def creation():
   """returns a list of notes by creation date"""
-  return RENDER.LIST(reversed(FLAT.list_by_create_date()),
+  return FLAT_RENDER.LIST(reversed(FLAT.list_by_create_date()),
                      title="Recent Notes",
                      linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
@@ -302,7 +487,7 @@ def creation():
 
 @app.route("/tag/<tag>")
 def tag(tag):
-  return RENDER.LIST(reversed([x for x in FLAT.list_by_create_date() if 'Tags' in FLAT.metadata(x) and tag in set(FLAT.metadata(x)['Tags'].split())]),
+  return FLAT_RENDER.LIST(reversed([x for x in FLAT.list_by_create_date() if 'Tags' in FLAT.metadata(x) and tag in set(FLAT.metadata(x)['Tags'].split())]),
                      title="Tag: " + tag,
                      linkfunc=FLAT.to_url,
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
@@ -329,7 +514,7 @@ def get_note(note):
     return Response('', 500)
 
   # default case: handle rendering
-  return RENDER.NOTE(note)
+  return FLAT_RENDER.NOTE(note)
 
 @app.route("/disc/<note>", methods=["GET", "POST"])
 def get_disc(note):
@@ -339,7 +524,7 @@ def get_disc(note):
     return redirect(f"/disc/{note}", code=302)
 
   # default case: handle rendering
-  return RENDER.DISCUSSION(note)
+  return FLAT_RENDER.DISCUSSION(note)
 
 @app.route("/edit/<note>", methods=['GET', 'POST'])
 def route_edit(note):
@@ -347,4 +532,16 @@ def route_edit(note):
     FLAT.handle_edit(note, request.form)
     return redirect(f"/edit/{note}", code=302)
 
-  return RENDER.EDIT(note)
+  return FLAT_RENDER.EDIT(note)
+
+
+@app.route("/index.html")
+def to_root():
+  return redirect("/", code=302)
+
+@app.route("/")
+def get_root():
+  if 'title' in request.args and len(request.args['title'].strip()) != 0:
+    return redirect(FLAT.to_url(FLAT.make_new(title=request.args['title'].strip())), code=302)
+
+  return FLAT_RENDER.INDEX()
