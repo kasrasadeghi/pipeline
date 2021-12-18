@@ -166,6 +166,12 @@ kaz_import('journal.py')
 kaz_import('graph.py')
 kaz_import('rm.py')
 
+kaz_import('discussion.py')
+kaz_import('parser.py')
+kaz_import('plan.py')
+kaz_import('search.py')
+
+
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
   # print(request.headers)
