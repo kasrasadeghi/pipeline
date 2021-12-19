@@ -181,9 +181,9 @@ class GIT:
     untracked = "".join(untracked_files)
 
     content = (f"<pre><h1>$ git status</h1>{status}</pre>" +
-               "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
+               RENDER.bar() +
                f"<pre><h1>$ git diff</h1>{diff}</pre>" +
-               "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>" +
+               RENDER.bar() +
                f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
@@ -213,8 +213,8 @@ class GIT:
     os.chdir(currdir)
 
     content = (
-      R._git_menu()
-      "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
+      R._git_menu() +
+      RENDER.bar() +
       f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{filename_title}'</h1>{output}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
@@ -231,8 +231,8 @@ class GIT:
     os.chdir(currdir)
 
     content = (
-      R._git_menu()
-      "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
+      R._git_menu() +
+      RENDER.bar() +
       f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
