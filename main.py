@@ -156,6 +156,11 @@ class RENDER:
 
     return "".join(acc)
 
+
+  @classmethod
+  def bar(cls):
+    return "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
+
 # END RENDER
 
 # ROUTES
