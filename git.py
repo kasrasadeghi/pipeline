@@ -5,9 +5,9 @@ class GIT:
   @classmethod
   def _handle_add(cls, note):
     currdir = os.getcwd()
-    os.chdir(cls.path)
+    os.chdir(FLAT.path)
 
-    if cls.exists(note):
+    if FLAT.exists(note):
       check_output(['git', 'add', note]).decode('utf8').strip()
 
       os.chdir(currdir)
@@ -21,9 +21,9 @@ class GIT:
   @classmethod
   def _handle_unstage(cls, note):
     currdir = os.getcwd()
-    os.chdir(cls.path)
+    os.chdir(FLAT.path)
 
-    if cls.exists(note):
+    if FLAT.exists(note):
       check_output(['git', 'restore', '--staged', note]).decode('utf8').strip()
 
       os.chdir(currdir)
@@ -33,6 +33,18 @@ class GIT:
       print(f"ERROR: note '{note}' doesn't exist to 'git add'")
       os.chdir(currdir)
       return Response('', 204)
+
+  @classmethod
+  def _handle_commit(cls, message):
+    currdir = os.getcwd()
+    os.chdir(FLAT.path)
+
+    check_output(['git', 'commit', '-m', message]).decode('utf8').strip()
+
+    os.chdir(currdir)
+
+    return Response('', 204)
+
 
   # END HANDLE
 
@@ -203,9 +215,58 @@ class GIT:
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
+  @classmethod
+  def RENDER_GIT_STAGE(R):
+    title = "Git Stage"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir('/home/kasra/notes')
+
+    output = R._git_stage()
+    menu = R._git_porcelain()
+    os.chdir(currdir)
+
+    content = (
+      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>'
+      "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
+      f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
+
+  @classmethod
+  def RENDER_GIT_COMMIT(R):
+    title = "Git Commit"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir('/home/kasra/notes')
+    output = R._git_stage()
+    menu = R._git_porcelain()
+    os.chdir(currdir)
+
+    content = (
+      f'<pre><h1>return to <a href="/git/menu"> git status --porcelain </a></h1></pre>'
+      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="commit_message"></form>'
+      f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
   # END RENDER
 
 # ROUTES
+
+@app.route("/git/commit", methods=['GET', 'POST'])
+def git_commit():
+  if 'POST' == request.method:
+    if 'commit_message' in request.form:
+      return GIT._handle_commit(request.form['commit_message'])
+
+    print("ERROR: unhandled request with form: ")
+    pprint(request.form)
+    return Response('', 204)
+
+  return GIT.RENDER_GIT_COMMIT()
+
 
 @app.route("/git", methods=['GET', 'POST'])
 def git_status():
@@ -221,6 +282,10 @@ def git_status():
     return Response('', 204)
 
   return GIT.RENDER_GIT()
+
+@app.route("/git/stage")
+def git_stage():
+  return GIT.RENDER_GIT_STAGE()
 
 @app.route("/git/menu")
 def git_menu():
