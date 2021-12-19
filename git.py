@@ -161,6 +161,10 @@ class GIT:
     return f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>'
 
   @classmethod
+  def _cmd(R, cmd, output):
+    return f"<pre><h1>$ {cmd}</h1>{output}</pre>"
+
+  @classmethod
   def RENDER_GIT(R):
     title = "Git Status"
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
@@ -180,9 +184,9 @@ class GIT:
                              '<span style="color: green">' + str(escape(untracked_files[-1])) + "</span>\n")
     untracked = "".join(untracked_files)
 
-    content = (f"<pre><h1>$ git status</h1>{status}</pre>" +
+    content = (R._cmd("git status", status) +
                RENDER.bar() +
-               f"<pre><h1>$ git diff</h1>{diff}</pre>" +
+               R._cmd("git diff", diff) +
                RENDER.bar() +
                f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
 
@@ -193,7 +197,13 @@ class GIT:
     title = "Git Menu"
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
-    content = R._git_menu()
+    content = (
+      R._git_menu() +
+      '<div style="margin-top: 8px">'
+      f'<a href="/git" class="link-button">overview</a>' +
+      f'<a href="/git/stage" class="link-button">stage</a>' +
+      "</div>"
+    )
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -215,7 +225,8 @@ class GIT:
     content = (
       R._git_menu() +
       RENDER.bar() +
-      f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{filename_title}'</h1>{output}</pre>")
+      R._cmd(f"git diff {'--staged ' if staged else ''}'{filename_title}'", output)
+    )
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -233,7 +244,9 @@ class GIT:
     content = (
       R._git_menu() +
       RENDER.bar() +
-      f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
+      f'<a href="/git/commit" class="link-button">commit</a>' +
+      R._cmd("git diff --staged", output)
+    )
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -248,9 +261,9 @@ class GIT:
     os.chdir(currdir)
 
     content = (
-      f'<pre><h1>return to <a href="/git/menu">git menu</a></h1></pre>'
-      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="commit_message"></form>'
-      f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
+      f'<pre><h1>return to <a href="/git/menu">git menu</a></h1></pre>' +
+      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="commit_message"></form>' +
+      R._cmd("git diff --staged", output))
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
   # END RENDER
