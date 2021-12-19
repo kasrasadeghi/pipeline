@@ -130,13 +130,14 @@ class GIT:
 
   @classmethod
   def _git_diff_staged(R, note):
-    """the diff between working and stage"""
+    """the diff between stage and head"""
     diff = check_output(['git', '-c', 'color.ui=always', 'diff', '--staged', note]).decode('utf8').strip()
     diff = RENDER._parse_color(str(escape(diff)))
     return diff
 
   @classmethod
   def _git_diff(R):
+    """the diff between work and stage"""
     # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
     diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
     diff = RENDER._parse_color(str(escape(diff)))
