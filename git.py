@@ -108,7 +108,7 @@ class GIT:
   def _git_status(R):
     status = check_output(['git', 'status']).decode('utf8').strip()
 
-    UUID_LEN = len("2e62fd14-9b3a-4275-9a39-7bf3d6b488c7.note") # off by one lol
+    UUID_LEN = len("2e62fd14-9b3a-4275-9a39-7bf3d6b488c7.note")
 
     acc = list()
     for l in status.splitlines():
@@ -151,12 +151,22 @@ class GIT:
     return diff
 
   @classmethod
+  def _git_menu(R):
+
+    currdir = os.getcwd()
+    os.chdir(FLAT.path)
+    menu = R._git_porcelain()
+    os.chdir(currdir)
+
+    return f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>'
+
+  @classmethod
   def RENDER_GIT(R):
     title = "Git Status"
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
-    os.chdir('/home/kasra/notes')
+    os.chdir(FLAT.path)
     status = R._git_status()
     diff = R._git_diff()
     untracked_filenames = check_output(["git", "ls-files", "--others", "--exclude-standard"]).decode('utf8').strip()
@@ -183,13 +193,7 @@ class GIT:
     title = "Git Menu"
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
-    currdir = os.getcwd()
-    os.chdir('/home/kasra/notes')
-    menu = R._git_porcelain()
-    os.chdir(currdir)
-
-    content = (
-      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>')
+    content = R._git_menu()
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
@@ -201,16 +205,15 @@ class GIT:
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
-    os.chdir('/home/kasra/notes')
+    os.chdir(FLAT.path)
     if staged:
       output = R._git_diff_staged(filename)
     else:
       output = R._git_diff_single(filename)
-    menu = R._git_porcelain()
     os.chdir(currdir)
 
     content = (
-      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>'
+      R._git_menu()
       "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
       f"<pre><h1>$ git diff {'--staged ' if staged else ''}'{filename_title}'</h1>{output}</pre>")
 
@@ -222,14 +225,13 @@ class GIT:
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
-    os.chdir('/home/kasra/notes')
+    os.chdir(FLAT.path)
 
     output = R._git_stage()
-    menu = R._git_porcelain()
     os.chdir(currdir)
 
     content = (
-      f'<pre><h1>$ <a href="/git/menu">git status --porcelain</a></h1>{menu}</pre>'
+      R._git_menu()
       "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
       f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
 
@@ -241,13 +243,12 @@ class GIT:
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
-    os.chdir('/home/kasra/notes')
+    os.chdir(FLAT.path)
     output = R._git_stage()
-    menu = R._git_porcelain()
     os.chdir(currdir)
 
     content = (
-      f'<pre><h1>return to <a href="/git/menu"> git status --porcelain </a></h1></pre>'
+      f'<pre><h1>return to <a href="/git/menu">git menu</a></h1></pre>'
       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="commit_message"></form>'
       f"<pre><h1>$ git diff --staged</h1>{output}</pre>")
 
