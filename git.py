@@ -1,9 +1,6 @@
-
-class GIT:
-  # HANDLE
-
+class GIT_HANDLE:
   @classmethod
-  def _handle_add(cls, note):
+  def _add(cls, note):
     currdir = os.getcwd()
     os.chdir(FLAT.path)
 
@@ -19,7 +16,7 @@ class GIT:
       return Response('', 204)
 
   @classmethod
-  def _handle_unstage(cls, note):
+  def _unstage(cls, note):
     currdir = os.getcwd()
     os.chdir(FLAT.path)
 
@@ -35,7 +32,7 @@ class GIT:
       return Response('', 204)
 
   @classmethod
-  def _handle_commit(cls, message):
+  def _commit(cls, message):
     currdir = os.getcwd()
     os.chdir(FLAT.path)
 
@@ -45,10 +42,10 @@ class GIT:
 
     return Response('', 204)
 
+# END HANDLE
 
-  # END HANDLE
-
-  # RENDER
+# RENDER
+class GIT:
   @classmethod
   def _git_porcelain(R):
     status = check_output(['git', 'status', '--porcelain']).decode('utf-8')  # NO .strip() !
@@ -274,7 +271,7 @@ class GIT:
 def git_commit():
   if 'POST' == request.method:
     if 'commit_message' in request.form:
-      return GIT._handle_commit(request.form['commit_message'])
+      return GIT_HANDLE._commit(request.form['commit_message'])
 
     print("ERROR: unhandled request with form: ")
     pprint(request.form)
@@ -287,10 +284,10 @@ def git_commit():
 def git_status():
   if 'POST' == request.method:
     if 'add' in request.form:
-      return GIT._handle_add(request.form['add'])
+      return GIT_HANDLE._add(request.form['add'])
 
     if 'unstage' in request.form:
-      return GIT._handle_unstage(request.form['unstage'])
+      return GIT_HANDLE._unstage(request.form['unstage'])
 
     print("ERROR: unhandled request with form: ")
     pprint(request.form)
