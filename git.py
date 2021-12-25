@@ -150,9 +150,32 @@ class GIT:
   @classmethod
   def _git_log(R):
     diff = check_output(['git', '-c', 'color.ui=always', '--no-pager', 'log', '--decorate=short']).decode('utf8')
-    diff = RENDER._parse_color(str(escape(diff)))
+
+    # add links for every commit
+    prefix = RENDER.ANSI() + "33m" + "commit "
+    len_prefix = len(prefix)
+    len_sha = len("da365d2d6a9c6c7dc5a748d382eab0434f20c04c")
+    sha_start = len_prefix
+    sha_end = sha_start + len_sha
+    acc = list()
+    for L in diff.splitlines():
+      if L.startswith(prefix):
+        pre, sha, post = str(escape(L[:sha_start])), str(escape(L[sha_start:sha_end])), str(escape(L[sha_end:]))
+        print(sha)
+        acc.append(pre + f'<a href="/git/show/{sha}">{sha}</a>' +post)
+      else:
+        acc.append(str(escape(L)))
+
+    diff = "\n".join(acc)
+    diff = RENDER._parse_color(diff)
+
     return diff
 
+  @classmethod
+  def _git_show_commit(R, sha):
+    output = check_output(['git', '-c', 'color.ui=always', 'show', sha]).decode('utf8')
+    output = RENDER._parse_color(str(escape(output)))
+    return output
 
   @classmethod
   def _git_menu(R):
@@ -206,6 +229,7 @@ class GIT:
       '<div style="margin-top: 8px">'
       f'<a href="/git" class="link-button">overview</a>' +
       f'<a href="/git/stage" class="link-button">stage</a>' +
+      f'<a href="/git/log" class="link-button">log</a>' +
       "</div>"
     )
 
@@ -271,9 +295,28 @@ class GIT:
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
 
+
+  @classmethod
+  def RENDER_GIT_SHOW(R, sha):
+    """the @param sha is the specific sha of the commit you want to render"""
+    title = "Git Commit"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir(FLAT.path)
+    output = R._git_show_commit(sha)
+    os.chdir(currdir)
+
+    content = (
+      f'<pre><h1>return to <a href="/git/menu">git menu</a></h1></pre>' +
+      R._cmd("git show", output))
+    # ^ TODO have the commit's first line in this, maybe along with the sha
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
+
   @classmethod
   def RENDER_GIT_LOG(R):
-    title = "Git Commit"
+    title = "Git Log"
     header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
 
     currdir = os.getcwd()
@@ -303,6 +346,9 @@ def git_commit():
 
   return GIT.RENDER_GIT_COMMIT()
 
+@app.route("/git/show/<sha>")
+def git_show_commit(sha):
+  return GIT.RENDER_GIT_SHOW(sha)
 
 @app.route("/git", methods=['GET', 'POST'])
 def git_status():
