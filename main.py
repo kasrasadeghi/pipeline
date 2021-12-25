@@ -119,6 +119,10 @@ class RENDER:
      </script>"""
 
   @classmethod
+  def ANSI(R):
+    return '\x1B['
+
+  @classmethod
   def _parse_color(R, s):
     original = s
 
@@ -142,7 +146,7 @@ class RENDER:
          '7;31m': '<span style="background-color:red">',
          }
 
-    ANSI = '\x1B['
+    ANSI = R.ANSI()
     while True:
       if -1 == s.find(ANSI):
         break
@@ -161,6 +165,8 @@ class RENDER:
 
     return "".join(acc)
 
+  # TODO CONSIDER making an "uncolored" function, that takes away the ascii
+  #               codes OR the coloring spans from a string
 
   @classmethod
   def bar(cls):
