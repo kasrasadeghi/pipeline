@@ -134,6 +134,10 @@ class RENDER:
          'm': '</span>',
          '1m': '<span style="font-weight: bold">',
          '36m': '<span style="color:blue">',
+         '1;36m': '<span style="font-weight:bold; color:#00b9f9">',
+         '1;32m': '<span style="font-weight:bold; color:green">', # might be bold
+         '1;31m': '<span style="font-weight:bold; color:red">', # might be bold
+         '33m': '<span style="color:orange">',
          '32m': '<span style="color:green">',
          '7;31m': '<span style="background-color:red">',
          }
@@ -153,6 +157,7 @@ class RENDER:
         print(f"ERROR: did not find replacement for ANSI code '{s[:5]}'")
         return original
 
+    acc.append(s)
 
     return "".join(acc)
 

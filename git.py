@@ -148,6 +148,13 @@ class GIT:
     return diff
 
   @classmethod
+  def _git_log(R):
+    diff = check_output(['git', '-c', 'color.ui=always', '--no-pager', 'log', '--decorate=short']).decode('utf8')
+    diff = RENDER._parse_color(str(escape(diff)))
+    return diff
+
+
+  @classmethod
   def _git_menu(R):
 
     currdir = os.getcwd()
@@ -263,6 +270,23 @@ class GIT:
       R._cmd("git diff --staged", output))
 
     return Response(header + content  + "</body></html>", mimetype="text/html")
+
+  @classmethod
+  def RENDER_GIT_LOG(R):
+    title = "Git Commit"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
+
+    currdir = os.getcwd()
+    os.chdir(FLAT.path)
+    log = R._git_log()
+    os.chdir(currdir)
+
+    content = (
+      R._git_menu() +
+      R._cmd("git log", log))
+
+    return Response(header + content  + "</body></html>", mimetype="text/html")
+
   # END RENDER
 
 # ROUTES
@@ -294,6 +318,10 @@ def git_status():
     return Response('', 204)
 
   return GIT.RENDER_GIT()
+
+@app.route("/git/log")
+def git_log():
+  return GIT.RENDER_GIT_LOG()
 
 @app.route("/git/stage")
 def git_stage():
