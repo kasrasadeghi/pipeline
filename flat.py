@@ -307,27 +307,18 @@ class FLAT_RENDER:
 
   @classmethod
   def _bar(R, note, *extras):
-    bar = list()
-    bar.append(f'<div style="display: flex;align-items:baseline">')
-    bar.append(f'<form method="post">')
-    bar.append(f'<button name="edit" value="{note}">edit</button>')
-    bar.append(f'<button name="open" value="{note}">open</button>')
-    bar.append(f'</form>')
-    bar.append(f'<button onclick="copy()">copy uuid</button>')
-    bar.append(f'<a style="margin-left: 10px" href="/">root</a>')
-    bar.append(f'<span> </span>')
-    bar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
-    bar.append(f'<span> </span>')
-    bar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>'
-               f'<span> </span>'
-               f'<a style="margin-left: 10px" href="/git/menu">git</a>')
-    bar.append(f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>')
+    navbar = RENDER.nav(*extras,
+                        f'<form method="post">'
+                        f'<button name="edit" value="{note}">edit</button>'
+                        f'<button name="open" value="{note}">open</button>'
+                        f'</form>'
+                        f'<button onclick="copy()">copy uuid</button>'
+                        f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>'
+    )
 
-    for extra in extras:
-      bar.append(extra)
+    return "".join(navbar)
 
-    bar.append(f'</div>')
-    return "".join(bar)
+
 
   @classmethod
   def NOTE(R, note):
