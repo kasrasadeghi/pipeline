@@ -36,11 +36,18 @@ class GIT_HANDLE:
     currdir = os.getcwd()
     os.chdir(FLAT.path)
 
-    check_output(['git', 'commit', '-m', message]).decode('utf8').strip()
+    stage_size = len(check_output(['git', 'diff', '--staged']).decode('utf8').strip())
 
+    # if we have something staged, commit it and redirect to showing that commit
+    if stage_size != 0:
+      check_output(['git', 'commit', '-m', message]).decode('utf8').strip()
+      just_committed = check_output(['git', 'rev-parse', 'HEAD']).decode('utf8').strip()
+      os.chdir(currdir)
+      return redirect("/git/show/" + just_committed)
+
+    # if we have nothing staged, then show the log
     os.chdir(currdir)
-
-    return Response('', 204)
+    return redirecit("/git/log")
 
 # END HANDLE
 
