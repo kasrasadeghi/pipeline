@@ -172,6 +172,25 @@ class RENDER:
   def bar(cls):
     return "<div style='width: 90%; background-color: black; height: 2px; margin: 10px'></div>"
 
+  @classmethod
+  def nav(R, *extras):
+    navbar = list()
+    navbar.append(f'<div style="display: flex;align-items:baseline">')
+    navbar.append(f'<a style="margin-left: 10px" href="/">root</a>')
+    navbar.append(f'<span> </span>')
+    navbar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
+    navbar.append(f'<span> </span>')
+    navbar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>'
+               f'<span> </span>'
+               f'<a style="margin-left: 10px" href="/git/menu">git</a>')
+
+    for extra in extras:
+      navbar.append(extra)
+
+    navbar.append(f'</div>')
+    return "".join(navbar)
+
+
 # END RENDER
 
 # ROUTES
@@ -190,8 +209,9 @@ kaz_import('search.py')
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
-  # print(request.headers)
-  # print(request.json)
+  print('client ip:', request.remote_addr)
+  print(request.headers)
+  print(request.json)
   return Response('', 204)
 
 # END ROUTES
