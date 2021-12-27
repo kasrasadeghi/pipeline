@@ -74,7 +74,8 @@ class RENDER:
     return """
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <style>
-       body { margin: 1% 2%; }
+       body { margin: 0; }
+       .content { padding-top: 80px; margin: 0% 2% 1% 2%; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
              align-content: stretch; align-items: flex-start; }
@@ -83,6 +84,12 @@ class RENDER:
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
        .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250); overflow-wrap: anywhere;}
        * { font-size: 18px; }
+       header {
+         display: flex; align-items:baseline;
+         position: fixed; width: 100%; height: 80px;
+         background: #00aaee; z-index: 12;
+         margin: 0px;
+       }
 
        .link-button {
          background: none;
@@ -175,19 +182,19 @@ class RENDER:
   @classmethod
   def nav(R, *extras):
     navbar = list()
-    navbar.append(f'<div style="display: flex;align-items:baseline">')
-    navbar.append(f'<a style="margin-left: 10px" href="/">root</a>')
-    navbar.append(f'<span> </span>')
-    navbar.append(f'<a style="margin-left: 10px" href="/today">today</a>')
-    navbar.append(f'<span> </span>')
-    navbar.append(f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>'
-               f'<span> </span>'
-               f'<a style="margin-left: 10px" href="/git/menu">git</a>')
+    navbar.append(f'<header>'
+                  f'<a style="margin-left: 10px" href="/">root</a>'
+                  f'<span> </span>'
+                  f'<a style="margin-left: 10px" href="/today">today</a>'
+                  f'<span> </span>'
+                  f'<a style="margin-left: 10px" href="/yesterday">yesterday</a>'
+                  f'<span> </span>'
+                  f'<a style="margin-left: 10px" href="/git/menu">git</a>')
 
     for extra in extras:
       navbar.append(extra)
 
-    navbar.append(f'</div>')
+    navbar.append(f'</header>')
     return "".join(navbar)
 
 
