@@ -71,7 +71,13 @@ class RENDER:
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
     # .msg_content: overflow: hidden; text-overflow: ellipsis;
     # .msg: overflow: hidden; max-width: 100%;
-    navbar_size = 40; # in pixels
+    navbar_size = 40 # in pixels
+    header_color = "#bb6"
+    link_button_color = "orange"
+    msg_color = "#a52a2a"
+    nav_button_color = "#611"
+    base_text_color = "#ddd"
+    input_background_color = "#333"
     return """
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <style>
@@ -80,36 +86,37 @@ class RENDER:
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
              align-content: stretch; align-items: flex-start; }
-       pre { margin: 0px; color: white; }
+       pre { margin: 0px; color: """ + base_text_color + """; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
-       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250); overflow-wrap: anywhere;}
-       * { font-size: 18px; color: white; }
+       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background: """ + msg_color + """; color: rgb(250, 250, 250); overflow-wrap: anywhere;}
+       * { font-size: 18px; color: """ + base_text_color + """; }
        header {
          display: flex; align-items:baseline;
          position: fixed; width: 100%; height: """ + str(navbar_size) + """px;
-         background: #00aaee; z-index: 12;
+         background: """ + header_color + """; z-index: 12;
          margin: 0px;
-         box-shadow: 0px 0px 11px 2px #00aaee;
+         box-shadow: 0px 0px 11px 2px """ + header_color + """;
        }
        header > a {
          margin: 5px;
          padding: 0px 5px;
+         color: """ + nav_button_color + """
        }
 
        .link-button {
          background: none;
-         color: blue;
+         color: """ + link_button_color + """;
          cursor: pointer;
          font-family: monospace;
-         border: blue 1px solid;
+         border: """ + link_button_color + """ 1px solid;
          margin: 2px;
          padding: 6px 6px 4px 6px;
        }
        .link-button:focus { outline: none; }
        .link-button:active { color:red; }
 
-       .msg_input { width: -webkit-fill-available; margin: 5px}
+       .msg_input { background: """ + input_background_color + """;width: -webkit-fill-available; margin: 5px}
 
        /* phones */
        @media (max-aspect-ratio: 1/1) {
