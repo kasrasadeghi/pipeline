@@ -422,7 +422,7 @@ class FLAT_RENDER:
                       f'<script>{textarea_resize_script}</script>'
                       f'<form method="post">'
                       #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
-                      f'<textarea name="text" style="height: calc(85vh);line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
+                      f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/><br/>',
                       f'<input type="submit" value="Submit"/></form>',
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")

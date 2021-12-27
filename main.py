@@ -104,6 +104,15 @@ class RENDER:
          color: """ + nav_button_color + """
        }
 
+       .editor_textarea {
+         background: """ + input_background_color + """;
+         height: calc(85vh);
+         line-height: 23px;
+         resize:none;
+         overflow: auto;
+         width: -webkit-fill-available;
+       }
+
        .link-button {
          background: none;
          color: """ + link_button_color + """;
