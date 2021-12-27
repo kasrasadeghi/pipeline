@@ -232,6 +232,7 @@ kaz_import('journal.py')
 kaz_import('graph.py')
 kaz_import('rm.py')
 
+kaz_import('edit.py')
 kaz_import('discussion.py')
 kaz_import('parser.py')
 kaz_import('plan.py')
