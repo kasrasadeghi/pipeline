@@ -307,18 +307,23 @@ class FLAT_RENDER:
 
   @classmethod
   def _bar(R, note, *extras):
-    navbar = RENDER.nav(*extras,
-                        f'<form method="post">'
-                        f'<button name="edit" value="{note}">edit</button>'
-                        f'<button name="open" value="{note}">open</button>'
-                        f'</form>'
-                        f'<button onclick="copy()">copy uuid</button>'
-                        f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>'
-    )
+    emacs_buttons = ""
+    if 'localhost' in request.headers['Host']:
+      emacs_buttons = (
+        f'<form method="post">'
+        f'<button name="edit" value="{note}">edit</button>'
+        f'<button name="open" value="{note}">open</button>'
+        f'</form>'
+        f'<button onclick="copy()">copy uuid</button>'
+        f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>'
+      )
 
+    navbar = RENDER.nav(*extras, emacs_buttons)
     return "".join(navbar)
 
-
+  @classmethod
+  def _title_style(R):
+    return "margin-left: 1em; border-left: 2px white solid; border-bottom: 2px white solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
 
   @classmethod
   def NOTE(R, note):
@@ -331,18 +336,15 @@ class FLAT_RENDER:
     backlinks = R._section_backward_links(note)
 
     bar = R._bar(note,
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>',
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>',
+                 f'<a href="/disc/{note}">disc</a>',
+                 f'<a href="/edit/{note}">edit</a>',
                  )
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
-                      f'<h1 style="{title_style}">{title}</h1>',
+                      f'<h1 style="{R._title_style()}">{title}</h1>',
                       f"{content}{forward_links}{backlinks}</pre></div></body></html>"])
     return Response(result, mimetype="text/html")
 
@@ -356,18 +358,15 @@ class FLAT_RENDER:
     content = FLAT_PARSER.parse(content)
 
     bar = R._bar(note,
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>',
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>',
+                 f'<a href="/disc/{note}">disc</a>',
+                 f'<a href="/edit/{note}">edit</a>',
                  )
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
-                      f'<h1 style="{title_style}">{title}</h1>',
+                      f'<h1 style="{R._title_style()}">{title}</h1>',
                       f"{content}</pre>",
                       f'<form><input style="width: 80%" type="text" name="title"><input type="submit" value="New Note"/></form>'
                       f"</div></body></html>"])
@@ -379,18 +378,15 @@ class FLAT_RENDER:
     content = FLAT_PARSER.parse_disc(content)
 
     bar = R._bar(note,
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
-                 f'<span> </span>'
-                 f'<a style="margin-left: 10px" href="/edit/{note}">edit</a>'
+                 f'<a href="/note/{note}">note</a>'
+                 f'<a href="/edit/{note}">edit</a>'
                  )
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\"><div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
-                      f'<h1 style="{title_style}">{title}</h1>',
+                      f'<h1 style="{R._title_style()}">{title}</h1>',
                       f"{content}</div>",
                       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
                       f"</div></body></html>"])
@@ -401,10 +397,8 @@ class FLAT_RENDER:
     content = util.read_file(FLAT.to_path(note))
 
     bar = R._bar(note,
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/note/{note}">note</a>'
-                 f'<span> </span>',
-                 f'<a style="margin-left: 10px" href="/disc/{note}">disc</a>'
+                 f'<a href="/note/{note}">note</a>'
+                 f'<a href="/disc/{note}">disc</a>'
                  )
 
     line_height = 23;
@@ -422,10 +416,9 @@ class FLAT_RENDER:
 
     # compose html
     title = FLAT.title(note)
-    title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\">",
-                      f'<h1 style="{title_style}">{title}</h1>',
+                      f'<h1 style="{R._title_style()}">{title}</h1>',
                       f'<script>{textarea_resize_script}</script>'
                       f'<form method="post">'
                       #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
