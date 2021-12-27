@@ -104,6 +104,11 @@ class RENDER:
          color: """ + nav_button_color + """
        }
 
+       h1.title {
+         margin-left: 1em; padding-left: 10px; padding-bottom: 6px; padding-right: 10px;
+         border-left: 2px white solid; border-bottom: 2px white solid;
+       }
+
        .editor_textarea {
          background: """ + input_background_color + """;
          height: calc(85vh);
