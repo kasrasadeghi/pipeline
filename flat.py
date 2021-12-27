@@ -281,7 +281,7 @@ class FLAT_RENDER:
   @classmethod
   def TEXT(R, title, content):
     return Response(f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>"
-                    + f"<body><pre>{content}</pre></body></html>", mimetype="text/html")
+                    + f"<body><div class=\"content\"><pre>{content}</pre></div></body></html>", mimetype="text/html")
 
   @classmethod
   def _render_link(R, note):
@@ -341,9 +341,9 @@ class FLAT_RENDER:
     title = FLAT.title(note)
     title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
-                      f"{content}{forward_links}{backlinks}</pre></body></html>"])
+                      f"{content}{forward_links}{backlinks}</pre></div></body></html>"])
     return Response(result, mimetype="text/html")
 
   @classmethod
@@ -366,11 +366,11 @@ class FLAT_RENDER:
     title = FLAT.title(note)
     title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<pre style='font-feature-settings: \"liga\" 0'>",
+                      f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
                       f"{content}</pre>",
                       f'<form><input style="width: 80%" type="text" name="title"><input type="submit" value="New Note"/></form>'
-                      f"</body></html>"])
+                      f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
   @classmethod
@@ -389,11 +389,11 @@ class FLAT_RENDER:
     title = FLAT.title(note)
     title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
+                      f"<body>{bar}<div class=\"content\"><div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 style="{title_style}">{title}</h1>',
                       f"{content}</div>",
                       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
-                      f"</body></html>"])
+                      f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
   @classmethod
@@ -424,14 +424,14 @@ class FLAT_RENDER:
     title = FLAT.title(note)
     title_style = "margin-left: 1em; border-left: 2px black solid; border-bottom: 2px black solid; padding-left: 10px; padding-bottom: 6px; padding-right: 10px"
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}",
+                      f"<body>{bar}<div class=\"content\">",
                       f'<h1 style="{title_style}">{title}</h1>',
                       f'<script>{textarea_resize_script}</script>'
                       f'<form method="post">'
                       #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
                       f'<textarea name="text" style="height: calc(85vh);line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
                       f'<input type="submit" value="Submit"/></form>',
-                      f"</body></html>"])
+                      f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
   @classmethod
@@ -439,14 +439,14 @@ class FLAT_RENDER:
     """
     @param colsfunc - returns content for the other columns in this item's row in a list
     """
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body>"
+    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
     body = """<table style="table-layout: fixed; width: 100%">"""
     for i in items:
       td_style = '"text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"'
       columns = "".join(map(lambda x: f"<td style={td_style}>" + x + "</td>", colsfunc(i)))
       body += f'<tr><td style={td_style}><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li>'
     body += "</ul>"
-    footer = "</body></html>"
+    footer = "</div></body></html>"
     return Response(header + body + footer, mimetype="text/html")
 
 # END FLAT RENDER
