@@ -159,8 +159,8 @@ class RENDER:
          '1m': '<span style="font-weight: bold">',
          '36m': '<span style="color:blue">',
          '1;36m': '<span style="font-weight:bold; color:#00b9f9">',
-         '1;32m': '<span style="font-weight:bold; color:green">', # might be bold
-         '1;31m': '<span style="font-weight:bold; color:red">', # might be bold
+         '1;32m': '<span style="font-weight:bold; color:green">',
+         '1;31m': '<span style="font-weight:bold; color:red">',
          '33m': '<span style="color:orange">',
          '32m': '<span style="color:green">',
          '7;31m': '<span style="background-color:red">',
