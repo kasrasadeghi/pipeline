@@ -389,41 +389,6 @@ class FLAT_RENDER:
     return Response(result, mimetype="text/html")
 
   @classmethod
-  def EDIT(R, note):
-    content = util.read_file(FLAT.to_path(note))
-
-    bar = R._bar(note,
-                 f'<a href="/note/{note}">note</a>'
-                 f'<a href="/disc/{note}">disc</a>'
-                 )
-
-    line_height = 23;
-
-    textarea_resize_script = """
-    function textarea_resize(el) {
-
-      // https://stackoverflow.com/questions/15195209/how-to-get-font-size-in-html
-      // https://stackoverflow.com/a/15195345
-      linecount = el.innerHTML.split(/\\n/).length;
-      el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
-    }
-    // window.onload = () => { textarea_resize(document.getElementsByTagName("textarea")[0]); };
-    """
-
-    # compose html
-    title = FLAT.title(note)
-    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"content\">",
-                      f'<h1 class="title">{title}</h1>',
-                      f'<script>{textarea_resize_script}</script>'
-                      f'<form method="post">'
-                      #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
-                      f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/><br/>',
-                      f'<input type="submit" value="Submit"/></form>',
-                      f"</div></body></html>"])
-    return Response(result, mimetype="text/html")
-
-  @classmethod
   def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
     """
     @param colsfunc - returns content for the other columns in this item's row in a list
@@ -480,7 +445,7 @@ def get_note(note):
   if not note.endswith(".note"): # /note/UUID.disc -> /disc/UUID.note
     return redirect("/" + note[-4:] + "/" + note[:-5] + ".note")
 
-  # handle bar, which is in both discussion and note
+  # handle emacs section of bar, which is in both discussion and note
   if request.method == 'POST':
     if 'open' in request.form:
       FLAT.open(request.form['open'])
@@ -505,15 +470,6 @@ def get_disc(note):
 
   # default case: handle rendering
   return FLAT_RENDER.DISCUSSION(note)
-
-@app.route("/edit/<note>", methods=['GET', 'POST'])
-def route_edit(note):
-  if request.method == 'POST':
-    FLAT.handle_edit(note, request.form)
-    return redirect(f"/edit/{note}", code=302)
-
-  return FLAT_RENDER.EDIT(note)
-
 
 @app.route("/index.html")
 def to_root():
