@@ -364,7 +364,8 @@ class FLAT_RENDER:
                       f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
                       f"{content}</pre>",
-                      f'<form><input style="width: 80%" type="text" name="title"><input type="submit" value="New Note"/></form>'
+                      f'<form><input class="msg_input" type="text" name="title">'
+                      f'<input class="link-button" type="submit" value="New Note"/></form>'
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
