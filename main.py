@@ -127,7 +127,7 @@ class RENDER:
          margin: 2px;
          padding: 6px 6px 4px 6px;
        }
-       .link-button:focus { outline: none; }
+       .link-button:focus, .link-button:hover { border-color: red; outline: none; }
        .link-button:active { color:red; }
 
        .msg_input { background: """ + input_background_color + """;width: -webkit-fill-available; margin: 5px}
