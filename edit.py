@@ -30,7 +30,7 @@ class EDIT_RENDER:
                       f'<form method="post">'
                       #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
                       f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/><br/>',
-                      f'<input type="submit" value="Submit"/></form>',
+                      f'<input class="link-button" type="submit" value="Submit"/></form>',
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
