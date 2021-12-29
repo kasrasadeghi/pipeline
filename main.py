@@ -73,15 +73,17 @@ class RENDER:
     # .msg: overflow: hidden; max-width: 100%;
     navbar_size = 40 # in pixels
     header_color = "#bb6"
-    link_button_color = "orange"
+    link_button_color = {'main': "orange", 'hover': "red"}
     msg_color = "#a52a2a"
     nav_button_color = "#611"
     base_text_color = "#ddd"
     input_background_color = "#333"
+    body_background_color= "#222"
+
     return """
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <style>
-       body { margin: 0; background: #222; }
+       body { margin: 0; background: """ + body_background_color + """; }
        .content { padding-top: """ + str(navbar_size) + """px; margin: 0% 2% 1% 2%; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
@@ -89,7 +91,7 @@ class RENDER:
        pre { margin: 0px; color: """ + base_text_color + """; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
-       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background: """ + msg_color + """; color: rgb(250, 250, 250); overflow-wrap: anywhere;}
+       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background: """ + msg_color + """; color: rgb(250, 250, 250); overflow-wrap: anywhere; }
        * { font-size: 18px; color: """ + base_text_color + """; }
        header {
          display: flex; align-items:baseline;
@@ -120,15 +122,15 @@ class RENDER:
 
        .link-button {
          background: none;
-         color: """ + link_button_color + """;
+         color: """ + link_button_color['main'] + """;
          cursor: pointer;
          font-family: monospace;
-         border: """ + link_button_color + """ 1px solid;
+         border: """ + link_button_color['main'] + """ 1px solid;
          margin: 2px;
          padding: 6px 6px 4px 6px;
        }
-       .link-button:focus, .link-button:hover { border-color: red; outline: none; }
-       .link-button:active { color:red; }
+       .link-button:hover, .link-button:focus { border-color: """ + link_button_color['hover'] + """; outline: none; }
+       .link-button:active { color: """ + link_button_color['hover'] + """; }
 
        .msg_input { background: """ + input_background_color + """;width: -webkit-fill-available; margin: 5px}
 
