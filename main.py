@@ -134,6 +134,38 @@ class RENDER:
 
        .msg_input { background: """ + input_background_color + """;width: -webkit-fill-available; margin: 5px}
 
+       /* sidebar */
+
+       .unselectable {
+         -webkit-touch-callout: none;
+         -webkit-user-select: none;
+         -khtml-user-select: none;
+         -moz-user-select: none;
+         -ms-user-select: none;
+         user-select: none;
+       }
+
+       input#toggler {
+         visibility: hidden;
+       }
+
+       input#toggler:checked ~ aside {
+         transition: all 0.2s ease-in 0s;
+         transform: translateX(-100%);
+       }
+
+       aside {
+         top: 40px;
+         position: fixed;
+         z-index: 15;
+         width: 100%;
+         height: -webkit-fill-available;
+         background-color: #000a;
+         transition: all 0.2s ease-in 0s;
+       }
+
+       /* end sidebar */
+
        /* phones */
        @media (max-aspect-ratio: 1/1) {
          .msg { flex-direction: column; align-items: flex-start; }
@@ -209,9 +241,24 @@ class RENDER:
     return "<div style='width: 90%; background-color: white; height: 2px; margin: 10px'></div>"
 
   @classmethod
+  def sidebar(cls):
+    return """
+      <aside>
+        <form action="/" method="POST">
+          <input class="msg_input" type="text" name="title">
+          <input class="link-button" type="submit" value="New Note"/>
+        </form>
+      </aside>
+    """
+
+
+  @classmethod
   def nav(R, *extras):
     navbar = list()
     navbar.append(f'<header>'
+                  f'<input type="checkbox" id="toggler" checked style=""/>'
+                  + R.sidebar() +
+                  f'<label class="unselectable" for="toggler">Menu</label>'
                   f'<a style="" href="/">root</a>'
                   f'<a href="/today">today</a>'
                   f'<a href="/yesterday">yesterday</a>'
