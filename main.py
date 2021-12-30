@@ -94,16 +94,16 @@ class RENDER:
        .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background: """ + msg_color + """; color: rgb(250, 250, 250); overflow-wrap: anywhere; }
        * { font-size: 18px; color: """ + base_text_color + """; }
        header {
-         display: flex; align-items:baseline;
+         display: flex; align-items: center;
          position: fixed; width: 100%; height: """ + str(navbar_size) + """px;
          background: """ + header_color + """; z-index: 12;
          margin: 0px;
          box-shadow: 0px 0px 11px 2px """ + header_color + """;
        }
-       header > a {
+       header > a, label#toggle-sidebar-menu {
          margin: 5px;
          padding: 0px 5px;
-         color: """ + nav_button_color + """
+         color: """ + nav_button_color + """;
        }
 
        h1.title {
@@ -162,6 +162,10 @@ class RENDER:
          height: -webkit-fill-available;
          background-color: #000a;
          transition: all 0.2s ease-in 0s;
+       }
+
+       div.sidebar-content {
+         margin: 5%;
        }
 
        /* end sidebar */
@@ -244,12 +248,18 @@ class RENDER:
   def sidebar(cls):
     return """
       <aside>
-        <form action="/" method="POST">
-          <input class="msg_input" type="text" name="title">
-          <input class="link-button" type="submit" value="New Note"/>
-        </form>
+        <div class="sidebar-content">
+          <form action="/" method="POST">
+            <input class="msg_input" type="text" name="title">
+            <input class="link-button" type="submit" value="New Note"/>
+          </form>
+          <a class="link-button" href="/yesterday">yesterday</a>
+          <a class="link-button" href="/recents">recents</a>
+        </div>
       </aside>
     """
+
+  # TODO render a prefix of index inside of the sidebar, using block renderer
 
 
   @classmethod
@@ -258,10 +268,9 @@ class RENDER:
     navbar.append(f'<header>'
                   f'<input type="checkbox" id="toggler" checked style=""/>'
                   + R.sidebar() +
-                  f'<label class="unselectable" for="toggler">Menu</label>'
+                  f'<label id="toggle-sidebar-menu" class="unselectable" for="toggler">&lt;menu</label>'
                   f'<a style="" href="/">root</a>'
-                  f'<a href="/today">today</a>'
-                  f'<a href="/yesterday">yesterday</a>'
+                  f'<a href="/today">journal</a>'
                   f'<a href="/git/menu">git</a>')
 
     for extra in extras:
