@@ -364,8 +364,6 @@ class FLAT_RENDER:
                       f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
                       f"{content}</pre>",
-                      f'<form><input class="msg_input" type="text" name="title">'
-                      f'<input class="link-button" type="submit" value="New Note"/></form>'
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
@@ -382,7 +380,8 @@ class FLAT_RENDER:
     # compose html
     title = FLAT.title(note)
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"content\"><div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
+                      f"<body>{bar}<div class=\"content\">"
+                      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
                       f"{content}</div>",
                       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
@@ -476,9 +475,10 @@ def get_disc(note):
 def to_root():
   return redirect("/", code=302)
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def get_root():
-  if 'title' in request.args and len(request.args['title'].strip()) != 0:
-    return redirect(FLAT.to_url(FLAT.make_new(title=request.args['title'].strip())), code=302)
+  if 'title' in request.form and \
+      len(note_title := request.form['title'].strip()) != 0:
+    return redirect("/edit/" + FLAT.make_new(title=note_title), code=302)
 
   return FLAT_RENDER.INDEX()
