@@ -18,7 +18,7 @@ class EDIT_RENDER:
       linecount = el.innerHTML.split(/\\n/).length;
       el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
     }
-    // window.onload = () => { textarea_resize(document.getElementsByTagName("textarea")[0]); };
+    window.onload = () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight };
     """
 
     # compose html
