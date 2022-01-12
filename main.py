@@ -244,21 +244,6 @@ class RENDER:
   def bar(cls):
     return "<div style='width: 90%; background-color: white; height: 2px; margin: 10px'></div>"
 
-  @classmethod
-  def sidebar(cls):
-    return """
-      <aside>
-        <div class="sidebar-content">
-          <form action="/" method="POST">
-            <input class="msg_input" type="text" name="title">
-            <input class="link-button" type="submit" value="New Note"/>
-          </form>
-          <a class="link-button" href="/yesterday">yesterday</a>
-          <a class="link-button" href="/recents">recents</a>
-        </div>
-      </aside>
-    """
-
   # TODO render a prefix of index inside of the sidebar, using block renderer
 
 
@@ -267,7 +252,7 @@ class RENDER:
     navbar = list()
     navbar.append(f'<header>'
                   f'<input type="checkbox" id="toggler" checked style=""/>'
-                  + R.sidebar() +
+                  + SIDEBAR.render() +
                   f'<label id="toggle-sidebar-menu" class="unselectable" for="toggler">&lt;menu</label>'
                   f'<a style="" href="/">root</a>'
                   f'<a href="/today">journal</a>'
@@ -296,6 +281,7 @@ kaz_import('parser.py')
 kaz_import('plan.py')
 kaz_import('search.py')
 
+kaz_import('sidebar.py')
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
