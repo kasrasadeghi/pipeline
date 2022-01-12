@@ -8,7 +8,7 @@ class LineReader:
 
   def get(R):
     R.i += 1
-    return R.i - 1, R.lines[R.i - 1][:-1]
+    return R.i - 1, R.lines[R.i - 1]
 
   def hasNext(R):
     return R.i < len(R.lines)
@@ -18,9 +18,38 @@ def parse_file(filepath):
     return parse_content(f.read())
 
 def parse_content(content):
+  # EXPL: a file is a list of sections, which each have a title and a list of blocks
+  # - a block is a list of nodes
+  # - a node can be either a line of type 'str', or a parsed tree
   R = LineReader(content)
 
-  # EXPL: a file is a list of blocks, which are each a list of lines
+  make_section = lambda title: {"section": title, "content": list()}
+
+  sections = list()
+  curr_section = make_section("entry")
+
+  while R.hasNext():
+    i, L = R.get()
+    if L.startswith("--- ") and L.endswith(" ---"):
+      sections.append(curr_section)
+
+      title = L[len("--- "):-len(" ---")]
+      if not all(map(lambda c: c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', title)):
+        print(f"WARNING: invalid section title '{title}'")
+      curr_section = make_section(title)
+    else:
+      curr_section['content'].append(L)
+  sections.append(curr_section)
+
+  for S in sections:
+    S['blocks'] = parse_section("\n".join(S['content']))
+    del S['content']
+
+  return sections
+
+def parse_section(section):
+  R = LineReader(section)
+  # EXPL: a section is a list of blocks, which are each a list of lines
   blocks = []
   curr_block = []
   while R.hasNext():
@@ -127,4 +156,10 @@ def parse_tree(block):
 
 @app.route('/parse/<note>')
 def test_parse(note):
-  return FLAT_RENDER.TEXT('test_parse', "\n\n".join(map(str, parse_file(FLAT.to_path(note)))))
+  acc = list()
+  for S in parse_file(FLAT.to_path(note)):
+    acc.append(S['section'])
+    for B in S['blocks']:
+      acc.append(str(B))
+
+  return FLAT_RENDER.TEXT('test_parse', "\n".join(acc))
