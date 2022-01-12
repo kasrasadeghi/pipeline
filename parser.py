@@ -1,6 +1,6 @@
 class LineReader:
-  def __init__(R, f):
-    R.lines = f.readlines()
+  def __init__(R, content):
+    R.lines = content.splitlines()
     R.i = 0
 
   def peek(R):
@@ -15,7 +15,10 @@ class LineReader:
 
 def parse_file(filepath):
   with open(filepath) as f:
-    R = LineReader(f)
+    return parse_content(f.read())
+
+def parse_content(content):
+  R = LineReader(content)
 
   # EXPL: a file is a list of blocks, which are each a list of lines
   blocks = []
