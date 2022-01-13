@@ -18,7 +18,7 @@ def get_search():
   print(time.time() - start)
   print(len(files))
   print(len(content))
-  return FLAT_RENDER.TEXT("search", content)
+  return DEBUG.TEXT("search", content)
 
 @app.route('/search/<query>')
 def get_search_with_query(query):
@@ -43,4 +43,4 @@ def get_search_with_query(query):
   content = "".join(map(DISCUSSION.RENDER_MSG, acc))
   print(time.time() - start)
   print(len(files))
-  return FLAT_RENDER.TEXT("search", content)
+  return DEBUG.TEXT("search", content)

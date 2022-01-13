@@ -80,6 +80,7 @@ kaz_import('search.py')
 
 kaz_import('sidebar.py')
 kaz_import('render.py')
+kaz_import('debug.py')
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():

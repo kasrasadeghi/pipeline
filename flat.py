@@ -275,14 +275,7 @@ class FLAT_PARSER:
     return "\n".join(acc)
 # END FLAT_PARSER
 
-
 class FLAT_RENDER:
-
-  @classmethod
-  def TEXT(R, title, content):
-    return Response(f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>"
-                    + f"<body><div class=\"content\"><pre>{content}</pre></div></body></html>", mimetype="text/html")
-
   @classmethod
   def _render_link(R, note):
     link = FLAT.to_url(note)
