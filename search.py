@@ -1,46 +1,55 @@
-@app.route('/search')
-def get_search():
+def block_generator():
   files = list(reversed(FLAT.list_by_create_date()))
-
-  acc = []
+  set_state("file count", len(files))
 
   for f in files:
-    print("LOG: searching through file: " + f)
-    for blocks in reversed(parse_file(FLAT.to_path(f))):
-      for B in blocks:
-        if isinstance(B, dict):
-          if B['value'].startswith("msg:"):
-            acc.append(B)
-  print(len(acc))
+    LOG("searching through file: " + f)
+    non_metadata_sections = list(filter(lambda x: x['section'] != 'METADATA',
+                                        parse_file(FLAT.to_path(f))))
+    for S in reversed(non_metadata_sections):
+      for B in S['blocks']:
+        yield B
+
+def msg_generator():
+  for B in block_generator():
+    for L in B:
+      if isinstance(L, dict) and L['value'].startswith("msg:"):
+        yield L
+
+@app.route('/search')
+def get_search():
+  init_state()
+
   import time
   start = time.time()
-  content = "".join(map(DISCUSSION.RENDER_MSG, acc))
-  print(time.time() - start)
-  print(len(files))
-  print(len(content))
+
+  acc = list()
+  for msg in msg_generator():
+    acc.append(msg)
+  content = "".join(map(DISCUSSION.RENDER_MSG, msg_generator()))
+
+  set_state("elapsed time", time.time() - start)
+  set_state("msg count", len(acc))
+  set_state("content size", len(content))
   return DEBUG.TEXT("search", content)
+
 
 @app.route('/search/<query>')
 def get_search_with_query(query):
-
-  def condition(B):
-    return query in B['value']
+  init_state()
 
   files = list(reversed(FLAT.list_by_create_date()))
 
-  acc = []
-
-  for f in files:
-    print(f)
-    for blocks in reversed(parse_file(FLAT.to_path(f))):
-      for B in blocks:
-        if isinstance(B, dict):
-          if B['value'].startswith("msg:"):
-            if condition(B):
-              acc.append(B)
   import time
   start = time.time()
+
+  acc = list()
+  for msg in msg_generator():
+    if query in msg['value']:
+      acc.append(msg)
   content = "".join(map(DISCUSSION.RENDER_MSG, acc))
-  print(time.time() - start)
-  print(len(files))
+
+  set_state("elapsed time", time.time() - start)
+  set_state("msg count", len(acc))
+  set_state("content size", len(content))
   return DEBUG.TEXT("search", content)
