@@ -63,4 +63,4 @@ def get_graph():
       result[value] = set()
     result[value].add(key)
 
-  return RENDER.TEXT("refs", legible_setdict(result))
+  return DEBUG.TEXT("refs", legible_setdict(result))

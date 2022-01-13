@@ -162,4 +162,4 @@ def test_parse(note):
     for B in S['blocks']:
       acc.append(str(B))
 
-  return FLAT_RENDER.TEXT('test_parse', "\n".join(acc))
+  return DEBUG.TEXT('test_parse', "\n".join(acc))
