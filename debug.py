@@ -1,3 +1,5 @@
+import time
+
 _STATE = None
 
 def clear_state():
@@ -7,6 +9,7 @@ def clear_state():
 def init_state():
   global _STATE
   _STATE = dict()
+  _STATE['start time'] = time.time()  # get current time
   _STATE['LOG'] = list()
 
 def set_state(k, v):
