@@ -13,3 +13,13 @@ class SIDEBAR:
         </div>
       </aside>
     """
+
+  @classmethod
+  def render_routine():
+    """parse the routine file in order to render common things in my daily routine"""
+    content = parse_file(FLAT.to_path(routine()))
+
+
+  @classmethod
+  def routine():
+    return "7e3e5fea-300a-4a97-ab10-ee6c687f647f.note"
