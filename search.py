@@ -16,32 +16,32 @@ def msg_generator():
       if isinstance(L, dict) and L['value'].startswith("msg:"):
         yield L
 
+class SEARCH:
+  @classmethod
+  def RENDER(cls, content):
+    return DEBUG.TEXT("search",
+                      f'found {get_state("msg count")} results '
+                      f'in {get_state("elapsed time")} seconds '
+                      + content)
+
+
 @app.route('/search')
 def get_search():
   init_state()
 
-  import time
-  start = time.time()
+  msgs = list(msg_generator())
+  content = "".join(map(DISCUSSION.RENDER_MSG, msgs))
 
-  acc = list()
-  for msg in msg_generator():
-    acc.append(msg)
-  content = "".join(map(DISCUSSION.RENDER_MSG, msg_generator()))
-
-  set_state("elapsed time", time.time() - start)
-  set_state("msg count", len(acc))
+  set_state("elapsed time", time.time() - get_state("start time"))
+  set_state("msg count", len(msgs))
   set_state("content size", len(content))
-  return DEBUG.TEXT("search", content)
+
+  return SEARCH.RENDER(content)
 
 
 @app.route('/search/<query>')
 def get_search_with_query(query):
   init_state()
-
-  files = list(reversed(FLAT.list_by_create_date()))
-
-  import time
-  start = time.time()
 
   acc = list()
   for msg in msg_generator():
@@ -49,7 +49,8 @@ def get_search_with_query(query):
       acc.append(msg)
   content = "".join(map(DISCUSSION.RENDER_MSG, acc))
 
-  set_state("elapsed time", time.time() - start)
+  set_state("elapsed time", time.time() - get_state("start time"))
   set_state("msg count", len(acc))
   set_state("content size", len(content))
-  return DEBUG.TEXT("search", content)
+
+  return SEARCH.RENDER(content)
