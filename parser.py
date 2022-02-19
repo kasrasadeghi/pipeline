@@ -84,6 +84,8 @@ def might_be_tree(B):
       indent_counts.append(-1)
       continue
     else:
+      if not L.lstrip():
+        return False
       if "-" != L.lstrip()[0]:
         return False
 
