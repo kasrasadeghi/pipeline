@@ -470,8 +470,8 @@ def to_root():
 
 @app.route("/", methods=["GET", "POST"])
 def get_root():
-  if 'title' in request.form and \
-      len(note_title := request.form['title'].strip()) != 0:
+  if 'content' in request.form and \
+      len(note_title := request.form['content'].strip()) != 0:
     return redirect("/edit/" + FLAT.make_new(title=note_title), code=302)
 
   return FLAT_RENDER.INDEX()

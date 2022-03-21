@@ -179,6 +179,17 @@ class RENDER:
 
   # TODO render a prefix of index inside of the sidebar, using block renderer
 
+  @classmethod
+  def button(cls, **kwargs):
+    action  = kwargs['action']
+    name    = kwargs['name']
+    method  = kwargs.get('method', "POST")  # second argument is default
+    return f"""
+           <form action="{action}" method="{method}">
+             <input class="msg_input" type="text" name="content">
+             <input class="link-button" type="submit" value="{name}"/>
+           </form>
+           """
 
   @classmethod
   def nav(R, *extras):

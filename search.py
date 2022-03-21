@@ -27,6 +27,9 @@ class SEARCH:
 
 @app.route('/search')
 def get_search():
+  if 'content' in request.args:
+    return redirect("/search/" + request.args['content'], code=302)
+
   init_state()
 
   msgs = list(msg_generator())
