@@ -1,13 +1,11 @@
 class SIDEBAR:
   @classmethod
   def render(cls):
-    return """
+    return f"""
       <aside>
         <div class="sidebar-content">
-          <form action="/" method="POST">
-            <input class="msg_input" type="text" name="title">
-            <input class="link-button" type="submit" value="New Note"/>
-          </form>
+          {RENDER.button(action='/', name='New Note')}
+          {RENDER.button(action='/search', name='Search', method='GET')}
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
         </div>
