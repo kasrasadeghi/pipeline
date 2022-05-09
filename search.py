@@ -8,12 +8,14 @@ def block_generator():
                                         parse_file(FLAT.to_path(f))))
     for S in reversed(non_metadata_sections):
       for B in S['blocks']:
-        yield B
+        yield f, B
 
 def msg_generator():
-  for B in block_generator():
+  for f, B in block_generator():
     for L in B:
       if isinstance(L, dict) and L['value'].startswith("msg:"):
+        assert 'origin' not in L
+        L |= {'origin': f}
         yield L
 
 class SEARCH:
