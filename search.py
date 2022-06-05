@@ -35,7 +35,7 @@ def get_search():
   init_state()
 
   msgs = list(msg_generator())
-  content = "".join(map(DISCUSSION.RENDER_MSG, msgs))
+  content = "".join(map(DISCUSSION_RENDER.MSG, msgs))
 
   set_state("elapsed time", time.time() - get_state("start time"))
   set_state("msg count", len(msgs))
@@ -52,7 +52,7 @@ def get_search_with_query(query):
   for msg in msg_generator():
     if query in msg['value']:
       acc.append(msg)
-  content = "".join(map(DISCUSSION.RENDER_MSG, acc))
+  content = "".join(map(DISCUSSION_RENDER.MSG, acc))
 
   set_state("elapsed time", time.time() - get_state("start time"))
   set_state("msg count", len(acc))
