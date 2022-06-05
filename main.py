@@ -64,7 +64,7 @@ class util:
 
 # END LIB
 
-# ROUTES
+# IMPORTS
 
 kaz_import('flat.py')
 kaz_import('git.py')
@@ -82,6 +82,10 @@ kaz_import('sidebar.py')
 kaz_import('render.py')
 kaz_import('debug.py')
 
+# END IMPORTS
+
+# ROUTES
+
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
   # print('client ip:', request.remote_addr)
@@ -93,6 +97,9 @@ def receive_info():
 
 # MAIN
 
+def main():
+  app.run()
+
 # don't run flask app in interactive prompt
 if __name__ == "__main__" and not sys.__stdin__.isatty() and not 'EXEC_IMPORT' in dir():
-  app.run()
+  main()
