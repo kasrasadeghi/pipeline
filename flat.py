@@ -158,13 +158,7 @@ class FLAT:
     return new_note
 
   @classmethod
-  def handle_msg(_, note, form):
-    # ignore empty messages
-    if '' == form['msg']:
-      return
-
-    msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n"
-
+  def append_to_note(_, note, content):
     # read note
     with open(FLAT.to_path(note), "r") as f:
       lines = f.readlines()
@@ -179,8 +173,23 @@ class FLAT:
     # write note with msg
     with open(FLAT.to_path(note), "w") as f:
       f.write("".join(lines[:metadata_linenum]))
-      f.write(msg)
+      f.write(content)
       f.write("".join(lines[metadata_linenum:]))
+
+
+  @classmethod
+  def handle_msg(_, note, form):
+
+    # debug
+    print(note, ',' + repr(form))
+
+    # ignore empty messages
+    if '' == form['msg']:
+      return
+
+    msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n"
+
+    FLAT.append_to_note(note, msg)
 
   @classmethod
   def handle_edit(_, note, form):

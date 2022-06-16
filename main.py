@@ -72,6 +72,10 @@ kaz_import('journal.py')
 kaz_import('graph.py')
 kaz_import('rm.py')
 
+kaz_import('command.py')
+kaz_import('commands/new_note.py')
+kaz_import('commands/twitch_clip.py')
+
 kaz_import('edit.py')
 kaz_import('discussion.py')
 kaz_import('parser.py')
