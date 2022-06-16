@@ -44,7 +44,8 @@ class DISCUSSION_RENDER:
 def get_disc(note):
   # handle messages
   if request.method == 'POST':
-    FLAT.handle_msg(note, request.form)
+    if COMMAND.PARSE(note, request.form['msg']):
+      FLAT.handle_msg(note, request.form)
     return redirect(f"/disc/{note}", code=302)
 
   # default case: handle rendering
