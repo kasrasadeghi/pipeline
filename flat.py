@@ -238,50 +238,6 @@ class FLAT_PARSER:
 
     return "\n".join(acc)
 
-  @classmethod
-  def parse_disc(cls, content):
-    lines = content.splitlines()
-    acc = list()
-
-    parse_msg = False
-    msg = ""
-    tmp_acc = list()
-
-    for L in lines:
-
-      if (result := cls.parse_ref(L))[0]:
-        tmp_acc.append(result[1])
-        continue
-
-      if (result := cls.parse_link(L))[0]:
-        tmp_acc.append(result[1])
-        continue
-
-      if L.startswith("- msg: "):
-        if tmp_acc and "".join(tmp_acc) != "":
-          acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
-        tmp_acc = list()
-
-        msg = L.split("- msg: ")[1]
-        parse_msg = True
-        continue
-
-      if parse_msg:
-        assert L.startswith("  - Date: ")
-
-        # use `date` to translate to current timezone because datetime in python sucks at timezones
-        date = util.date_cmd("-d", L.split("- Date: ")[1], "+%T")
-        acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{escape(msg)}</div></div>')
-        parse_msg = False
-        msg = ""
-        continue
-
-      tmp_acc.append(L)
-
-    if tmp_acc:
-      acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
-
-    return "\n".join(acc)
 # END FLAT_PARSER
 
 class FLAT_RENDER:
@@ -309,6 +265,7 @@ class FLAT_RENDER:
 
   @classmethod
   def _bar(R, note, *extras):
+    # TODO fix the style for this localhost business
     emacs_buttons = ""
     if 'localhost' in request.headers['Host']:
       emacs_buttons = (
