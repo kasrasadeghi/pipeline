@@ -1,6 +1,6 @@
 class LineReader:
   def __init__(R, content):
-    R.lines = content.splitlines()
+    R.lines = content.split('\n')
     R.i = 0
 
   def peek(R):
