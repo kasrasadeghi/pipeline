@@ -31,6 +31,7 @@ def parse_content(content):
   while R.hasNext():
     i, L = R.get()
     if L.startswith("--- ") and L.endswith(" ---"):
+      # end previous section
       sections.append(curr_section)
 
       title = L[len("--- "):-len(" ---")]
@@ -56,16 +57,15 @@ def parse_section(section):
     i, l = R.get()
 
     if "" == l:
-      if 0 != len(curr_block):
+      if len(curr_block):
         blocks.append(curr_block)
-        curr_block = []
-      continue
+      blocks.append([''])
+      curr_block = []
     else:
       curr_block.append(l)
 
-  if 0 != len(curr_block):
+  if len(curr_block):
     blocks.append(curr_block)
-    curr_block = []
 
   new_blocks = []
   for B in blocks:
@@ -80,7 +80,7 @@ def might_be_tree(B):
   indent_counts = []
   for i, L in enumerate(B):
     # search for toplevels
-    if L[0] != ' ' and L[0] != "-" and len(B) > i + 1 and B[i + 1].startswith("-"):
+    if L and L[0] != ' ' and L[0] != "-" and len(B) > i + 1 and B[i + 1].startswith("-"):
       indent_counts.append(-1)
       continue
     else:
