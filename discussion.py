@@ -1,3 +1,50 @@
+class DISCUSSION_PARSER:
+  @classmethod
+  def MAIN(cls, content):
+    lines = content.splitlines()
+    acc = list()
+
+    parse_msg = False
+    msg = ""
+    tmp_acc = list()
+
+    for L in lines:
+
+      if (result := FLAT_PARSER.parse_ref(L))[0]:
+        tmp_acc.append(result[1])
+        continue
+
+      if (result := FLAT_PARSER.parse_link(L))[0]:
+        tmp_acc.append(result[1])
+        continue
+
+      if L.startswith("- msg: "):
+        if tmp_acc and "".join(tmp_acc) != "":
+          acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+        tmp_acc = list()
+
+        msg = L.split("- msg: ")[1]
+        parse_msg = True
+        continue
+
+      if parse_msg:
+        assert L.startswith("  - Date: ")
+
+        # use `date` to translate to current timezone because datetime in python sucks at timezones
+        date = util.date_cmd("-d", L.split("- Date: ")[1], "+%T")
+        acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{escape(msg)}</div></div>')
+        parse_msg = False
+        msg = ""
+        continue
+
+      tmp_acc.append(L)
+
+    if tmp_acc:
+      acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
+
+    return "\n".join(acc)
+
+
 class DISCUSSION_RENDER:
   @classmethod
   def MSG(cls, msg):
@@ -16,12 +63,12 @@ class DISCUSSION_RENDER:
       )
     except:
       print("ERROR: could not render msg: '" + str(msg) + "'")
-      return ""
+      return str(msg)
 
   @classmethod
   def MAIN(cls, note):
     content = util.read_file(FLAT.to_path(note))
-    content = FLAT_PARSER.parse_disc(content)
+    content = DISCUSSION_PARSER.MAIN(content)
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/note/{note}">note</a>'
