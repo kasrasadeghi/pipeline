@@ -156,12 +156,50 @@ def parse_tree(block):
 
   return make_children(indent_counts)
 
+def trim_newlines(section):
+  """
+  this function deletes consecutive newline blocks
+  - a newline block looks like this: ['']
+  """
+  new_section = []
+
+  def is_newline(block):
+    return len(block) == 1 and block[0] == ''
+
+  i = 0
+  while i < len(section):
+    block = section[i]
+    new_section.append(block)
+    print("trim newlines", repr(block), is_newline(block))
+
+    if i < len(section) and is_newline(section[i]):
+      while i < len(section) and is_newline(section[i]):
+        i += 1
+        print("trim newlines, consuming:", repr(block))
+    else:
+      i += 1
+
+    if i < len(section):
+      print("next section:", section[i])
+
+
+  pprint(new_section)
+
+  return new_section
+
 @app.route('/parse/<note>')
 def test_parse(note):
   acc = list()
   for S in parse_file(FLAT.to_path(note)):
     acc.append(S['section'])
     for B in S['blocks']:
+      acc.append(str(B))
+
+  acc.append("\n\nTRIMMED:")
+
+  for S in parse_file(FLAT.to_path(note)):
+    acc.append(S['section'])
+    for B in trim_newlines(S['blocks']):
       acc.append(str(B))
 
   return DEBUG.TEXT('test_parse', "\n".join(acc))
