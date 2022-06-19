@@ -1,58 +1,17 @@
-class DISCUSSION_PARSER:
-  @classmethod
-  def MAIN(cls, content):
-    lines = content.splitlines()
-    acc = list()
-
-    parse_msg = False
-    msg = ""
-    tmp_acc = list()
-
-    for L in lines:
-
-      if (result := FLAT_PARSER.parse_ref(L))[0]:
-        tmp_acc.append(result[1])
-        continue
-
-      if (result := FLAT_PARSER.parse_link(L))[0]:
-        tmp_acc.append(result[1])
-        continue
-
-      if L.startswith("- msg: "):
-        if tmp_acc and "".join(tmp_acc) != "":
-          acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
-        tmp_acc = list()
-
-        msg = L.split("- msg: ")[1]
-        parse_msg = True
-        continue
-
-      if parse_msg:
-        assert L.startswith("  - Date: ")
-
-        # use `date` to translate to current timezone because datetime in python sucks at timezones
-        date = util.date_cmd("-d", L.split("- Date: ")[1], "+%T")
-        acc.append(f'<div class="msg"><div class="msg_timestamp">{date}</div><div class="msg_content">{escape(msg)}</div></div>')
-        parse_msg = False
-        msg = ""
-        continue
-
-      tmp_acc.append(L)
-
-    if tmp_acc:
-      acc.append("<pre>" + "\n".join(tmp_acc) + "</pre>")
-
-    return "\n".join(acc)
-
+import os
 
 class DISCUSSION_RENDER:
   @classmethod
-  def MSG(cls, msg):
+  def MSG(cls, msg, timerender=None):
     try:
       msg_date = msg['children'][0]['value'].split('Date: ', 1)[1]
       msg_content = msg["value"].split("msg: ", 1)[1]
       origin = msg.get('origin', None)  # second argument of .get() is a default value
-      date = util.date_cmd("-d", msg_date, "+%b %d %T")
+
+      if timerender:
+        date = timerender(msg_date)
+      else:
+        date = util.date_cmd("-d", msg_date, "+%b %d %T")
       return (
         (f'<a href="/disc/{origin}">' if origin else "") +
         f'<div class="msg">'
@@ -67,8 +26,47 @@ class DISCUSSION_RENDER:
 
   @classmethod
   def MAIN(cls, note):
-    content = util.read_file(FLAT.to_path(note))
-    content = DISCUSSION_PARSER.MAIN(content)
+    sections = PARSER.parse_file(FLAT.to_path(note))
+
+    acc = []
+    for section in sections:
+      if section['section'] != 'entry':
+        acc.append(f'<pre>--- {section["section"]} --- </pre>')
+
+      pre_acc = list()
+
+      # don't print two empty blocks consecutively
+      for block in PARSER.trim_newlines(section['blocks']):
+
+        if block == ['']:
+          debug("whitespace")
+          pre_acc.append('')
+          continue
+
+        for item in block:
+          # if item is a tree/node
+          if isinstance(item, dict):
+            if 0 != len(pre_acc):
+              acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
+              pre_acc = list()
+
+            if item['value'].startswith('msg: '):
+              acc.append(DISCUSSION_RENDER.MSG(item, lambda x: util.date_cmd("-d", x, "+%T")))
+              debug("msg:", repr(item))
+              continue
+
+          if isinstance(item, str):
+            pre_acc.append(item)
+            debug("string:", item)
+            continue
+
+          acc.append(repr(item))
+
+      if 0 != len(pre_acc):
+        acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
+        pre_acc = list()
+
+    content = '\n'.join(acc)
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/note/{note}">note</a>'
