@@ -50,9 +50,9 @@ class DISCUSSION_RENDER:
               acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
               pre_acc = list()
 
-            if item['value'].startswith('msg: '):
-              acc.append(DISCUSSION_RENDER.MSG(item, lambda x: util.date_cmd("-d", x, "+%T")))
-              debug("msg:", repr(item))
+            result = RENDER.node(item)
+            if result:
+              acc.append(result)
               continue
 
           if isinstance(item, str):

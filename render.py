@@ -207,3 +207,23 @@ class RENDER:
 
     navbar.append(f'</header>')
     return "".join(navbar)
+
+  @staticmethod
+  def link(url_node):
+    # this is a tree parser node
+    url = url_node['value'].removeprefix('link: ')
+    return f'<a href="{url}">{url}</a>'
+
+  @staticmethod
+  def node(item):
+    if item['value'].startswith('msg: '):
+      result = DISCUSSION_RENDER.MSG(item, lambda x: util.date_cmd("-d", x, "+%T"))
+      debug("msg:", repr(item))
+      return result
+
+    if item['value'].startswith('link: '):
+      result = '<pre>- link: ' + RENDER.link(item) + "</pre>"
+      debug("link:", repr(item))
+      return result
+
+    return None
