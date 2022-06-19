@@ -13,193 +13,199 @@ class LineReader:
   def hasNext(R):
     return R.i < len(R.lines)
 
-def parse_file(filepath):
-  with open(filepath) as f:
-    return parse_content(f.read())
+# ---------------------------------------------------------------------------- #
 
-def parse_content(content):
-  # EXPL: a file is a list of sections, which each have a title and a list of blocks
-  # - a block is a list of nodes
-  # - a node can be either a line of type 'str', or a parsed tree
-  R = LineReader(content)
+class PARSER:
+  @staticmethod
+  def parse_file(filepath):
+    with open(filepath) as f:
+      return PARSER.parse_content(f.read())
 
-  make_section = lambda title: {"section": title, "content": list()}
+  @staticmethod
+  def parse_content(content):
+    # EXPL: a file is a list of sections, which each have a title and a list of blocks
+    # - a block is a list of nodes
+    # - a node can be either a line of type 'str', or a parsed tree
+    R = LineReader(content)
 
-  sections = list()
-  curr_section = make_section("entry")
+    make_section = lambda title: {"section": title, "content": list()}
 
-  while R.hasNext():
-    i, L = R.get()
-    if L.startswith("--- ") and L.endswith(" ---"):
-      # end previous section
-      sections.append(curr_section)
+    sections = list()
+    curr_section = make_section("entry")
 
-      title = L[len("--- "):-len(" ---")]
-      if not all(map(lambda c: c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', title)):
-        print(f"WARNING: invalid section title '{title}'")
-      curr_section = make_section(title)
-    else:
-      curr_section['content'].append(L)
-  sections.append(curr_section)
+    while R.hasNext():
+      i, L = R.get()
+      if L.startswith("--- ") and L.endswith(" ---"):
+        # end previous section
+        sections.append(curr_section)
 
-  for S in sections:
-    S['blocks'] = parse_section("\n".join(S['content']))
-    del S['content']
+        title = L[len("--- "):-len(" ---")]
+        if not all(map(lambda c: c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', title)):
+          print(f"WARNING: invalid section title '{title}'")
+        curr_section = make_section(title)
+      else:
+        curr_section['content'].append(L)
+    sections.append(curr_section)
 
-  return sections
+    for S in sections:
+      S['blocks'] = PARSER.parse_section("\n".join(S['content']))
+      del S['content']
 
-def parse_section(section):
-  R = LineReader(section)
-  # EXPL: a section is a list of blocks, which are each a list of lines
-  blocks = []
-  curr_block = []
-  while R.hasNext():
-    i, l = R.get()
+    return sections
 
-    if "" == l:
-      if len(curr_block):
-        blocks.append(curr_block)
-      blocks.append([''])
-      curr_block = []
-    else:
-      curr_block.append(l)
+  @staticmethod
+  def parse_section(section):
+    R = LineReader(section)
+    # EXPL: a section is a list of blocks, which are each a list of lines
+    blocks = []
+    curr_block = []
+    while R.hasNext():
+      i, l = R.get()
 
-  if len(curr_block):
-    blocks.append(curr_block)
+      if "" == l:
+        if len(curr_block):
+          blocks.append(curr_block)
+        blocks.append([''])
+        curr_block = []
+      else:
+        curr_block.append(l)
 
-  new_blocks = []
-  for B in blocks:
-    if might_be_tree(B):
-      new_blocks.append(parse_tree(B))
-    else:
-      new_blocks.append(B)
+    if len(curr_block):
+      blocks.append(curr_block)
 
-  return new_blocks
+    new_blocks = []
+    for B in blocks:
+      if PARSER.might_be_tree(B):
+        new_blocks.append(PARSER.parse_tree(B))
+      else:
+        new_blocks.append(B)
 
-def might_be_tree(B):
-  indent_counts = []
-  for i, L in enumerate(B):
-    # search for toplevels
-    if L and L[0] != ' ' and L[0] != "-" and len(B) > i + 1 and B[i + 1].startswith("-"):
-      indent_counts.append(-1)
-      continue
-    else:
-      if not L.lstrip():
-        return False
-      if "-" != L.lstrip()[0]:
-        return False
+    return new_blocks
 
-    indent, rest = L.split("-", 1)
-    indent_counts.append(len(indent) // 2)
+  @staticmethod
+  def might_be_tree(B):
+    indent_counts = []
+    for i, L in enumerate(B):
+      # search for toplevels
+      if L and L[0] != ' ' and L[0] != "-" and len(B) > i + 1 and B[i + 1].startswith("-"):
+        indent_counts.append(-1)
+        continue
+      else:
+        if not L.lstrip():
+          return False
+        if "-" != L.lstrip()[0]:
+          return False
 
-  prev = None
-  for indent, L in zip(indent_counts, B):
-    # initial is toplevel or zero/0 indent
-    if prev is None \
-       and (indent == 0 or indent == -1):
-      prev = indent
-      continue
+      indent, rest = L.split("-", 1)
+      indent_counts.append(len(indent) // 2)
 
-    # child element
-    if prev is not None and indent == prev + 1:
-      prev = indent
-      continue
+    prev = None
+    for indent, L in zip(indent_counts, B):
+      # initial is toplevel or zero/0 indent
+      if prev is None \
+         and (indent == 0 or indent == -1):
+        prev = indent
+        continue
 
-    # reset to sibling or ancestor
-    if prev is not None and indent <= prev:
-      prev = indent
-      continue
+      # child element
+      if prev is not None and indent == prev + 1:
+        prev = indent
+        continue
 
-    # if no successful condition found, this line has failed
-    print("ERROR: failed on", prev, "->", indent, L)
-    return False
+      # reset to sibling or ancestor
+      if prev is not None and indent <= prev:
+        prev = indent
+        continue
 
-  return True
+      # if no successful condition found, this line has failed
+      print("ERROR: failed on", prev, "->", indent, L)
+      return False
 
-def parse_tree(block):
-  indent_counts = []
-  for L in block:
-    if L[0] != ' ' and L[0] != "-":
-      indent_counts.append({"indent": -1, "content": L})
-      continue
-    indent, rest = L.split("-", 1)
-    assert all(' ' == c for c in indent),  "error with line: " + L
-    indent_counts.append({"indent": len(indent) // 2, "content": rest.lstrip()})
+    return True
 
-  def make_node(content, children):
-    return {'value': content, 'children': children}
+  @staticmethod
+  def parse_tree(block):
+    indent_counts = []
+    for L in block:
+      if L[0] != ' ' and L[0] != "-":
+        indent_counts.append({"indent": -1, "content": L})
+        continue
+      indent, rest = L.split("-", 1)
+      assert all(' ' == c for c in indent),  "error with line: " + L
+      indent_counts.append({"indent": len(indent) // 2, "content": rest.lstrip()})
 
-  # from: https://github.com/kasrasadeghi/cornerstone-haskell/blob/master/src/Parse.hs#L50-L59
-  def make_children(B):
-    result = []
-    rest = B
+    def make_node(content, children):
+      return {'value': content, 'children': children}
 
-    while 0 != len(rest):
-      level, content = rest[0]['indent'], rest[0]['content']
-      rest = rest[1:]
-      # collect children of this node,
-      #   which are the prefix of _rest_ that have a level that is greater than this node
-      acc = []
-      while True:
-        if 0 == len(rest):
-          break
-        if rest[0]['indent'] <= level:
-          break
-        acc.append(rest[0])
+    # from: https://github.com/kasrasadeghi/cornerstone-haskell/blob/master/src/Parse.hs#L50-L59
+    def make_children(B):
+      result = []
+      rest = B
+
+      while 0 != len(rest):
+        level, content = rest[0]['indent'], rest[0]['content']
         rest = rest[1:]
+        # collect children of this node,
+        #   which are the prefix of _rest_ that have a level that is greater than this node
+        acc = []
+        while True:
+          if 0 == len(rest):
+            break
+          if rest[0]['indent'] <= level:
+            break
+          acc.append(rest[0])
+          rest = rest[1:]
 
-      children = make_children(acc)
-      result.append(make_node(content, children))
+        children = make_children(acc)
+        result.append(make_node(content, children))
 
-    #   return acc
-    return result
+      #   return acc
+      return result
 
-  return make_children(indent_counts)
+    return make_children(indent_counts)
 
-def trim_newlines(section):
-  """
-  this function deletes consecutive newline blocks
-  - a newline block looks like this: ['']
-  """
-  new_section = []
+  @staticmethod
+  def trim_newlines(section):
+    """
+    this function deletes consecutive newline blocks
+    - a newline block looks like this: ['']
+    """
+    new_section = []
 
-  def is_newline(block):
-    return len(block) == 1 and block[0] == ''
+    def is_newline(block):
+      return len(block) == 1 and block[0] == ''
 
-  i = 0
-  while i < len(section):
-    block = section[i]
-    new_section.append(block)
-    print("trim newlines", repr(block), is_newline(block))
+    i = 0
+    while i < len(section):
+      block = section[i]
+      new_section.append(block)
+      debug("trim newlines", repr(block), is_newline(block))
 
-    if i < len(section) and is_newline(section[i]):
-      while i < len(section) and is_newline(section[i]):
+      if i < len(section) and is_newline(section[i]):
+        while i < len(section) and is_newline(section[i]):
+          i += 1
+          debug("trim newlines, consuming:", repr(block))
+      else:
         i += 1
-        print("trim newlines, consuming:", repr(block))
-    else:
-      i += 1
 
-    if i < len(section):
-      print("next section:", section[i])
+      if i < len(section):
+        debug("next section:", section[i])
 
-
-  pprint(new_section)
-
-  return new_section
+    return new_section
 
 @app.route('/parse/<note>')
 def test_parse(note):
   acc = list()
-  for S in parse_file(FLAT.to_path(note)):
+  for S in PARSER.parse_file(FLAT.to_path(note)):
     acc.append(S['section'])
     for B in S['blocks']:
       acc.append(str(B))
 
   acc.append("\n\nTRIMMED:")
 
-  for S in parse_file(FLAT.to_path(note)):
+  for S in PARSER.parse_file(FLAT.to_path(note)):
     acc.append(S['section'])
-    for B in trim_newlines(S['blocks']):
+    for B in PARSER.trim_newlines(S['blocks']):
       acc.append(str(B))
 
   return DEBUG.TEXT('test_parse', "\n".join(acc))
