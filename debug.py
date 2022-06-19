@@ -44,10 +44,25 @@ class DEBUG:
     clear_state()
     return r
 
+  @staticmethod
+  def REQUIRE_ACTIVE():
+    # CONFIGURE HERE
+    return True
+
 
 # debug print
 # TODO have a config for debugging module by module by inspecting the stacktrace
 def debug(*l, **kw):
   is_debug = 'FLASK_ENV' in os.environ and os.getenv('FLASK_ENV') == 'development'
+
+  # REQUIRE_ACTIVE makes it so that it has to have a kw-arg debugmode='ACTIVE'
+  if DEBUG.REQUIRE_ACTIVE():
+    if 'debugmode' in kw:
+      tag = kw['debugmode']
+      del kw['debugmode']
+      if tag != 'ACTIVE':
+        return
+    else:
+      return
   if is_debug:
     print(*l, **kw)
