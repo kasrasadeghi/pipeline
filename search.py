@@ -50,7 +50,7 @@ def get_search_with_query(query):
 
   acc = list()
   for msg in msg_generator():
-    if query in msg['value']:
+    if query.lower() in msg['value'].lower():
       acc.append(msg)
   content = "".join(map(DISCUSSION_RENDER.MSG, acc))
 
