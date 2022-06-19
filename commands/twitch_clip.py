@@ -35,9 +35,9 @@ class TWITCH_CLIP:
     with open(cls.folder + '/mapping.txt', 'a') as f:
       f.write(url + '\n')
       f.write(filename + '\n')
-      f.write(title + '\n')
+      f.write(title + '\n\n')
 
-    chdir(cwd)
+    os.chdir(cwd)
     return output
 
 
@@ -49,7 +49,7 @@ def COMMAND_TWITCH_CLIP(args, continuation):
   if rest.strip().startswith("http"):
     title, url = 'title not given', args['arg']
   else:
-    title, url = rest.rsplit(':', 1)
+    title, url = rest.rsplit(': ', 1)
 
   import subprocess
   import os
