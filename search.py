@@ -5,7 +5,7 @@ def block_generator():
   for f in files:
     LOG("searching through file: " + f)
     non_metadata_sections = list(filter(lambda x: x['section'] != 'METADATA',
-                                        parse_file(FLAT.to_path(f))))
+                                        PARSER.parse_file(FLAT.to_path(f))))
     for S in reversed(non_metadata_sections):
       for B in S['blocks']:
         yield f, B
