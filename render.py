@@ -209,9 +209,7 @@ class RENDER:
     return "".join(navbar)
 
   @staticmethod
-  def link(url_node):
-    # this is a tree parser node
-    url = url_node['value'].removeprefix('link: ')
+  def link(url):
     return f'<a href="{url}">{url}</a>'
 
   @staticmethod
@@ -222,7 +220,8 @@ class RENDER:
       return result
 
     if item['value'].startswith('link: '):
-      result = '<pre>- link: ' + RENDER.link(item) + "</pre>"
+      url = item['value'].removeprefix('link: ')
+      result = '<pre>- link: ' + RENDER.link(url) + "</pre>"
       debug("link:", repr(item))
       return result
 

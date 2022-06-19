@@ -4,9 +4,20 @@ class DISCUSSION_RENDER:
   @classmethod
   def MSG(cls, msg, timerender=None):
     try:
-      msg_date = msg['children'][0]['value'].split('Date: ', 1)[1]
-      msg_content = msg["value"].split("msg: ", 1)[1]
+      msg_date = msg['children'][0]['value'].removeprefix('Date: ')
+      msg_content = msg["value"].removeprefix("msg: ")
+      msg_content_altered = False
       origin = msg.get('origin', None)  # second argument of .get() is a default value
+
+      if ': ' in msg_content:
+        prefix, potentially_url = msg_content.rsplit(': ', 1)
+        if potentially_url.strip().startswith('https://'):
+          msg_content = prefix + ": " + RENDER.link(potentially_url)
+          msg_content_altered = True
+          msg_content_altered = True
+
+      if not msg_content_altered:
+        msg_content = escape(msg_content)
 
       if timerender:
         date = timerender(msg_date)
@@ -16,7 +27,7 @@ class DISCUSSION_RENDER:
         (f'<a href="/disc/{origin}">' if origin else "") +
         f'<div class="msg">'
         f'<div class="msg_timestamp">{date}</div>'
-        f'<div class="msg_content">{escape(msg_content)}</div>'
+        f'<div class="msg_content">{msg_content}</div>'
         f'</div>' +
         (f'</a>' if origin else "")
       )
