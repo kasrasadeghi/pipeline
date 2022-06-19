@@ -1,5 +1,6 @@
 import time
 
+# TODO should make state request specific so that it can be multithreaded or multi-processed
 _STATE = None
 
 def clear_state():
@@ -24,8 +25,8 @@ def LOG(s):
   print("LOG: " + str(s))
 
 class DEBUG:
-  @classmethod
-  def TEXT(R, title, content):
+  @staticmethod
+  def TEXT(title, content):
     debug = ""
     if _STATE is not None:
       if 'LOG' in _STATE:
@@ -42,3 +43,11 @@ class DEBUG:
                  "</div></body></html>", mimetype="text/html")
     clear_state()
     return r
+
+
+# debug print
+# TODO have a config for debugging module by module by inspecting the stacktrace
+def debug(*l, **kw):
+  is_debug = 'FLASK_ENV' in os.environ and os.getenv('FLASK_ENV') == 'development'
+  if is_debug:
+    print(*l, **kw)
