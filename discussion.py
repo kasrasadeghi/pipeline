@@ -14,6 +14,9 @@ class DISCUSSION_RENDER:
         if potentially_url.strip().startswith('https://'):
           msg_content = prefix + ": " + RENDER.link(potentially_url)
           msg_content_altered = True
+        if potentially_url.strip().endswith(".note") and \
+           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
+          msg_content = prefix + ": " + RENDER.note(potentially_url)
           msg_content_altered = True
 
       if not msg_content_altered:
