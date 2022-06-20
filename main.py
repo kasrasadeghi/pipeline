@@ -79,6 +79,7 @@ kaz_import('commands/twitch_clip.py')
 kaz_import('edit.py')
 kaz_import('discussion.py')
 kaz_import('parser.py')
+kaz_import('tree.py')
 kaz_import('plan.py')
 kaz_import('search.py')
 
