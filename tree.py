@@ -43,45 +43,52 @@ class TREE:
     return "".join(acc)
 
   @staticmethod
-  def page(sections):
+  def section(section):
+    acc = list()
+    if section['section'] != 'entry':
+      acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
-    acc = []
-    for section in sections:
-      if section['section'] != 'entry':
-        acc.append(f'<pre>--- {section["section"]} --- </pre>')
-
-      pre_acc = list()
-
-      # don't print two empty blocks consecutively
-      for block in TREE.trim_newlines(section['blocks']):
-
-        if block == ['']:
-          debug("whitespace")
-          acc.append('<br/>')
-          continue
-
-        for item in block:
-          # if item is a tree/node
-          if isinstance(item, dict):
-            if 0 != len(pre_acc):
-              acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
-              pre_acc = list()
-
-            acc.append(TREE.node(item))
-            continue
-
-          if isinstance(item, str):
-            pre_acc.append(item)
-            debug("string:", item)
-            continue
-
-          acc.append(repr(item))
-
+    pre_acc = list()
+    def flush_pre_acc():
+      nonlocal pre_acc
       if 0 != len(pre_acc):
         acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
         pre_acc = list()
 
-    return '\n'.join(acc)
+    # don't print two empty blocks consecutively
+    for block in TREE.trim_newlines(section['blocks']):
+
+      if block == ['']:
+        debug("whitespace")
+        acc.append('<br/>')
+        continue
+
+      for item in block:
+        # if item is a tree/node
+        if isinstance(item, dict):
+          flush_pre_acc()
+
+          acc.append(TREE.node(item))
+          continue
+
+        if isinstance(item, str):
+          pre_acc.append(item)
+          debug("string:", item)
+          continue
+
+        acc.append(repr(item))
+
+    flush_pre_acc()
+    return ''.join(acc)
+
+  @staticmethod
+  def page(sections):
+
+    acc = list()
+    for section in sections:
+      acc.append(TREE.section(section))
+
+    return ''.join(acc)
 
   @staticmethod
   def trim_newlines(section):
@@ -111,6 +118,10 @@ class TREE:
         debug("next section:", section[i])
 
     return new_section
+
+  @staticmethod
+  def squash_messages(section):
+    pass
 
   @staticmethod
   def dump_tree(page):
