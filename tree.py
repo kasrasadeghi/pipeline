@@ -186,6 +186,21 @@ def test_render_trim_newline(note):
   for S in page:
     new_S = dict()
     new_S['section'] = S['section']
-    S['blocks'] = TREE.trim_newlines(S['blocks'])
+    new_S['blocks'] = TREE.trim_newlines(S['blocks'])
+    new_page.append(new_S)
+
+  return DEBUG.TEXT('test_parse', TREE.dump_tree(new_page))
+
+@app.route('/render/trim_and_squash/<note>')
+def test_render_trim_and_squash(note):
+
+  page = PARSER.parse_file(FLAT.to_path(note))
+
+  new_page = list()
+  for S in page:
+    new_S = dict()
+    new_S['section'] = S['section']
+    new_S['blocks'] = TREE.squash_messages(TREE.trim_newlines(S['blocks']))
+    new_page.append(new_S)
 
   return DEBUG.TEXT('test_parse', TREE.dump_tree(new_page))
