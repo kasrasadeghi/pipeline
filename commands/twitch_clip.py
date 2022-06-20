@@ -54,7 +54,7 @@ def COMMAND_TWITCH_CLIP(args, continuation):
   import subprocess
   import os
 
-  print('downloading twitch clip:', url)
+  print('LOG: downloading twitch clip:', url)
 
   output = TWITCH_CLIP.DOWNLOAD(url, title)
   continuation(args['arg'])
