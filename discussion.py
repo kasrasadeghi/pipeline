@@ -12,11 +12,11 @@ class DISCUSSION_RENDER:
       if ': ' in msg_content:
         prefix, potentially_url = msg_content.rsplit(': ', 1)
         if potentially_url.strip().startswith('https://'):
-          msg_content = prefix + ": " + RENDER.link(potentially_url)
+          msg_content = prefix + ": " + TREE.link(potentially_url)
           msg_content_altered = True
         if potentially_url.strip().endswith(".note") and \
            len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
-          msg_content = prefix + ": " + RENDER.note(potentially_url)
+          msg_content = prefix + ": " + TREE.note(potentially_url)
           msg_content_altered = True
 
       if not msg_content_altered:
@@ -34,53 +34,14 @@ class DISCUSSION_RENDER:
         f'</div>' +
         (f'</a>' if origin else "")
       )
-    except:
+    except Exception as e:
       print("ERROR: could not render msg: '" + str(msg) + "'")
+      print(" ", str(e))
       return str(msg)
 
   @classmethod
   def MAIN(cls, note):
-    sections = PARSER.parse_file(FLAT.to_path(note))
-
-    acc = []
-    for section in sections:
-      if section['section'] != 'entry':
-        acc.append(f'<pre>--- {section["section"]} --- </pre>')
-
-      pre_acc = list()
-
-      # don't print two empty blocks consecutively
-      for block in PARSER.trim_newlines(section['blocks']):
-
-        if block == ['']:
-          debug("whitespace")
-          pre_acc.append('')
-          continue
-
-        for item in block:
-          # if item is a tree/node
-          if isinstance(item, dict):
-            if 0 != len(pre_acc):
-              acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
-              pre_acc = list()
-
-            result = RENDER.node(item)
-            if result:
-              acc.append(result)
-              continue
-
-          if isinstance(item, str):
-            pre_acc.append(item)
-            debug("string:", item)
-            continue
-
-          acc.append(repr(item))
-
-      if 0 != len(pre_acc):
-        acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
-        pre_acc = list()
-
-    content = '\n'.join(acc)
+    content = TREE.page(PARSER.parse_file(FLAT.to_path(note)))
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/note/{note}">note</a>'

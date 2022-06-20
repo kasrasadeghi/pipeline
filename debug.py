@@ -45,9 +45,8 @@ class DEBUG:
     return r
 
   @staticmethod
-  def REQUIRE_ACTIVE():
-    # CONFIGURE HERE
-    return True
+  def FILTER(debugmode):
+    return debugmode and set(debugmode.split()) in []
 
 
 # debug print
@@ -55,14 +54,14 @@ class DEBUG:
 def debug(*l, **kw):
   is_debug = 'FLASK_ENV' in os.environ and os.getenv('FLASK_ENV') == 'development'
 
-  # REQUIRE_ACTIVE makes it so that it has to have a kw-arg debugmode='ACTIVE'
-  if DEBUG.REQUIRE_ACTIVE():
-    if 'debugmode' in kw:
-      tag = kw['debugmode']
-      del kw['debugmode']
-      if tag != 'ACTIVE':
-        return
-    else:
-      return
+  if 'debugmode' in kw:
+    debugmode = kw['debugmode']
+    del kw['debugmode']
+  else:
+    debugmode = None
+
+  if not DEBUG.FILTER(debugmode):
+    return
+
   if is_debug:
     print(*l, **kw)

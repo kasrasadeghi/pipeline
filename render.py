@@ -207,26 +207,3 @@ class RENDER:
 
     navbar.append(f'</header>')
     return "".join(navbar)
-
-  @staticmethod
-  def link(url):
-    return f'<a href="{url}">{url}</a>'
-
-  @staticmethod
-  def note(note):
-    return f'<a href="{FLAT.to_url(FLAT.to_disc(note))}">{note}</a>'
-
-  @staticmethod
-  def node(item):
-    if item['value'].startswith('msg: '):
-      result = DISCUSSION_RENDER.MSG(item, lambda x: util.date_cmd("-d", x, "+%T"))
-      debug("msg:", repr(item))
-      return result
-
-    if item['value'].startswith('link: '):
-      url = item['value'].removeprefix('link: ')
-      result = '<pre>- link: ' + RENDER.link(url) + "</pre>"
-      debug("link:", repr(item))
-      return result
-
-    return None
