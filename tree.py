@@ -158,8 +158,31 @@ class TREE:
     return new_section
 
   @staticmethod
-  def squash_messages(section):
-    pass
+  def squash_messages(blocks):
+    """ removes newline blocks between messages """
+    new_blocks = list()
+
+    i = 0
+    while i < len(blocks):
+      if TREE.is_newline(blocks[i]):
+        after_msg = (i+1) < len(blocks) \
+          and len(blocks[i+1]) == 1 \
+          and isinstance(blocks[i+1][0], dict)\
+          and blocks[i+1][0]['value'].startswith('msg:')
+
+        before_msg = (i-1) < len(blocks) \
+          and len(blocks[i-1]) == 1 \
+          and isinstance(blocks[i-1][0], dict)\
+          and blocks[i-1][0]['value'].startswith('msg:')
+
+        if after_msg and before_msg:
+          i += 1
+          continue
+
+      new_blocks.append(blocks[i])
+      i += 1
+
+    return new_blocks
 
   @staticmethod
   def dump_tree(page):
