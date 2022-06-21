@@ -48,13 +48,20 @@ class TREE:
       return str(msg)
 
   @staticmethod
+  def is_msg(item):
+    if not isinstance(item, dict):
+      print("ERROR: cannot check a non-dictionary:", item)
+      return False
+    return item['value'].startswith('msg: ')
+
+  @staticmethod
   def node(item, level=0):
     result = None
 
     indent = ("  " * (level - 1)) + ("- " if level > 0 else "")
 
-    if item['value'].startswith('msg: '):
-      result = TREE.MSG(item, lambda x: util.date_cmd("-d", x, "+%T"))
+    if TREE.is_msg(item):
+      result = TREE.msg(item, lambda x: util.date_cmd("-d", x, "+%T"))
       debug("msg:", repr(item))
       return result
 
@@ -171,11 +178,11 @@ class TREE:
       if TREE.is_newline(blocks[i]):
         after_msg = (i-1) >= 0 \
           and TREE.is_singleton(blocks[i-1]) \
-          and blocks[i-1][0]['value'].startswith('msg:')
+          and TREE.is_msg(blocks[i-1][0])
 
         before_msg = (i+1) < len(blocks) \
           and TREE.is_singleton(blocks[i+1]) \
-          and blocks[i+1][0]['value'].startswith('msg:')
+          and TREE.is_msg(blocks[i+1][0])
 
         if after_msg and before_msg:
           i += 1
