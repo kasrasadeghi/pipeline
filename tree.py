@@ -134,6 +134,12 @@ class TREE:
       acc.append(TREE.section(section))
 
     return ''.join(acc)
+
+  @staticmethod
+  def is_newline(block):
+    """ a newline block looks like this: [''] """
+    return len(block) == 1 and block[0] == ''
+
   @staticmethod
   def is_singleton(block):
     """ a singleton is a block with one item that is a dict, and thus a parsed tree """
@@ -141,23 +147,17 @@ class TREE:
 
   @staticmethod
   def trim_newlines(section):
-    """
-    this function deletes consecutive newline blocks
-    - a newline block looks like this: ['']
-    """
+    """ this function deletes consecutive newline blocks """
     new_section = []
-
-    def is_newline(block):
-      return len(block) == 1 and block[0] == ''
 
     i = 0
     while i < len(section):
       block = section[i]
       new_section.append(block)
-      debug("trim newlines", repr(block), is_newline(block))
+      debug("trim newlines", repr(block), TREE.is_newline(block))
 
-      if i < len(section) and is_newline(section[i]):
-        while i < len(section) and is_newline(section[i]):
+      if i < len(section) and TREE.is_newline(section[i]):
+        while i < len(section) and TREE.is_newline(section[i]):
           i += 1
           debug("trim newlines, consuming:", repr(block))
       else:
