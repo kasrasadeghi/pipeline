@@ -1,9 +1,8 @@
 import os
 
 class DISCUSSION_RENDER:
-
-  @classmethod
-  def MAIN(cls, note):
+  @staticmethod
+  def MAIN(note):
     content = TREE.page(PARSER.parse_file(FLAT.to_path(note)))
 
     bar = FLAT_RENDER._bar(note,
