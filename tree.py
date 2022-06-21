@@ -127,6 +127,10 @@ class TREE:
       acc.append(TREE.section(section))
 
     return ''.join(acc)
+  @staticmethod
+  def is_singleton(block):
+    """ a singleton is a block with one item that is a dict, and thus a parsed tree """
+    return len(block) == 1 and isinstance(block[0], dict)
 
   @staticmethod
   def trim_newlines(section):
@@ -166,13 +170,11 @@ class TREE:
     while i < len(blocks):
       if TREE.is_newline(blocks[i]):
         after_msg = (i-1) >= 0 \
-          and len(blocks[i-1]) == 1 \
-          and isinstance(blocks[i-1][0], dict)\
+          and TREE.is_singleton(blocks[i-1]) \
           and blocks[i-1][0]['value'].startswith('msg:')
 
         before_msg = (i+1) < len(blocks) \
-          and len(blocks[i+1]) == 1 \
-          and isinstance(blocks[i+1][0], dict)\
+          and TREE.is_singleton(blocks[i+1]) \
           and blocks[i+1][0]['value'].startswith('msg:')
 
         if after_msg and before_msg:
