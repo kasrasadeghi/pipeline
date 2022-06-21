@@ -165,15 +165,15 @@ class TREE:
     i = 0
     while i < len(blocks):
       if TREE.is_newline(blocks[i]):
-        after_msg = (i+1) < len(blocks) \
-          and len(blocks[i+1]) == 1 \
-          and isinstance(blocks[i+1][0], dict)\
-          and blocks[i+1][0]['value'].startswith('msg:')
-
-        before_msg = (i-1) < len(blocks) \
+        after_msg = (i-1) >= 0 \
           and len(blocks[i-1]) == 1 \
           and isinstance(blocks[i-1][0], dict)\
           and blocks[i-1][0]['value'].startswith('msg:')
+
+        before_msg = (i+1) < len(blocks) \
+          and len(blocks[i+1]) == 1 \
+          and isinstance(blocks[i+1][0], dict)\
+          and blocks[i+1][0]['value'].startswith('msg:')
 
         if after_msg and before_msg:
           i += 1
