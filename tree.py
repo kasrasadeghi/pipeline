@@ -10,13 +10,51 @@ class TREE:
     return f'<a href="{FLAT.to_url(FLAT.to_disc(note))}">{note}</a>'
 
   @staticmethod
+  def msg(msg, timerender=None):
+    try:
+      msg_date = msg['children'][0]['value'].removeprefix('Date: ')
+      msg_content = msg["value"].removeprefix("msg: ")
+      msg_content_altered = False
+      origin = msg.get('origin', None)  # second argument of .get() is a default value
+
+      if ': ' in msg_content:
+        prefix, potentially_url = msg_content.rsplit(': ', 1)
+        if potentially_url.strip().startswith('https://'):
+          msg_content = prefix + ": " + TREE.link(potentially_url)
+          msg_content_altered = True
+        if potentially_url.strip().endswith(".note") and \
+           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
+          msg_content = prefix + ": " + TREE.note(potentially_url)
+          msg_content_altered = True
+
+      if not msg_content_altered:
+        msg_content = escape(msg_content)
+
+      if timerender:
+        date = timerender(msg_date)
+      else:
+        date = util.date_cmd("-d", msg_date, "+%b %d %T")
+      return (
+        (f'<a href="/disc/{origin}">' if origin else "") +
+        f'<div class="msg">'
+        f'<div class="msg_timestamp">{date}</div>'
+        f'<div class="msg_content">{msg_content}</div>'
+        f'</div>' +
+        (f'</a>' if origin else "")
+      )
+    except Exception as e:
+      print("ERROR: could not render msg: '" + str(msg) + "'")
+      print(" ", str(e))
+      return str(msg)
+
+  @staticmethod
   def node(item, level=0):
     result = None
 
     indent = ("  " * (level - 1)) + ("- " if level > 0 else "")
 
     if item['value'].startswith('msg: '):
-      result = DISCUSSION_RENDER.MSG(item, lambda x: util.date_cmd("-d", x, "+%T"))
+      result = TREE.MSG(item, lambda x: util.date_cmd("-d", x, "+%T"))
       debug("msg:", repr(item))
       return result
 
