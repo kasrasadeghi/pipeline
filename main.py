@@ -42,17 +42,6 @@ kaz_import('debug.py')
 
 # END IMPORTS
 
-# ROUTES
-
-@app.route("/receive_info", methods=['POST'])
-def receive_info():
-  # print('client ip:', request.remote_addr)
-  # print(request.headers)
-  # print(request.json)
-  return Response('', 204)
-
-# END ROUTES
-
 # MAIN
 
 def main():
