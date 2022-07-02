@@ -41,3 +41,11 @@ class util:
         acc.append("\n")
       acc.append(c)
     return "".join(acc)
+
+  @staticmethod
+  def day_before(datetime_str):
+    return util.date_cmd("-d", datetime_str + " - 1 day")  # literally subtract a day, unix 'date' can do that
+
+  @staticmethod
+  def day_after(datetime_str):
+    return util.date_cmd("-d", datetime_str + " + 1 day")
