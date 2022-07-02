@@ -21,6 +21,18 @@ class FLAT:
   def to_path(cls, note):
     return cls.path + "/" + note
 
+  @staticmethod
+  def try_from_url(url):
+    host = request.headers["Host"]  # like 192.37.37.3:5000
+    if url.startswith(f"http://{host}"):
+      url = url.removeprefix(f"http://{host}")
+
+    if url.startswith('/note/'):
+      return url.removeprefix("/note/")
+    if url.startswith('/disc/'):
+      return url.removeprefix("/disc/")
+    return url
+
   @classmethod
   def exists(cls, note):
     return os.path.isfile(cls.to_path(note))
@@ -96,6 +108,9 @@ class FLAT:
 
   @classmethod
   def metadata(cls, note):
+    if not FLAT.exists(note):
+      raise FileNotFoundError("cannot find notes file at " + note)
+
     with open(cls.to_path(note)) as f:
       reading = False
       acc = list()

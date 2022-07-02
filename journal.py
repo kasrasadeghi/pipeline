@@ -63,3 +63,27 @@ def route_after(note):
       return redirect(FLAT.to_url(FLAT.to_disc(n)))
 
   return "ERROR: could not find journal on the day after"
+
+@app.route("/before")
+def route_before_bare():
+  note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  journal_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
+
+  # look for a note
+  for n in FLAT.list():
+    if journal_title == FLAT.title(n):
+      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+
+  return "ERROR: could not find journal on the day before, which was: " + journal_title
+
+@app.route("/after")
+def route_after_bare():
+  note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  journal_title = JOURNAL.date_to_title(util.day_after(FLAT.metadata(note)['Date']))
+
+  # look for a note
+  for n in FLAT.list():
+    if journal_title == FLAT.title(n):
+      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+
+  return "ERROR: could not find journal on the day after, which was: " + journal_title
