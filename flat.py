@@ -123,38 +123,32 @@ class FLAT:
 
   @classmethod
   def today(cls):
-    day_of_month = check_output(["date", "+%e"]).decode('latin-1').strip()
-    day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
-    month, year = check_output(["date", "+%B %Y"]).decode('latin-1').rstrip().split()
-    title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
+    D = JOURNAL.date_to_parts(util.get_current_time())
 
     for n in FLAT.list():
-      if title == FLAT.title(n):
+      if D['title'] == FLAT.title(n):
         return n
 
-    new_note = FLAT.make_new(title=title)
+    new_note = FLAT.make_new(title=D['title'])
     with open(FLAT.to_path(new_note)) as f:
       content = f.read()
     with open(FLAT.to_path(new_note), "w") as f:
-      f.write(f"# {month} {day_of_month}\n\n" + content + "Tags: Journal\n")
+      f.write(f"# {D['month']} {D['day_of_month']}\n\n{content}Tags: Journal\n")
     return new_note
 
   @classmethod
   def yesterday(cls):
-    day_of_month = check_output(["date", "--date=yesterday", "+%e"]).decode('latin-1').strip()
-    day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
-    month, year = check_output(["date", "--date=yesterday", "+%B %Y"]).decode('latin-1').rstrip().split()
-    title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
+    D = JOURNAL.date_to_parts("yesterday")
 
     for n in FLAT.list():
-      if title == FLAT.title(n):
+      if D['title'] == FLAT.title(n):
         return n
 
-    new_note = FLAT.make_new(title=title)
+    new_note = FLAT.make_new(title=D['title'])
     with open(FLAT.to_path(new_note)) as f:
       content = f.read()
     with open(FLAT.to_path(new_note), "w") as f:
-      f.write(f"# {month} {day_of_month}\n\n" + content + "Tags: Journal\n")
+      f.write(f"# {D['month']} {D['day_of_month']}\n\n{content}Tags: Journal\n")
     return new_note
 
   @classmethod
