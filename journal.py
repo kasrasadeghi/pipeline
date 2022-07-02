@@ -31,6 +31,17 @@ def today():
 def yesterday():
   return redirect(FLAT.to_url(FLAT.to_disc(FLAT.yesterday())), code=302)
 
+@app.route("/day-of/<note>")
+def route_day_of(note):
+  journal_title = JOURNAL.date_to_title(FLAT.metadata(note)['Date'])
+
+  # look for a note
+  for n in FLAT.list():
+    if journal_title == FLAT.title(n):
+      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+
+  return "ERROR: could not find journal on that day"
+
 @app.route("/before/<note>")
 def route_before(note):
   day_before_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
@@ -40,7 +51,7 @@ def route_before(note):
     if day_before_title == FLAT.title(n):
       return redirect(FLAT.to_url(FLAT.to_disc(n)))
 
-  return "ERROR: could not find note before"
+  return "ERROR: could not find journal on the day before"
 
 @app.route("/after/<note>")
 def route_after(note):
@@ -51,4 +62,4 @@ def route_after(note):
     if day_after_title == FLAT.title(n):
       return redirect(FLAT.to_url(FLAT.to_disc(n)))
 
-  return "ERROR: could not find note after"
+  return "ERROR: could not find journal on the day after"
