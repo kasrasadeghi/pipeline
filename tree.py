@@ -101,7 +101,7 @@ class TREE:
         pre_acc = list()
 
     # don't print two empty blocks consecutively
-    for block in TREE.trim_newlines(section['blocks']):
+    for block in TREE.squash_messages(TREE.trim_newlines(section['blocks'])):
 
       if block == ['']:
         debug("whitespace")
