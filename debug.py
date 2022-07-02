@@ -65,3 +65,21 @@ def debug(*l, **kw):
 
   if is_debug:
     print(*l, **kw)
+
+
+@app.route("/debuginfo")
+def route_debuginfo():
+  jsondump = lambda data: json.dumps(data, default=lambda x: str(x), indent=2)
+
+  return (
+    f"<h1>client ip:</h1><pre>{request.remote_addr}</pre>"
+    f"<h1>request.environ:</h1><pre>{jsondump(request.environ)}</pre>"
+    f"<h1>request headers:</h1><pre>{request.headers}</pre>"
+  )
+
+@app.route("/receive_info", methods=['POST'])
+def receive_info():
+  # print('client ip:', request.remote_addr)
+  # print(request.headers)
+  # print(request.json)
+  return Response('', 204)
