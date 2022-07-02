@@ -93,13 +93,6 @@ class TREE:
     if section['section'] != 'entry':
       acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
-    pre_acc = list()
-    def flush_pre_acc():
-      nonlocal pre_acc
-      if 0 != len(pre_acc):
-        acc.append("<pre>" + '\n'.join(pre_acc) + "</pre>")
-        pre_acc = list()
-
     # don't print two empty blocks consecutively
     for block in TREE.squash_messages(TREE.trim_newlines(section['blocks'])):
 
@@ -111,20 +104,18 @@ class TREE:
       for item in block:
         # if item is a tree/node
         if isinstance(item, dict):
-          flush_pre_acc()
 
           acc.append(TREE.node(item))
           continue
 
         if isinstance(item, str):
-          pre_acc.append(item)
+          acc.append(f"<pre>{item}</pre>")
           debug("string:", item)
           continue
 
         acc.append(repr(item))
 
-    flush_pre_acc()
-    return ''.join(acc)
+    return '\n'.join(acc)
 
   @staticmethod
   def page(sections):
@@ -133,7 +124,7 @@ class TREE:
     for section in sections:
       acc.append(TREE.section(section))
 
-    return ''.join(acc)
+    return '\n'.join(acc)
 
   @staticmethod
   def is_newline(block):
