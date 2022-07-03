@@ -50,40 +50,26 @@ def route_day_of(note):
 
   return "ERROR: could not find journal on that day"
 
+@app.route("/before", defaults={"note": None})
 @app.route("/before/<note>")
 def route_before(note):
-  journal_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
+  if not note:
+    note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  journal_title = JOURNAL.date_to_title(util.day_before(current_day := FLAT.metadata(note)['Date']))
 
   if n := FLAT.find_note_with_title(journal_title):
     return redirect(FLAT.to_disc_url(n))
 
-  return "ERROR: could not find journal on the day before"
+  return f"ERROR: could not find journal on the day before {JOURNAL.date_to_title(current_day)}, which was {journal_title}"
 
+@app.route("/after", defaults={"note": None})
 @app.route("/after/<note>")
 def route_after(note):
-  journal_title = JOURNAL.date_to_title(util.day_after(FLAT.metadata(note)['Date']))
+  if not note:
+    note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  journal_title = JOURNAL.date_to_title(util.day_after(current_day := FLAT.metadata(note)['Date']))
 
   if n := FLAT.find_note_with_title(journal_title):
     return redirect(FLAT.to_disc_url(n))
 
-  return "ERROR: could not find journal on the day after"
-
-@app.route("/before")
-def route_before_bare():
-  note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-  journal_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
-
-  if n := FLAT.find_note_with_title(journal_title):
-    return redirect(FLAT.to_disc_url(n))
-
-  return "ERROR: could not find journal on the day before, which was: " + journal_title
-
-@app.route("/after")
-def route_after_bare():
-  note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-  journal_title = JOURNAL.date_to_title(util.day_after(FLAT.metadata(note)['Date']))
-
-  if n := FLAT.find_note_with_title(journal_title):
-    return redirect(FLAT.to_disc_url(n))
-
-  return "ERROR: could not find journal on the day after, which was: " + journal_title
+  return f"ERROR: could not find journal on the day after {JOURNAL.date_to_title(current_day)}, which was {journal_title}"
