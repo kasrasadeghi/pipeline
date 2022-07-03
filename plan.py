@@ -1,8 +1,4 @@
-class PLAN:
-  pass
-
 class PLAN_RENDER:
-
   @staticmethod
   def section(section):
     if section['section'] == 'METADATA':
@@ -21,10 +17,45 @@ class PLAN_RENDER:
       if "DAILY" in block[0]['value']:
         msg_blocks.append(block)
 
-    result = list()
-    for b in msg_blocks:
-      result.append(TREE.msg(b[0], lambda x: util.date_cmd("-d", x, "+%T")))
-    return "".join(result)
+    def render_msg(msg_block, date_prefix=''):
+      return TREE.msg(msg_block[0], lambda x: date_prefix + util.date_cmd("-d", x, "+%T"))
+
+    try:
+      import itertools
+      todo = [{"isDone": False, "block": item}
+              for item in filter(lambda x: "ADD" in x[0]['value'], msg_blocks)]
+      done = [{"startedWhen": None, "block": item}
+              for item in filter(lambda x: "DONE" in x[0]['value'], msg_blocks)]
+
+      dangling_done = list()
+      for d in done:
+        task = d['block'][0]['value'].removeprefix("msg: DAILY DONE:")
+        corresponding_todo_msg = "msg: DAILY ADD:" + task
+
+        found = False
+        for t in todo:
+          if corresponding_todo_msg == t['block'][0]['value']:
+            found = True
+            t['isDone'] = True
+            d['startedWhen'] = t['block'][0]['children'][0]
+
+        if not found:
+          dangling_done.append(d)
+      return (
+        "<pre>TODO:</pre>"
+        + "".join(map(lambda x: render_msg(x['block']),
+                      filter(lambda y: not y['isDone'], todo)))
+        + "<pre>DONE:</pre>"
+        + "".join(map(lambda x: render_msg(x['block']), done))
+        + "<pre>DANGLING DONE:</pre>"
+        + "".join(map(render_msg, dangling_done))
+      )
+
+
+    except Exception as e:
+      return (f"<pre>error parsing message:\n</pre>"
+              + "".join(map(render_msg, msg_blocks))
+              )
 
 
   @staticmethod
