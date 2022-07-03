@@ -10,8 +10,8 @@ class JOURNAL_RENDER:
 class JOURNAL:
   @staticmethod
   def is_journal(metadata_section):
-    parsed_metadata = TREE.parse_metadata(metadata_section)
-    return 'Tags' in parsed_metadata and "Journal" in parsed_metadata['Tags']
+    metadata = TREE.parse_metadata(metadata_section)
+    return 'Tags' in metadata and "Journal" in metadata['Tags']
 
   @staticmethod
   def date_to_parts(date_str):
