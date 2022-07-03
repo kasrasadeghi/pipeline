@@ -38,7 +38,8 @@ class DEBUG:
     if _STATE is not None:
       if 'LOG' in _STATE:
         # if log is empty, don't print anything
-        return ''
+        if 0 == len(_STATE['LOG']):
+          return ''
 
         # rearrange to put the log at the end
         log = _STATE['LOG']
