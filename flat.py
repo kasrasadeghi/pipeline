@@ -147,9 +147,8 @@ class FLAT:
   def today(cls):
     D = JOURNAL.date_to_parts(util.get_current_time())
 
-    for n in FLAT.list():
-      if D.title == FLAT.title(n):
-        return n
+    if n := FLAT.find_note_with_title(D.title):
+      return n
 
     new_note = FLAT.make_new(title=D.title)
     with open(FLAT.to_path(new_note)) as f:
@@ -162,9 +161,8 @@ class FLAT:
   def yesterday(cls):
     D = JOURNAL.date_to_parts("yesterday")
 
-    for n in FLAT.list():
-      if D['title'] == FLAT.title(n):
-        return n
+    if n := FLAT.find_note_with_title(D.title):
+      return n
 
     new_note = FLAT.make_new(title=D.title)
     with open(FLAT.to_path(new_note)) as f:
