@@ -81,10 +81,12 @@ class PLAN_RENDER:
                       f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
                       f"{content}</div>",
+                      DEBUG.CONTENT(),
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
 
 @app.route('/plan/<note>')
 def get_plan_note(note):
+  init_state()
   return PLAN_RENDER.MAIN(note)
