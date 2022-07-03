@@ -14,8 +14,8 @@ class FLAT:
     return "/note/" + note
 
   @classmethod
-  def to_disc(_, note):
-    return note[:-len(".note")] + ".disc"
+  def to_disc_url(_, note):
+    return "/disc/" + note
 
   @classmethod
   def to_path(cls, note):

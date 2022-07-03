@@ -39,11 +39,11 @@ def journal_list():
 
 @app.route("/today")
 def today():
-  return redirect(FLAT.to_url(FLAT.to_disc(FLAT.today())), code=302)
+  return redirect(FLAT.to_disc_url(FLAT.today()), code=302)
 
 @app.route("/yesterday")
 def yesterday():
-  return redirect(FLAT.to_url(FLAT.to_disc(FLAT.yesterday())), code=302)
+  return redirect(FLAT.to_disc_url(FLAT.yesterday()), code=302)
 
 @app.route("/day-of/<note>")
 def route_day_of(note):
@@ -52,7 +52,7 @@ def route_day_of(note):
   # look for a note
   for n in FLAT.list():
     if journal_title == FLAT.title(n):
-      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+      return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on that day"
 
@@ -63,7 +63,7 @@ def route_before(note):
   # look for a note
   for n in FLAT.list():
     if day_before_title == FLAT.title(n):
-      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+      return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day before"
 
@@ -74,7 +74,7 @@ def route_after(note):
   # look for a note
   for n in FLAT.list():
     if day_after_title == FLAT.title(n):
-      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+      return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day after"
 
@@ -86,7 +86,7 @@ def route_before_bare():
   # look for a note
   for n in FLAT.list():
     if journal_title == FLAT.title(n):
-      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+      return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day before, which was: " + journal_title
 
@@ -98,6 +98,6 @@ def route_after_bare():
   # look for a note
   for n in FLAT.list():
     if journal_title == FLAT.title(n):
-      return redirect(FLAT.to_url(FLAT.to_disc(n)))
+      return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day after, which was: " + journal_title
