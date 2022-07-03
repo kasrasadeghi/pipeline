@@ -12,8 +12,6 @@ class PLAN_RENDER:
       if not TREE.block_is_msg(block):
         continue
 
-      print(block)
-
       if "DAILY" in block[0]['value']:
         msg_blocks.append(block)
 
@@ -53,6 +51,7 @@ class PLAN_RENDER:
 
 
     except Exception as e:
+      DEBUG.CATCH(e)
       return "<pre>error parsing message:\n</pre>" + "".join(map(render_msg, msg_blocks))
 
 
@@ -81,7 +80,7 @@ class PLAN_RENDER:
                       f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
                       f"{content}</div>",
-                      DEBUG.CONTENT(),
+                      "<br>", DEBUG.CONTENT(),
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
