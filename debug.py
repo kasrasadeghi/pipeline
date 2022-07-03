@@ -1,5 +1,5 @@
 import time
-# TODO: import traceback # format_exc (for printing stacktraces)
+import traceback # format_exc (for printing stacktraces)
 
 # TODO should make state request specific so that it can be multithreaded or multi-processed
 _STATE = None
@@ -15,8 +15,11 @@ def init_state():
   _STATE['LOG'] = list()
 
 def set_state(k, v):
-  LOG(f"set '{k}' to '{v}'")
-  _STATE[k] = v
+  if _STATE:
+    LOG(f"set '{k}' to '{v}'")
+    _STATE[k] = v
+  else:
+    print("cannot set_state without `init_state()`")
 
 def get_state(k):
   return _STATE[k]
@@ -24,6 +27,7 @@ def get_state(k):
 def LOG(s):
   if _STATE:
     _STATE['LOG'].append(s)
+  else:
     print("cannot LOG without `init_state()`")
   print("LOG: " + str(s))
 
@@ -33,15 +37,23 @@ class DEBUG:
     debug = ""
     if _STATE is not None:
       if 'LOG' in _STATE:
+        # if log is empty, don't print anything
+        return ''
+
         # rearrange to put the log at the end
         log = _STATE['LOG']
         del _STATE['LOG']
         _STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{json.dumps(_STATE, indent=2)}</pre>"
+      debug = f"<pre>DEBUG STATE: \n" + f"{json.dumps(_STATE, indent=2)}\n"
+      debug += _STATE.get("stacktrace", "")
+      debug += "</pre>"
     clear_state()
     return debug
 
   # TODO add a traceback section to this
+  @staticmethod
+  def CATCH(exception):
+    set_state("stacktrace", traceback.format_exc())
 
   @staticmethod
   def TEXT(title, content):
