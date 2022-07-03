@@ -53,9 +53,8 @@ class PLAN_RENDER:
 
 
     except Exception as e:
-      return (f"<pre>error parsing message:\n</pre>"
-              + "".join(map(render_msg, msg_blocks))
-              )
+      return "<pre>error parsing message:\n</pre>" + "".join(map(render_msg, msg_blocks))
+
 
 
   @staticmethod
