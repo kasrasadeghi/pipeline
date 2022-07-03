@@ -19,7 +19,7 @@ def set_state(k, v):
     LOG(f"set '{k}' to '{v}'")
     _STATE[k] = v
   else:
-    print("cannot set_state without `init_state()`")
+    print("stateless ", end='')
 
 def get_state(k):
   return _STATE[k]
@@ -28,7 +28,7 @@ def LOG(s):
   if _STATE:
     _STATE['LOG'].append(s)
   else:
-    print("cannot LOG without `init_state()`")
+    print("stateless ", end='')
   print("LOG: " + str(s))
 
 class DEBUG:
@@ -45,7 +45,7 @@ class DEBUG:
         log = _STATE['LOG']
         del _STATE['LOG']
         _STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{json.dumps(_STATE, indent=2)}\n"
+      debug = f"<pre>DEBUG STATE: \n" + f"{str(escape(json.dumps(_STATE, indent=2, default=lambda x: str(x))))}\n"
       debug += _STATE.get("stacktrace", "")
       debug += "</pre>"
     clear_state()
