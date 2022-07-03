@@ -21,7 +21,7 @@ class PLAN_RENDER:
       return TREE.msg(msg_block[0], lambda x: date_prefix + util.date_cmd("-d", x, "+%T"))
 
     try:
-      import itertools
+      import itertools  # repeat
       todo = [{"isDone": False, "block": item}
               for item in filter(lambda x: "ADD" in x[0]['value'], msg_blocks)]
       done = [{"startedWhen": None, "block": item}
