@@ -1,4 +1,18 @@
+class JOURNAL_RENDER:
+  @staticmethod
+  def METADATA(metadata):
+    """ @param metadata - must be parsed metadata"""
+    return (f"<pre>Journal for {metadata['Title']}\n"
+            f"- created at {util.date_cmd('-d', metadata['Date'], '+%T %Z')}\n"
+            f'- see the day <a href="/before">before</a> <a href="/after">after</a>'
+            f"</pre>")
+
 class JOURNAL:
+  @staticmethod
+  def is_journal(metadata_section):
+    parsed_metadata = TREE.parse_metadata(metadata_section)
+    return "Journal" in parsed_metadata['Tags']
+
   @staticmethod
   def date_to_parts(date_str):
     day_of_month = check_output(["date", "-d", date_str, "+%e"]).decode('latin-1').strip()
