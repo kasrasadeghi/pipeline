@@ -1,4 +1,5 @@
 import time
+# TODO: import traceback # format_exc (for printing stacktraces)
 
 # TODO should make state request specific so that it can be multithreaded or multi-processed
 _STATE = None
@@ -21,12 +22,14 @@ def get_state(k):
   return _STATE[k]
 
 def LOG(s):
-  _STATE['LOG'].append(s)
+  if _STATE:
+    _STATE['LOG'].append(s)
+    print("cannot LOG without `init_state()`")
   print("LOG: " + str(s))
 
 class DEBUG:
   @staticmethod
-  def TEXT(title, content):
+  def CONTENT():
     debug = ""
     if _STATE is not None:
       if 'LOG' in _STATE:
@@ -35,18 +38,25 @@ class DEBUG:
         del _STATE['LOG']
         _STATE['LOG'] = log
       debug = f"<pre>DEBUG STATE: \n" + f"{json.dumps(_STATE, indent=2)}</pre>"
+    clear_state()
+    return debug
+
+  # TODO add a traceback section to this
+
+  @staticmethod
+  def TEXT(title, content):
+    debug = DEBUG.CONTENT()
 
     r = Response(f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>"
                  f"<body><div class=\"content\">"
                  f"<pre>{content}</pre>" +
                  debug +
                  "</div></body></html>", mimetype="text/html")
-    clear_state()
     return r
 
   @staticmethod
   def FILTER(debugmode):
-    return debugmode and set(debugmode.split()) in []
+    return debugmode and set(debugmode.split()) in []  # set to anything right now
 
 
 # debug print
