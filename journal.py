@@ -19,11 +19,7 @@ class JOURNAL:
     day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
     month, year = util.date_cmd("-d", date_str, "+%B %Y").split()
     title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
-    return DICT(day_of_month=day_of_month,
-                day_of_month_suffix=day_of_month_suffix,
-                month=month,
-                year=year,
-                title=title)
+    return DICT(day_of_month, day_of_month_suffix, month, year, title)
 
   @staticmethod
   def date_to_title(date_str):
