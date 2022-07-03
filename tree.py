@@ -49,10 +49,22 @@ class TREE:
 
   @staticmethod
   def is_msg(item):
+    """ checks whether an item in a block is a msg """
     if not isinstance(item, dict):
       print("ERROR: cannot check a non-dictionary:", item)
       return False
     return item['value'].startswith('msg: ')
+
+  @staticmethod
+  def block_is_msg(block):
+    """
+    checks whether the block is just one msg
+    - this is the most common case
+    """
+    # TODO consider choosing between:
+    # - only singleton message blocks, where we'd only use block_is_msg
+    # - multimessage blocks, where we could have multiple messages in a block, possible useful for quotes and includes
+    return TREE.is_singleton(block) and TREE.is_msg(block[0])
 
   @staticmethod
   def node(item, level=0):
