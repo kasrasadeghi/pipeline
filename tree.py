@@ -88,21 +88,23 @@ class TREE:
     return "".join(acc)
 
   @staticmethod
+  def parse_metadata(section):
+    metadata_section = "\n".join(map(
+      lambda x: "\n".join(x),
+      section['blocks']))
+    metadata = {p[0]: p[1].strip() for p in
+                [x.split(":", 1) for x in metadata_section.split('\n') if x]}
+    return metadata
+
+  @staticmethod
   def section(section):
     acc = list()
     if section['section'] != 'entry':
       acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
     if section['section'] == 'METADATA':
-      metadata_section = "\n".join(map(
-        lambda x: "\n".join(x),
-        section['blocks']))
-      metadata = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in metadata_section.split('\n') if x]}
-      if "Journal" in metadata['Tags']:
-        return (f"<pre>Journal for {metadata['Title']}\n"
-                f"- created at {util.date_cmd('-d', metadata['Date'], '+%T %Z')}\n"
-                f'- see the day <a href="/before">before</a> <a href="/after">after</a>'
-                f"</pre>")
+      if JOURNAL.is_journal(section):
+        return JOURNAL_RENDER.METADATA(TREE.parse_metadata(section))
 
     # don't print two empty blocks consecutively
     for block in TREE.squash_messages(TREE.trim_newlines(section['blocks'])):
