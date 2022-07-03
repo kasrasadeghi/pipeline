@@ -151,11 +151,11 @@ class FLAT:
       if D.title == FLAT.title(n):
         return n
 
-    new_note = FLAT.make_new(title=D['title'])
+    new_note = FLAT.make_new(title=D.title)
     with open(FLAT.to_path(new_note)) as f:
       content = f.read()
     with open(FLAT.to_path(new_note), "w") as f:
-      f.write(f"# {D['month']} {D['day_of_month']}\n\n{content}Tags: Journal\n")
+      f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
     return new_note
 
   @classmethod
@@ -166,11 +166,11 @@ class FLAT:
       if D['title'] == FLAT.title(n):
         return n
 
-    new_note = FLAT.make_new(title=D['title'])
+    new_note = FLAT.make_new(title=D.title)
     with open(FLAT.to_path(new_note)) as f:
       content = f.read()
     with open(FLAT.to_path(new_note), "w") as f:
-      f.write(f"# {D['month']} {D['day_of_month']}\n\n{content}Tags: Journal\n")
+      f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
     return new_note
 
   @classmethod
