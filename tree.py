@@ -74,7 +74,6 @@ class TREE:
 
     if TREE.is_msg(item):
       result = TREE.msg(item, lambda x: util.date_cmd("-d", x, "+%T"))
-      debug("msg:", repr(item))
       return result
 
     if item['value'].startswith('link: '):
