@@ -141,7 +141,7 @@ class FLAT:
     D = JOURNAL.date_to_parts(util.get_current_time())
 
     for n in FLAT.list():
-      if D['title'] == FLAT.title(n):
+      if D.title == FLAT.title(n):
         return n
 
     new_note = FLAT.make_new(title=D['title'])

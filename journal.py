@@ -19,15 +19,15 @@ class JOURNAL:
     day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
     month, year = check_output(["date", "-d", date_str, "+%B %Y"]).decode('latin-1').rstrip().split()
     title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
-    return {"day_of_month": day_of_month,
-            "day_of_month_suffix": day_of_month_suffix,
-            "month": month,
-            "year": year,
-            "title": title}
+    return DICT(day_of_month=day_of_month,
+                day_of_month_suffix=day_of_month_suffix,
+                month=month,
+                year=year,
+                title=title)
 
   @staticmethod
   def date_to_title(date_str):
-    return JOURNAL.date_to_parts(date_str)['title']
+    return JOURNAL.date_to_parts(date_str).title
 
 @app.route("/journals")
 def journal_list():

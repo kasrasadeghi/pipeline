@@ -22,33 +22,33 @@ class PLAN_RENDER:
 
     try:
       import itertools  # repeat
-      todo = [{"isDone": False, "block": item}
+      todo = [DICT(isDone=False, block=item)
               for item in filter(lambda x: "ADD" in x[0]['value'], msg_blocks)]
-      done = [{"startedWhen": None, "block": item}
+      done = [DICT(startedWhen=None, block=item)
               for item in filter(lambda x: "DONE" in x[0]['value'], msg_blocks)]
 
       dangling_done = list()
       for d in done:
-        task = d['block'][0]['value'].removeprefix("msg: DAILY DONE:")
+        task = d.block[0]['value'].removeprefix("msg: DAILY DONE:")
         corresponding_todo_msg = "msg: DAILY ADD:" + task
 
         found = False
         for t in todo:
-          if corresponding_todo_msg == t['block'][0]['value']:
+          if corresponding_todo_msg == t.block[0]['value']:
             found = True
-            t['isDone'] = True
-            d['startedWhen'] = t['block'][0]['children'][0]
+            t.isDone = True
+            d.startedWhen = t.block[0]['children'][0]
 
         if not found:
           dangling_done.append(d)
       return (
         "<pre>TODO:</pre>"
-        + "".join(map(lambda x: render_msg(x['block']),
-                      filter(lambda y: not y['isDone'], todo)))
+        + "".join(map(lambda x: render_msg(x.block),
+                      filter(lambda y: not y.isDone, todo)))
         + "<pre>DONE:</pre>"
-        + "".join(map(lambda x: render_msg(x['block']), done))
-        + "<pre>DANGLING DONE:</pre>"
-        + "".join(map(render_msg, dangling_done))
+        + "".join(map(lambda x: render_msg(x.block), done))
+        + ("<pre>DANGLING DONE:</pre>"
+           + "".join(map(render_msg, dangling_done)) if dangling_done else "")
       )
 
 
