@@ -4,6 +4,7 @@ import sys  # argv
 import json  # load, dump
 import datetime
 from subprocess import check_output
+from types import SimpleNamespace as DICT
 
 from flask import Flask, Response, render_template, escape, request, redirect
 
