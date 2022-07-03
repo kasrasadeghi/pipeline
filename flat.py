@@ -22,6 +22,13 @@ class FLAT:
     return cls.path + "/" + note
 
   @staticmethod
+  def find_note_with_title(title):
+    for n in FLAT.list():
+      if title == FLAT.title(n):
+        return n
+    return None
+
+  @staticmethod
   def try_from_url(url):
     host = request.headers["Host"]  # like 192.37.37.3:5000
     if url.startswith(f"http://{host}"):
