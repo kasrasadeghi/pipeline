@@ -45,32 +45,26 @@ def yesterday():
 def route_day_of(note):
   journal_title = JOURNAL.date_to_title(FLAT.metadata(note)['Date'])
 
-  # look for a note
-  for n in FLAT.list():
-    if journal_title == FLAT.title(n):
-      return redirect(FLAT.to_disc_url(n))
+  if n := FLAT.find_note_with_title(journal_title):
+    return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on that day"
 
 @app.route("/before/<note>")
 def route_before(note):
-  day_before_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
+  journal_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
 
-  # look for a note
-  for n in FLAT.list():
-    if day_before_title == FLAT.title(n):
-      return redirect(FLAT.to_disc_url(n))
+  if n := FLAT.find_note_with_title(journal_title):
+    return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day before"
 
 @app.route("/after/<note>")
 def route_after(note):
-  day_after_title = JOURNAL.date_to_title(util.day_after(FLAT.metadata(note)['Date']))
+  journal_title = JOURNAL.date_to_title(util.day_after(FLAT.metadata(note)['Date']))
 
-  # look for a note
-  for n in FLAT.list():
-    if day_after_title == FLAT.title(n):
-      return redirect(FLAT.to_disc_url(n))
+  if n := FLAT.find_note_with_title(journal_title):
+    return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day after"
 
@@ -79,10 +73,8 @@ def route_before_bare():
   note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
   journal_title = JOURNAL.date_to_title(util.day_before(FLAT.metadata(note)['Date']))
 
-  # look for a note
-  for n in FLAT.list():
-    if journal_title == FLAT.title(n):
-      return redirect(FLAT.to_disc_url(n))
+  if n := FLAT.find_note_with_title(journal_title):
+    return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day before, which was: " + journal_title
 
@@ -91,9 +83,7 @@ def route_after_bare():
   note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
   journal_title = JOURNAL.date_to_title(util.day_after(FLAT.metadata(note)['Date']))
 
-  # look for a note
-  for n in FLAT.list():
-    if journal_title == FLAT.title(n):
-      return redirect(FLAT.to_disc_url(n))
+  if n := FLAT.find_note_with_title(journal_title):
+    return redirect(FLAT.to_disc_url(n))
 
   return "ERROR: could not find journal on the day after, which was: " + journal_title
