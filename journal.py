@@ -11,7 +11,7 @@ class JOURNAL:
   @staticmethod
   def is_journal(metadata_section):
     parsed_metadata = TREE.parse_metadata(metadata_section)
-    return "Journal" in parsed_metadata['Tags']
+    return 'Tags' in parsed_metadata and "Journal" in parsed_metadata['Tags']
 
   @staticmethod
   def date_to_parts(date_str):
