@@ -13,7 +13,8 @@ app = Flask(__name__)
 
 def kaz_import(filepath):
   with open(filepath) as f:
-    exec(f.read(), globals())
+    compiled = compile(f.read(), filepath, 'exec')
+    exec(compiled, globals())
 
 # IMPORTS
 
