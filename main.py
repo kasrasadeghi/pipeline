@@ -4,7 +4,6 @@ import sys  # argv
 import json  # load, dump
 import datetime
 from subprocess import check_output
-from types import SimpleNamespace as DICT
 
 from flask import Flask, Response, render_template, escape, request, redirect
 
@@ -18,6 +17,8 @@ def kaz_import(filepath):
     exec(compiled, globals())
 
 # IMPORTS
+
+kaz_import('magic.py')
 
 kaz_import('util.py')
 
