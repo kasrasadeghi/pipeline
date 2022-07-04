@@ -42,15 +42,17 @@ class PLAN_RENDER:
 
         if not found:
           dangling_done.append(d)
-      return (
-        "<pre>TODO:</pre>"
-        + "".join(map(lambda x: render_msg(x.block),
-                      filter(lambda y: not y.isDone, todo)))
-        + "<pre>DONE:</pre>"
-        + "".join(map(lambda x: render_msg(x.block), done))
-        + ("<pre>DANGLING DONE:</pre>"
-           + "".join(map(lambda x: render_msg(x.block), dangling_done)) if dangling_done else "")
-      )
+
+      undone_todos = list(filter(lambda y: not y.isDone, todo))
+      def render_todos(title, l):
+        if l:
+          return f"<pre>{title}:</pre>" + "".join(map(lambda x: render_msg(x.block), l))
+        else:
+          return ""
+
+      return (render_todos("TODO", undone_todos)
+              + render_todos("DONE", done)
+              + render_todos("DANGLING DONE", dangling_done))
 
 
     except Exception as e:
