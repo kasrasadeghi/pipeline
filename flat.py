@@ -151,11 +151,7 @@ class FLAT:
       return n
 
     new_note = FLAT.make_new(title=D.title)
-    with open(FLAT.to_path(new_note)) as f:
-      content = f.read()
-    with open(FLAT.to_path(new_note), "w") as f:
-      f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
-    return new_note
+    JOURNAL.init_journal(new_note)
 
   @classmethod
   def yesterday(cls):
@@ -165,11 +161,7 @@ class FLAT:
       return n
 
     new_note = FLAT.make_new(title=D.title)
-    with open(FLAT.to_path(new_note)) as f:
-      content = f.read()
-    with open(FLAT.to_path(new_note), "w") as f:
-      f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
-    return new_note
+    JOURNAL.init_journal(new_note)
 
   @classmethod
   def append_to_note(_, note, content):

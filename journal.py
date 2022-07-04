@@ -25,6 +25,15 @@ class JOURNAL:
   def date_to_title(date_str):
     return JOURNAL.date_to_parts(date_str).title
 
+  @staticmethod
+  def init_journal(note):
+    with open(FLAT.to_path(note)) as f:
+      content = f.read()
+    with open(FLAT.to_path(note), "w") as f:
+      f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
+    return note
+
+
 @app.route("/journals")
 def journal_list():
   return FLAT_RENDER.LIST(reversed([x for x in FLAT.list_by_create_date() if 'Tags' in FLAT.metadata(x) and "Journal" in set(FLAT.metadata(x)['Tags'].split())]),
