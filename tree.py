@@ -7,7 +7,7 @@ class TREE:
 
   @staticmethod
   def note(note):
-    return f'<a href="{FLAT.to_disc_url(note)}">{note}</a>'
+    return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
   def msg(msg, timerender=None):

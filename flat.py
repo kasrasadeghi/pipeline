@@ -10,12 +10,8 @@ class FLAT:
     return list(map(lambda x: cls.path + "/" + x, cls.list()))
 
   @classmethod
-  def to_url(_, note):
-    return "/note/" + note
-
-  @classmethod
-  def to_disc_url(_, note):
-    return "/disc/" + note
+  def to_url(_, note, view="note"):
+    return f"/{view}/{note}"
 
   @classmethod
   def to_path(cls, note):
@@ -34,10 +30,10 @@ class FLAT:
     if url.startswith(f"http://{host}"):
       url = url.removeprefix(f"http://{host}")
 
-    if url.startswith('/note/'):
-      return url.removeprefix("/note/")
-    if url.startswith('/disc/'):
-      return url.removeprefix("/disc/")
+    for view in ["note", "disc", "plan"]:
+      if url.startswith(f'/{view}/'):
+        return view, url.removeprefix(f"/{view}/")
+
     return url
 
   @classmethod
