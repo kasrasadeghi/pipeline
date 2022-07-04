@@ -46,7 +46,7 @@ class PLAN_RENDER:
         + "<pre>DONE:</pre>"
         + "".join(map(lambda x: render_msg(x.block), done))
         + ("<pre>DANGLING DONE:</pre>"
-           + "".join(map(render_msg, dangling_done)) if dangling_done else "")
+           + "".join(map(lambda x: render_msg(x.block), dangling_done)) if dangling_done else "")
       )
 
 
