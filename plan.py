@@ -1,3 +1,5 @@
+# DEPENDS ON journal.py
+
 class PLAN_RENDER:
   @staticmethod
   def section(section):
@@ -27,12 +29,13 @@ class PLAN_RENDER:
 
       dangling_done = list()
       for d in done:
-        task = d.block[0]['value'].removeprefix("msg: DAILY DONE:")
-        corresponding_todo_msg = "msg: DAILY ADD:" + task
+        done_msg = d.block[0]['value'].removeprefix("msg: ")
+        task = done_msg.split("DAILY DONE:", 1)[1]  # get what's after DAILY DONE:
+        corresponding_todo_msg = "DAILY ADD:" + task
 
         found = False
         for t in todo:
-          if corresponding_todo_msg == t.block[0]['value']:
+          if corresponding_todo_msg in t.block[0]['value']:
             found = True
             t.isDone = True
             d.startedWhen = t.block[0]['children'][0]
