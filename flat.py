@@ -181,9 +181,7 @@ class FLAT:
 
   @classmethod
   def handle_msg(_, note, form):
-
-    # debug
-    print(note, ',' + repr(form))
+    LOG(note + ': ' + repr(form))
 
     # ignore empty messages
     if '' == form['msg']:
