@@ -14,8 +14,8 @@ class DISCUSSION_RENDER:
     title = FLAT.title(note)
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\">"
-                      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
+                      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
                       f"{content}</div>",
                       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
                       f"</div></body></html>"])
