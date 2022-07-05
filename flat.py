@@ -278,9 +278,11 @@ class FLAT_RENDER:
     # compose html
     title = FLAT.title(note)
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
+                      f"<body>{bar}<div class=\"content\">",
                       f'<h1 class="title">{title}</h1>',
-                      f"{content}{forward_links}{backlinks}</pre></div></body></html>"])
+                      f"<pre style='font-feature-settings: \"liga\" 0'>"
+                      f"{content}{forward_links}{backlinks}</pre>",
+                      f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
   @classmethod
