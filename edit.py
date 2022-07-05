@@ -22,7 +22,6 @@ class EDIT_RENDER:
     """
 
     # compose html
-    title = FLAT.title(note)
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\">",
                       f'<h1 class="title">{title}</h1>',
@@ -33,6 +32,11 @@ class EDIT_RENDER:
                       f'<input class="link-button" type="submit" value="Submit"/></form>',
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
+    try:
+      title = FLAT.title(note)
+    except:
+      title = "ERROR, NOTE DOESN'T HAVE METADATA"
+      pass
 
 
 @app.route("/edit/<note>", methods=['GET', 'POST'])
