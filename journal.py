@@ -33,6 +33,28 @@ class JOURNAL:
       f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
     return note
 
+  @staticmethod
+  def find_journal_for_day(date):
+    return FLAT.find_note_with_title(JOURNAL.date_to_title(date))
+
+  @staticmethod
+  def create_journal_for_day(date):
+    title = JOURNAL.date_to_title(date)
+    new_note = FLAT.make_new(title)
+    JOURNAL.init_journal(new_note)
+    return new_note
+
+  @staticmethod
+  def today():
+    if note := JOURNAL.find_journal_for_day("today"):
+      return note
+    return create_journal_for_day("today")
+
+  @staticmethod
+  def yesterday():
+    if note := JOURNAL.find_journal_for_day("yesterday"):
+      return note
+    return create_journal_for_day("yesterday")
 
 @app.route("/journals")
 def journal_list():
@@ -44,17 +66,15 @@ def journal_list():
 
 @app.route("/today")
 def today():
-  return redirect(FLAT.to_url(FLAT.today(), view="disc"), code=302)
+  return redirect(FLAT.to_url(JOURNAL.today(), view="disc"), code=302)
 
 @app.route("/yesterday")
 def yesterday():
-  return redirect(FLAT.to_url(FLAT.yesterday(), view="disc"), code=302)
+  return redirect(FLAT.to_url(JOURNAL.yesterday(), view="disc"), code=302)
 
 @app.route("/day-of/<note>")
 def route_day_of(note):
-  journal_title = JOURNAL.date_to_title(FLAT.metadata(note)['Date'])
-
-  if n := FLAT.find_note_with_title(journal_title):
+  if n := JOURNAL.find_journal_for_day(FLAT.metadata(note)['Date']):
     return redirect(FLAT.to_url(n, view="disc"))
 
   return "ERROR: could not find journal on that day"
@@ -64,21 +84,21 @@ def route_day_of(note):
 def route_before(note):
   if not note:
     view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-  journal_title = JOURNAL.date_to_title(util.day_before(current_day := FLAT.metadata(note)['Date']))
 
-  if n := FLAT.find_note_with_title(journal_title):
+  day = util.day_before(current_day := FLAT.metadata(note)['Date'])
+  if n := JOURNAL.find_journal_for_day(day):
     return redirect(FLAT.to_url(n, view=view))
 
-  return f"ERROR: could not find journal on the day before {JOURNAL.date_to_title(current_day)}, which was {journal_title}"
+  return f"ERROR: could not find journal on the day before {JOURNAL.date_to_title(current_day)}, which is {JOURNAL.date_to_title(day)}"
 
 @app.route("/after", defaults={"note": None})
 @app.route("/after/<note>")
 def route_after(note):
   if not note:
     view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-  journal_title = JOURNAL.date_to_title(util.day_after(current_day := FLAT.metadata(note)['Date']))
 
-  if n := FLAT.find_note_with_title(journal_title):
+  day = util.day_after(current_day := FLAT.metadata(note)['Date'])
+  if n := JOURNAL.find_journal_for_day(day):
     return redirect(FLAT.to_url(n, view=view))
 
-  return f"ERROR: could not find journal on the day after {JOURNAL.date_to_title(current_day)}, which was {journal_title}"
+  return f"ERROR: could not find journal on the day after {JOURNAL.date_to_title(current_day)}, which is {JOURNAL.date_to_title(day)}"

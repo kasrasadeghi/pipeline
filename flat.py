@@ -140,26 +140,6 @@ class FLAT:
     return sorted(cls.list(), key=lambda n: util.parse_time_to_utc(FLAT.metadata(n)['Date']))
 
   @classmethod
-  def today(cls):
-    D = JOURNAL.date_to_parts(util.get_current_time())
-
-    if n := FLAT.find_note_with_title(D.title):
-      return n
-
-    new_note = FLAT.make_new(title=D.title)
-    JOURNAL.init_journal(new_note)
-
-  @classmethod
-  def yesterday(cls):
-    D = JOURNAL.date_to_parts("yesterday")
-
-    if n := FLAT.find_note_with_title(D.title):
-      return n
-
-    new_note = FLAT.make_new(title=D.title)
-    JOURNAL.init_journal(new_note)
-
-  @classmethod
   def append_to_note(_, note, content):
     # read note
     with open(FLAT.to_path(note), "r") as f:
