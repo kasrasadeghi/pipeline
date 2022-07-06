@@ -207,3 +207,15 @@ class RENDER:
 
     navbar.append(f'</header>')
     return "".join(navbar)
+
+  @staticmethod
+  def base_page(D):
+    """ D is a magic_dict with keys: { title, bar, content } """
+    result = (
+      f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{D.title}</title></head>"
+      f"<body>{D.bar}<div class=\"content\">"
+        f'<h1 class="title">{D.title}</h1>'
+        f"{D.content}"
+      f"</div></body></html>"
+    )
+    return Response(result, mimetype="text/html")

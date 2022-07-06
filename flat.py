@@ -127,6 +127,8 @@ class FLAT:
             continue
           if l.strip() != "":
             acc.append(l.rstrip())
+      if 0 == len(acc):
+        return None
 
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
     return result
@@ -277,13 +279,11 @@ class FLAT_RENDER:
 
     # compose html
     title = FLAT.title(note)
-    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"content\">",
-                      f'<h1 class="title">{title}</h1>',
-                      f"<pre style='font-feature-settings: \"liga\" 0'>"
-                      f"{content}{forward_links}{backlinks}</pre>",
-                      f"</div></body></html>"])
-    return Response(result, mimetype="text/html")
+    result = (
+      f"<pre style='font-feature-settings: \"liga\" 0'>"
+      f"{content}{forward_links}{backlinks}</pre>"
+    )
+    return RENDER.base_page(DICT(title, bar, content=result))
 
   @classmethod
   def INDEX(R):
