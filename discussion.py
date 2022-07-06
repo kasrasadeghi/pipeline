@@ -12,14 +12,12 @@ class DISCUSSION_RENDER:
 
     # compose html
     title = FLAT.title(note)
-    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"content\">"
-                      f'<h1 class="title">{title}</h1>',
-                      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>",
-                      f"{content}</div>",
-                      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>',
-                      f"</div></body></html>"])
-    return Response(result, mimetype="text/html")
+    result = (
+      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
+      f"{content}</div>"
+      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
+    )
+    return RENDER.base_page(DICT(title, bar, content=result))
 
 
 @app.route("/disc/<note>", methods=["GET", "POST"])
