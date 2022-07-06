@@ -26,7 +26,7 @@ class JOURNAL:
     return JOURNAL.date_to_parts(date_str).title
 
   @staticmethod
-  def init_journal(note):
+  def init_journal(note, D):
     with open(FLAT.to_path(note)) as f:
       content = f.read()
     with open(FLAT.to_path(note), "w") as f:
@@ -39,22 +39,22 @@ class JOURNAL:
 
   @staticmethod
   def create_journal_for_day(date):
-    title = JOURNAL.date_to_title(date)
-    new_note = FLAT.make_new(title)
-    JOURNAL.init_journal(new_note)
+    D = JOURNAL.date_to_parts(date)
+    new_note = FLAT.make_new(D.title)
+    JOURNAL.init_journal(new_note, D)
     return new_note
 
   @staticmethod
   def today():
     if note := JOURNAL.find_journal_for_day("today"):
       return note
-    return create_journal_for_day("today")
+    return JOURNAL.create_journal_for_day("today")
 
   @staticmethod
   def yesterday():
     if note := JOURNAL.find_journal_for_day("yesterday"):
       return note
-    return create_journal_for_day("yesterday")
+    return JOURNAL.create_journal_for_day("yesterday")
 
 @app.route("/journals")
 def journal_list():
