@@ -10,25 +10,32 @@ class TREE:
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
+  def msg_content(content):
+
+    def parse_url(S, cont, base):
+      if ': ' in content:
+        prefix, potentially_url = S.rsplit(': ', 1)
+
+        if potentially_url.strip().startswith('https://'):
+          return cont(prefix) + ": " + TREE.link(potentially_url)
+
+        if potentially_url.strip().endswith(".note") and \
+           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
+          return cont(prefix) + ": " + TREE.note(potentially_url)
+
+      return base(S)
+
+    default_base = lambda x: str(escape(x))
+
+    return parse_url(content, default_base, default_base)
+
+
+  @staticmethod
   def msg(msg, timerender=None):
     try:
       msg_date = msg['children'][0]['value'].removeprefix('Date: ')
-      msg_content = msg["value"].removeprefix("msg: ")
-      msg_content_altered = False
       origin = msg.get('origin', None)  # second argument of .get() is a default value
-
-      if ': ' in msg_content:
-        prefix, potentially_url = msg_content.rsplit(': ', 1)
-        if potentially_url.strip().startswith('https://'):
-          msg_content = prefix + ": " + TREE.link(potentially_url)
-          msg_content_altered = True
-        if potentially_url.strip().endswith(".note") and \
-           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
-          msg_content = prefix + ": " + TREE.note(potentially_url)
-          msg_content_altered = True
-
-      if not msg_content_altered:
-        msg_content = escape(msg_content)
+      msg_content = TREE.msg_content(msg["value"].removeprefix("msg: "))
 
       if timerender:
         date = timerender(msg_date)
