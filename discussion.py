@@ -1,5 +1,3 @@
-import os
-
 class DISCUSSION_RENDER:
   @staticmethod
   def MAIN(note):
