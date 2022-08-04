@@ -68,6 +68,10 @@ class DEBUG:
     return r
 
   @staticmethod
+  def DUMP(content=''):
+    return DEBUG.TEXT("Debug DUMP", content)
+
+  @staticmethod
   def FILTER(debugmode):
     return debugmode and set(debugmode.split()) in []  # set to anything right now
 
