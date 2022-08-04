@@ -20,6 +20,7 @@ def kaz_import(filepath):
 
 kaz_import('magic.py')
 kaz_import('util.py')
+kaz_import('flask_util.py')
 
 kaz_import('flat.py')
 kaz_import('git.py')

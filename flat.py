@@ -26,7 +26,7 @@ class FLAT:
 
   @staticmethod
   def try_from_url(url):
-    host = request.headers["Host"]  # like 192.37.37.3:5000
+    host = FLASK_UTIL.HOST()
     if url.startswith(f"http://{host}"):
       url = url.removeprefix(f"http://{host}")
 
@@ -249,7 +249,7 @@ class FLAT_RENDER:
   def _bar(R, note, *extras):
     # TODO fix the style for this localhost business
     emacs_buttons = ""
-    if 'localhost' in request.headers['Host']:
+    if 'localhost' in FLASK_UTIL.HOST():
       emacs_buttons = (
         f'<form method="post">'
         f'<button name="edit" value="{note}">edit</button>'
