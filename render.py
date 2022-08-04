@@ -124,14 +124,7 @@ class RENDER:
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 0px; }
        }
-     </style>""" + f"""<script>
-       fetch("http://{request.headers['Host']}/receive_info",
-         {{ method: "POST",
-            headers: {{ 'Content-Type': 'application/json'}},
-            body: JSON.stringify({{width: window.screen.width, height: window.screen.height, dpr: window.devicePixelRatio }})
-         }}
-       )
-     </script>"""
+     </style>""" + FLASK_UTIL.TELEMETRY()
 
   @classmethod
   def ANSI(R):
