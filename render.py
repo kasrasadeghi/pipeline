@@ -13,8 +13,18 @@ class RENDER:
     input_background_color = "#333"
     body_background_color= "#222"
 
+    meta_tags = ", ".join([
+      'height=device-height',
+      'width=device-width',
+      'initial-scale=1.0',
+      'minimum-scale=1.0',
+      'maximum-scale=1.0',
+      'user-scalable=no',
+      'target-densitydpi=device-dpi'
+    ])
+
     return """
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="viewport" content=" """ + meta_tags + """ ">
      <style>
        body { margin: 0; background: """ + body_background_color + """; }
        .content { padding-top: """ + str(navbar_size) + """px; margin: 0% 2% 1% 2%; }
