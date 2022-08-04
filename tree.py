@@ -12,22 +12,28 @@ class TREE:
   @staticmethod
   def msg_content(content):
 
+    # cont is continuation
+    # base is the escape function for when we have no more rendering left to do
     def parse_url(S, cont, base):
       if ': ' in content:
         prefix, potentially_url = S.rsplit(': ', 1)
 
         if potentially_url.strip().startswith('https://'):
-          return cont(prefix) + ": " + TREE.link(potentially_url)
+          return cont(prefix, base) + ": " + TREE.link(potentially_url)
 
         if potentially_url.strip().endswith(".note") and \
            len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
-          return cont(prefix) + ": " + TREE.note(potentially_url)
+          return cont(prefix, base) + ": " + TREE.note(potentially_url)
 
-      return base(S)
+      return cont(S, base)
 
-    default_base = lambda x: str(escape(x))
+    def highlight_tags(S, base):
+      # replace DAILY with linked DAILY and run base() on everything between
+      return "<a href='/daily'><b>DAILY</b></a>".join(map(base, S.split("DAILY")))
 
-    return parse_url(content, default_base, default_base)
+    basic_escape = lambda x: str(escape(x))
+
+    return parse_url(content, cont=highlight_tags, base=basic_escape)
 
 
   @staticmethod
