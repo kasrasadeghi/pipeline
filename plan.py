@@ -74,8 +74,7 @@ class PLAN_RENDER:
     content = PLAN_RENDER.page(PARSER.parse_file(FLAT.to_path(note)))
 
     bar = FLAT_RENDER._bar(note,
-                           f'<a href="/note/{note}">note</a>'
-                           f'<a href="/edit/{note}">edit</a>'
+                           f'<a href="/disc/{note}">disc</a>'
                            )
 
     # compose html
