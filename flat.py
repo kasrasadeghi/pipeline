@@ -30,7 +30,7 @@ class FLAT:
     if url.startswith(f"http://{host}"):
       url = url.removeprefix(f"http://{host}")
 
-    for view in ["note", "disc", "plan"]:
+    for view in ["note", "disc", "plan", "daily"]:
       if url.startswith(f'/{view}/'):
         return view, url.removeprefix(f"/{view}/")
 

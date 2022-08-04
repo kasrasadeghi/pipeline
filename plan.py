@@ -90,7 +90,12 @@ class PLAN_RENDER:
     return Response(result, mimetype="text/html")
 
 
-@app.route('/plan/<note>')
+@app.route('/daily', defaults={"note": None})
+@app.route('/daily/<note>')
 def get_plan_note(note):
+  if not note:
+    _, note = FLASK_UTIL.REFERER_NOTE()
+    return redirect(FLAT.to_url(note, view='daily'))
+
   init_state()
   return PLAN_RENDER.MAIN(note)
