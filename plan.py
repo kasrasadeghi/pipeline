@@ -62,16 +62,16 @@ class PLAN_RENDER:
 
 
   @staticmethod
-  def page(sections):
+  def page(note, sections):
     acc = list()
     for section in sections:
       acc.append(PLAN_RENDER.section(section))
 
-    return '\n'.join(acc)
+    return '\n'.join(acc) + TREE.filesize(note)
 
   @staticmethod
   def MAIN(note):
-    content = PLAN_RENDER.page(PARSER.parse_file(FLAT.to_path(note)))
+    content = PLAN_RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)))
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/disc/{note}">disc</a>'

@@ -121,6 +121,10 @@ class TREE:
     return metadata
 
   @staticmethod
+  def filesize(note):
+    return f"<pre><br/>(file size: {os.path.getsize(FLAT.to_path(note))} bytes)</pre>"
+
+  @staticmethod
   def section(section):
     acc = list()
     if section['section'] != 'entry':
@@ -155,13 +159,13 @@ class TREE:
     return '\n'.join(acc)
 
   @staticmethod
-  def page(sections):
+  def page(note, sections):
 
     acc = list()
     for section in sections:
       acc.append(TREE.section(section))
 
-    return '\n'.join(acc)
+    return '\n'.join(acc) + TREE.filesize(note)
 
   @staticmethod
   def is_newline(block):
