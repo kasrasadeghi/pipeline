@@ -1,7 +1,7 @@
 class DISCUSSION_RENDER:
   @staticmethod
   def MAIN(note):
-    content = TREE.page(PARSER.parse_file(FLAT.to_path(note)))
+    content = TREE.page(note, PARSER.parse_file(FLAT.to_path(note)))
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/note/{note}">note</a>'
