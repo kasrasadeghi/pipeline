@@ -25,6 +25,12 @@ def LOG(s):
     print("stateless ", end='')
   print("LOG: " + str(s))
 
+class Boundary(Exception):
+  pass
+
+def ABORT(msg):
+  raise Boundary(msg)
+
 class DEBUG:
   # TODO should make state request specific so that it can be multithreaded or multi-processed
   _STATE = None
@@ -76,6 +82,10 @@ class DEBUG:
   # TODO add a traceback section to this
   @staticmethod
   def CATCH(exception):
+    LOG('huh')
+    if isinstance(exception, Boundary):
+      DEBUG.set_state("error boundary", str(exception))
+      return str(exception)
     DEBUG.set_state("stacktrace", traceback.format_exc())
 
   @staticmethod
