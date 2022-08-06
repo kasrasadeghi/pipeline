@@ -1,6 +1,6 @@
 def block_generator():
   files = list(reversed(FLAT.list_by_create_date()))
-  set_state("file count", len(files))
+  DEBUG.set_state("file count", len(files))
 
   for f in files:
     LOG("searching through file: " + f)
@@ -22,8 +22,8 @@ class SEARCH:
   @classmethod
   def RENDER(cls, content):
     return DEBUG.TEXT("search",
-                      f'found {get_state("msg count")} results '
-                      f'in {get_state("elapsed time")} seconds '
+                      f'found {DEBUG.get_state("msg count")} results '
+                      f'in {DEBUG.get_state("elapsed time")} seconds '
                       + content)
 
 
@@ -32,21 +32,21 @@ def get_search():
   if 'content' in request.args:
     return redirect("/search/" + request.args['content'], code=302)
 
-  init_state()
+  DEBUG.init_state()
 
   msgs = list(msg_generator())
   content = "".join(map(TREE.msg, msgs))
 
-  set_state("elapsed time", time.time() - get_state("start time"))
-  set_state("msg count", len(msgs))
-  set_state("content size", len(content))
+  DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
+  DEBUG.set_state("msg count", len(msgs))
+  DEBUG.set_state("content size", len(content))
 
   return SEARCH.RENDER(content)
 
 
 @app.route('/search/<query>')
 def get_search_with_query(query):
-  init_state()
+  DEBUG.init_state()
 
   acc = list()
   for msg in msg_generator():
@@ -54,8 +54,8 @@ def get_search_with_query(query):
       acc.append(msg)
   content = "".join(map(TREE.msg, acc))
 
-  set_state("elapsed time", time.time() - get_state("start time"))
-  set_state("msg count", len(acc))
-  set_state("content size", len(content))
+  DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
+  DEBUG.set_state("msg count", len(acc))
+  DEBUG.set_state("content size", len(content))
 
   return SEARCH.RENDER(content)
