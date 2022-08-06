@@ -38,6 +38,7 @@ kaz_import('parser.py')
 kaz_import('tree.py')
 kaz_import('plan.py')
 kaz_import('search.py')
+kaz_import('blog.py')
 
 kaz_import('sidebar.py')
 kaz_import('render.py')
