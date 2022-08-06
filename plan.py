@@ -96,5 +96,5 @@ def get_plan_note(note):
     _, note = FLASK_UTIL.REFERER_NOTE()
     return redirect(FLAT.to_url(note, view='daily'))
 
-  init_state()
+  DEBUG.init_state()
   return PLAN_RENDER.MAIN(note)

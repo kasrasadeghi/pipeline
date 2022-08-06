@@ -1,60 +1,82 @@
+"""
+USAGE:
+def helper():
+  LOG("huh")
+
+@app.route("/example")
+def get_example():
+  DEBUG.init_state()
+
+  helper()  # calls LOG, "huh" will show up in the output
+  ....
+  # choose one of:
+  return DEBUG.DUMP(content)
+  return DEBUG.TEXT(title, content)
+  return Response(custom() + DEBUG.CONTENT(), 200)
+"""
+
 import time
 import traceback # format_exc (for printing stacktraces)
 
-# TODO should make state request specific so that it can be multithreaded or multi-processed
-_STATE = None
-
-def clear_state():
-  global _STATE
-  _STATE = None
-
-def init_state():
-  global _STATE
-  _STATE = dict()
-  _STATE['start time'] = time.time()  # get current time
-  _STATE['LOG'] = list()
-
-def set_state(k, v):
-  if _STATE:
-    LOG(f"set '{k}' to '{v}'")
-    _STATE[k] = v
-  else:
-    print("stateless ", end='')
-
-def get_state(k):
-  return _STATE[k]
-
 def LOG(s):
-  if _STATE:
-    _STATE['LOG'].append(s)
+  if DEBUG._STATE:
+    DEBUG._STATE['LOG'].append(s)
   else:
     print("stateless ", end='')
   print("LOG: " + str(s))
 
 class DEBUG:
+  # TODO should make state request specific so that it can be multithreaded or multi-processed
+  _STATE = None
+
+  def clear_state():
+    DEBUG._STATE = None
+
+  def init_state():
+    DEBUG._STATE = dict()
+    DEBUG._STATE['start time'] = time.time()  # get current time
+    DEBUG._STATE['LOG'] = list()
+
+  def set_state(k, v):
+    if DEBUG._STATE:
+      LOG(f"set '{k}' to '{v}'")
+      DEBUG._STATE[k] = v
+    else:
+      print("stateless ", end='')
+
+  def get_state(k):
+    return DEBUG._STATE[k]
+
+  def LOG(s):
+    if DEBUG._STATE:
+      DEBUG._STATE['LOG'].append(s)
+    else:
+      print("stateless ", end='')
+    print("LOG: " + str(s))
+
   @staticmethod
   def CONTENT():
     debug = ""
-    if _STATE is not None:
-      if 'LOG' in _STATE:
+    if DEBUG._STATE is not None:
+      if 'LOG' in DEBUG._STATE:
         # if log is empty, don't print anything
-        if 0 == len(_STATE['LOG']):
+        if 0 == len(DEBUG._STATE['LOG']):
           return ''
 
         # rearrange to put the log at the end
-        log = _STATE['LOG']
-        del _STATE['LOG']
-        _STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{str(escape(json.dumps(_STATE, indent=2, default=lambda x: str(x))))}\n"
-      debug += _STATE.get("stacktrace", "")
+        log = DEBUG._STATE['LOG']
+        del DEBUG._STATE['LOG']
+        DEBUG._STATE['LOG'] = log
+      debug = f"<pre>DEBUG STATE: \n" + f"{str(escape(json.dumps(DEBUG._STATE, indent=2, default=lambda x: str(x))))}\n"
+      debug += DEBUG._STATE.get("stacktrace", "")
       debug += "</pre>"
-    clear_state()
+    DEBUG.clear_state()
     return debug
 
   # TODO add a traceback section to this
   @staticmethod
   def CATCH(exception):
-    set_state("stacktrace", traceback.format_exc())
+    DEBUG.set_state("stacktrace", traceback.format_exc())
 
   @staticmethod
   def TEXT(title, content):
