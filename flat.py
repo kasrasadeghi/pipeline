@@ -29,6 +29,16 @@ class FLAT:
     return open(FLAT.to_path(note))
 
   @staticmethod
+  def note_read_lines(note):
+    with FLAT.open_note(note) as N:
+      # for some reason, "f.readlines()" and "for L in f:" don't usually do what
+      # i expect so i'm using splitlines().  I think splitlines handles weird
+      # cases with empty last lines and empty front matter correctly, actually
+      # preserving them instead of randomly chopping them off
+      lines = N.read().splitlines()
+    return lines
+
+  @staticmethod
   def try_from_url(url):
     host = FLASK_UTIL.HOST()
     if url.startswith(f"http://{host}"):
