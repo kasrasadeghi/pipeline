@@ -25,6 +25,10 @@ class FLAT:
     return None
 
   @staticmethod
+  def open_note(note):
+    return open(FLAT.to_path(note))
+
+  @staticmethod
   def try_from_url(url):
     host = FLASK_UTIL.HOST()
     if url.startswith(f"http://{host}"):
