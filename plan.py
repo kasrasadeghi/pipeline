@@ -26,6 +26,8 @@ class PLAN_RENDER:
               for item in filter(lambda x: "ADD" in x[0]['value'], msg_blocks)]
       done = [DICT(startedWhen=None, block=item)
               for item in filter(lambda x: "DONE" in x[0]['value'], msg_blocks)]
+      rest = [DICT(startedWhen=None, block=item)
+              for item in filter(lambda x: "DONE" not in x[0]['value'] and "ADD" not in x[0]['value'], msg_blocks)]
 
       dangling_done = list()
       for d in done:
@@ -52,7 +54,8 @@ class PLAN_RENDER:
 
       return (render_todos("TODO", undone_todos)
               + render_todos("DONE", done)
-              + render_todos("DANGLING DONE", dangling_done))
+              + render_todos("DANGLING DONE", dangling_done)
+              + render_todos("MISC", rest))
 
 
     except Exception as e:
