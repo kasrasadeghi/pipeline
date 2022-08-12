@@ -20,11 +20,13 @@ class DISCUSSION_RENDER:
 
 @app.route("/disc/<note>", methods=["GET", "POST"])
 def get_disc(note):
+  DEBUG.init_state()
+
   # handle messages
   if request.method == 'POST':
     if COMMAND.PARSE(note, request.form['msg']):
       FLAT.handle_msg(note, request.form)
-    return redirect(f"/disc/{note}", code=302)
+    return redirect(f"/disc/{note}")
 
   # default case: handle rendering
   return DISCUSSION_RENDER.MAIN(note)

@@ -1,4 +1,9 @@
 class util:
+  @staticmethod
+  def cmd(*args, **kwargs):
+    import subprocess
+    return subprocess.check_output(*args, **kwargs).decode('utf8')
+
   @classmethod
   def sort_recent(_, files, root_path):
     return [p[0] for p in sorted([(f, os.stat(root_path +'/'+ f).st_mtime) for f in files], key = lambda p: p[1])]
