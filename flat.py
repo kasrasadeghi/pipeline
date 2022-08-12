@@ -29,6 +29,11 @@ class FLAT:
     return open(FLAT.to_path(note))
 
   @staticmethod
+  def read_note(note):
+    with FLAT.open_note(note) as N:
+      return N.read()
+
+  @staticmethod
   def note_read_lines(note):
     with FLAT.open_note(note) as N:
       # for some reason, "f.readlines()" and "for L in f:" don't usually do what
@@ -142,7 +147,7 @@ class FLAT:
           if l.strip() != "":
             acc.append(l.rstrip())
       if 0 == len(acc):
-        return None
+        ABORT(f"did not find metadata for note '{note}'")
 
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
     return result
