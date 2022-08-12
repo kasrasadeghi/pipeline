@@ -18,12 +18,9 @@ def get_example():
 import time
 import traceback # format_exc (for printing stacktraces)
 
+# convenience function
 def LOG(s):
-  if DEBUG._STATE:
-    DEBUG._STATE['LOG'].append(s)
-  else:
-    print("stateless ", end='')
-  print("LOG: " + str(s))
+  DEBUG.LOG(s)
 
 class Boundary(Exception):
   pass
@@ -34,15 +31,19 @@ def ABORT(msg):
 class DEBUG:
   # TODO should make state request specific so that it can be multithreaded or multi-processed
   _STATE = None
+  _GLOBAL_LOG = []
 
+  @staticmethod
   def clear_state():
     DEBUG._STATE = None
 
+  @staticmethod
   def init_state():
     DEBUG._STATE = dict()
     DEBUG._STATE['start time'] = time.time()  # get current time
     DEBUG._STATE['LOG'] = list()
 
+  @staticmethod
   def set_state(k, v):
     if DEBUG._STATE:
       LOG(f"set '{k}' to '{v}'")
@@ -50,15 +51,24 @@ class DEBUG:
     else:
       print("stateless ", end='')
 
+  @staticmethod
   def get_state(k):
     return DEBUG._STATE[k]
 
+  @staticmethod
   def LOG(s):
     if DEBUG._STATE:
       DEBUG._STATE['LOG'].append(s)
     else:
       print("stateless ", end='')
     print("LOG: " + str(s))
+    DEBUG._GLOBAL_LOG.append(s)
+
+  @staticmethod
+  def RENDER_LOG():
+    content = f"<pre>DEBUG LOG: \n" + f"{FLASK_UTIL.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
+    print(DEBUG._GLOBAL_LOG)
+    return RENDER.base_page(DICT(content, title="DEBUG LOG", bar=""))
 
   @staticmethod
   def CONTENT():
@@ -73,7 +83,7 @@ class DEBUG:
         log = DEBUG._STATE['LOG']
         del DEBUG._STATE['LOG']
         DEBUG._STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{str(escape(json.dumps(DEBUG._STATE, indent=2, default=lambda x: str(x))))}\n"
+      debug = f"<pre>DEBUG STATE: \n" + f"{FLASK_UTIL.DUMP(DEBUG._STATE)}\n"
       debug += DEBUG._STATE.get("stacktrace", "")
       debug += "</pre>"
     DEBUG.clear_state()
@@ -142,3 +152,8 @@ def receive_info():
   # print(request.headers)
   # print(request.json)
   return Response('', 204)
+
+
+@app.route("/debuglog")
+def get_debuglog():
+  return DEBUG.RENDER_LOG()

@@ -195,7 +195,7 @@ class RENDER:
            """
 
   @classmethod
-  def nav(R, *extras):
+  def nav(R, *extras) -> list:
     navbar = list()
     navbar.append(f'<header>'
                   f'<input type="checkbox" id="toggler" checked style=""/>'
@@ -213,10 +213,23 @@ class RENDER:
 
   @staticmethod
   def base_page(D):
-    """ D is a magic_dict with keys: { title, bar, content } """
+    """
+    D is a magic_dict with keys: { title, bar, content }
+
+    USAGE:
+    - RENDER.base_page(DICT(title, bar, content))
+    - RENDER.base_page(DICT(title, bar, content=result))
+    - RENDER.base_page(DICT(title, content, bar=None))
+    """
+    if D.bar is None or D.bar == "":
+      bar = "".join(RENDER.nav())
+      print('huh')
+    else:
+      bar = D.bar
+
     result = (
       f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{D.title}</title></head>"
-      f"<body>{D.bar}<div class=\"content\">"
+      f"<body>{bar}<div class=\"content\">"
         f'<h1 class="title">{D.title}</h1>'
         f"{D.content}"
       f"</div></body></html>"
