@@ -53,7 +53,7 @@ class FLAT:
       if url.startswith(f'/{view}/'):
         return view, url.removeprefix(f"/{view}/")
 
-    return url
+    return None, url
 
   @classmethod
   def exists(cls, note):

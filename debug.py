@@ -92,7 +92,7 @@ class DEBUG:
   # TODO add a traceback section to this
   @staticmethod
   def CATCH(exception):
-    LOG('huh')
+    LOG('catch: ' + str(exception))
     if isinstance(exception, Boundary):
       DEBUG.set_state("error boundary", str(exception))
       return str(exception)
