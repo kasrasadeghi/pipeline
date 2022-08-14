@@ -309,6 +309,7 @@ class FLAT_RENDER:
     note = FLAT.get_index()
 
     content = util.read_file(FLAT.to_path(note))
+    lines_of_code = util.cmd("tokei", shell=True, cwd="/home/kasra/projects/notes-website")
 
     # parse references and links in file
     content = FLAT_PARSER.parse(content)
@@ -323,7 +324,7 @@ class FLAT_RENDER:
     result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
                       f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
                       f'<h1 class="title">{title}</h1>',
-                      f"{content}</pre>",
+                      f"{content}\n{lines_of_code}</pre>",
                       f"</div></body></html>"])
     return Response(result, mimetype="text/html")
 
