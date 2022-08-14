@@ -114,8 +114,8 @@ class DEBUG:
     return DEBUG.TEXT("Debug DUMP", content)
 
   @staticmethod
-  def FILTER(debugmode):
-    return debugmode and set(debugmode.split()) in []  # set to anything right now
+  def SELECTED(debugmode):
+    return debugmode and set(debugmode.split()) in ['RENDER']  # set to debug nothing right now
 
 
 # debug print
@@ -129,7 +129,7 @@ def debug(*l, **kw):
   else:
     debugmode = None
 
-  if not DEBUG.FILTER(debugmode):
+  if not DEBUG.SELECTED(debugmode):
     return
 
   if is_debug:
