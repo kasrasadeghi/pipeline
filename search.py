@@ -35,7 +35,7 @@ def get_search():
   DEBUG.init_state()
 
   msgs = list(msg_generator())
-  content = "".join(map(TREE.msg, msgs))
+  content = "".join(map(DISCUSSION_RENDER.msg, msgs))
 
   DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
   DEBUG.set_state("msg count", len(msgs))
@@ -52,7 +52,7 @@ def get_search_with_query(query):
   for msg in msg_generator():
     if query.lower() in msg['value'].lower():
       acc.append(msg)
-  content = "".join(map(TREE.msg, acc))
+  content = "".join(map(DISCUSSION_RENDER.msg, acc))
 
   DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
   DEBUG.set_state("msg count", len(acc))

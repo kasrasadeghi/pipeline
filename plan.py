@@ -11,14 +11,14 @@ class PLAN_RENDER:
 
     msg_blocks = list()
     for block in section['blocks']:
-      if not TREE.block_is_msg(block):
+      if not DISCUSSION.block_is_msg(block):
         continue
 
       if "DAILY" in block[0]['value']:
         msg_blocks.append(block)
 
     def render_msg(msg_block, date_prefix=''):
-      return TREE.msg(msg_block[0], lambda x: date_prefix + util.date_cmd("-d", x, "+%T"))
+      return DISCUSSION_RENDER.msg(msg_block[0], lambda x: date_prefix + util.date_cmd("-d", x, "+%T"))
 
     try:
       import itertools  # repeat
