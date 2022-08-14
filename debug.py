@@ -57,12 +57,21 @@ class DEBUG:
 
   @staticmethod
   def LOG(s):
+    # find a frame from a function that isn't called "LOG" in this file
+    # - not this one and not toplevel LOG above
+    import inspect
+    parent_frame = inspect.currentframe()
+    while parent_frame.f_code.co_name == "LOG" and\
+          parent_frame.f_code.co_filename == "debug.py":
+      parent_frame = parent_frame.f_back
+
     if DEBUG._STATE:
       DEBUG._STATE['LOG'].append(s)
     else:
       print("stateless ", end='')
     print("LOG: " + str(s))
-    DEBUG._GLOBAL_LOG.append(s)
+    DEBUG.parent_frame = parent_frame
+    DEBUG._GLOBAL_LOG.append({"filename": parent_frame.f_code.co_filename, "funcname": parent_frame.f_code.co_name, "line": parent_frame.f_lineno, "content": s})
 
   @staticmethod
   def RENDER_LOG():
@@ -117,6 +126,7 @@ class DEBUG:
     return debugmode and set(debugmode.split()) in ['RENDER']  # set to debug nothing right now
 
 
+# TODO maybe don't even use debug print, maybe add something like this to the logging system instead.
 # debug print
 # TODO have a config for debugging module by module by inspecting the stacktrace
 def debug(*l, **kw):
