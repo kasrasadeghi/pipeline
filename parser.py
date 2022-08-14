@@ -86,7 +86,9 @@ class PARSER:
   def might_be_tree(B):
     indent_counts = []
     for i, L in enumerate(B):
-      # search for toplevels
+      # search for toplevels, will have indent -1
+      # - toplevels start with something other than ' ' and '-' and are _immediately followed_ by a subnode.
+      # - n.b. this even handles toplevels halfway through a block
       if L and L[0] != ' ' and L[0] != "-" and len(B) > i + 1 and B[i + 1].startswith("-"):
         indent_counts.append(-1)
         continue
@@ -118,7 +120,7 @@ class PARSER:
         continue
 
       # if no successful condition found, this line has failed
-      print("ERROR: failed on", prev, "->", indent, L)
+      LOG(f"ERROR: failed guessing tree-ness on {prev} -> {indent}{L}")
       return False
 
     return True
@@ -128,14 +130,15 @@ class PARSER:
     indent_counts = []
     for L in block:
       if L[0] != ' ' and L[0] != "-":
+        LOG(f"'{L[0]}': {L}")
         indent_counts.append({"indent": -1, "content": L})
-        continue
-      indent, rest = L.split("-", 1)
-      assert all(' ' == c for c in indent),  "error with line: " + L
-      indent_counts.append({"indent": len(indent) // 2, "content": rest.lstrip()})
+      else:
+        indent, rest = L.split("-", 1)
+        assert all(' ' == c for c in indent),  "error with line: " + L
+        indent_counts.append({"indent": len(indent) // 2, "content": rest.lstrip()})
 
-    def make_node(content, children):
-      return {'value': content, 'children': children}
+    def make_node(content, children, indent):
+      return {"indent": indent, 'value': content, 'children': children}
 
     # from: https://github.com/kasrasadeghi/cornerstone-haskell/blob/master/src/Parse.hs#L50-L59
     def make_children(B):
@@ -157,7 +160,7 @@ class PARSER:
           rest = rest[1:]
 
         children = make_children(acc)
-        result.append(make_node(content, children))
+        result.append(make_node(content, children, level))
 
       #   return acc
       return result

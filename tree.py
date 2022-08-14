@@ -80,10 +80,16 @@ class TREE:
     return TREE.is_singleton(block) and TREE.is_msg(block[0])
 
   @staticmethod
-  def node(item, level=0):
+  def node(item):
     result = None
 
-    indent = ("  " * (level - 1)) + ("- " if level > 0 else "")
+    level = item['indent']
+    if level == -1:  # toplevel
+      indent = ""
+    elif level == 0:
+      indent = "- "
+    else:
+      indent = (level * "  ") + "- "
 
     if TREE.is_msg(item):
       result = TREE.msg(item, lambda x: util.date_cmd("-d", x, "+%T"))
@@ -91,7 +97,7 @@ class TREE:
 
     if item['value'].startswith('link: '):
       url = item['value'].removeprefix('link: ')
-      result = '<pre>' + indent + 'link: ' + TREE.link(url) + "</pre>"
+      result = f'<pre>{indent}link: {TREE.link(url)}</pre>'
       debug("link:", repr(item), debugmode='RENDER LINK')
 
     if item['value'].startswith('note: '):
@@ -107,7 +113,7 @@ class TREE:
     acc.append(result)
 
     for child in item['children']:
-      acc.append(TREE.node(child, 1 + level))
+      acc.append(TREE.node(child))
 
     return "".join(acc)
 
