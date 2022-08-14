@@ -102,21 +102,6 @@ class FLAT:
       f.write(f"Title: {title}\n")
 
   @classmethod
-  def open(cls, note):
-    cmd = f"emacsclient -ca '{cls.to_path(note)}' & disown > /dev/null"
-    os.system(cmd)
-
-  @classmethod
-  def edit(cls, note):
-    cmd = f"emacsclient '{cls.to_path(note)}' & disown > /dev/null"
-    os.system(cmd)
-
-  @classmethod
-  def chrome(cls, note):
-    cmd = f"google-chrome-stable --app=http://localhost:5000" + FLAT.to_url(note)
-    os.system(cmd)
-
-  @classmethod
   def make_new(cls, title):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
@@ -266,19 +251,7 @@ class FLAT_RENDER:
 
   @classmethod
   def _bar(R, note, *extras):
-    # TODO fix the style for this localhost business
-    emacs_buttons = ""
-    if 'localhost' in FLASK_UTIL.HOST():
-      emacs_buttons = (
-        f'<form method="post">'
-        f'<button name="edit" value="{note}">edit</button>'
-        f'<button name="open" value="{note}">open</button>'
-        f'</form>'
-        f'<button onclick="copy()">copy uuid</button>'
-        f'<script>function copy() {{ navigator.clipboard.writeText("{note}"); }}</script>'
-      )
-
-    navbar = RENDER.nav(*extras, emacs_buttons)
+    navbar = RENDER.nav(*extras)
     return "".join(navbar)
 
   @classmethod
@@ -380,18 +353,6 @@ def get_note(note):
 
   if not note.endswith(".note"): # /note/UUID.disc -> /disc/UUID.note
     return redirect("/" + note[-4:] + "/" + note[:-5] + ".note")
-
-  # handle emacs section of bar, which is in both discussion and note
-  if request.method == 'POST':
-    if 'open' in request.form:
-      FLAT.open(request.form['open'])
-      return Response('', 204)
-    if 'edit' in request.form:
-      FLAT.edit(request.form['edit'])
-      return Response('', 204)
-
-    LOG({"ERROR unhandled POST request with form": request.form})
-    return Response('', 500)
 
   # default case: handle rendering
   return FLAT_RENDER.NOTE(note)
