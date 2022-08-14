@@ -101,7 +101,8 @@ class TREE:
       debug("link:", repr(item), debugmode='RENDER LINK')
 
     if item['value'].startswith('note: '):
-      result = f"<pre>{indent}{item['value']}</pre>"
+      note = item['value'].removeprefix('note: ').strip()
+      result = f"<pre>{indent}note: {TREE.note(note)}</pre>"
 
     if None == result:
       debug('item, but none matched:', repr(item), debugmode='RENDER')
