@@ -298,10 +298,8 @@ class FLAT_RENDER:
 
     # compose html
     title = FLAT.title(note)
-    result = (
-      f"<pre style='font-feature-settings: \"liga\" 0'>"
-      f"{content}{forward_links}{backlinks}</pre>"
-    )
+    result = (f"<pre style='font-feature-settings: \"liga\" 0'>"
+              f"{content}{forward_links}{backlinks}</pre>")
     return RENDER.base_page(DICT(title, bar, content=result))
 
   @classmethod
@@ -315,18 +313,16 @@ class FLAT_RENDER:
     content = FLAT_PARSER.parse(content)
 
     bar = R._bar(note,
+                 f'<a href="/note/{note}">note</a>',
                  f'<a href="/disc/{note}">disc</a>',
                  f'<a href="/edit/{note}">edit</a>',
                  )
 
     # compose html
     title = FLAT.title(note)
-    result = "".join([f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>",
-                      f"<body>{bar}<div class=\"content\"><pre style='font-feature-settings: \"liga\" 0'>",
-                      f'<h1 class="title">{title}</h1>',
-                      f"{content}\n{lines_of_code}</pre>",
-                      f"</div></body></html>"])
-    return Response(result, mimetype="text/html")
+    result = (f"<pre style='font-feature-settings: \"liga\" 0'>"
+              f"{content}\n{lines_of_code}</pre>")
+    return RENDER.base_page(DICT(title, bar, content=result))
 
   @classmethod
   def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
