@@ -56,15 +56,15 @@ class TREE:
         (f'</a>' if origin else "")
       )
     except Exception as e:
-      print("ERROR: could not render msg: '" + str(msg) + "'")
-      print(" ", str(e))
+      LOG("ERROR: could not render msg: '" + str(msg) + "'")
+      LOG(" ", str(e))
       return str(msg)
 
   @staticmethod
   def is_msg(item):
     """ checks whether an item in a block is a msg """
     if not isinstance(item, dict):
-      print("ERROR: cannot check a non-dictionary:", item)
+      LOG("ERROR: cannot check a non-dictionary:", item)
       return False
     return item['value'].startswith('msg: ')
 

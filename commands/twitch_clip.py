@@ -25,7 +25,7 @@ class TWITCH_CLIP:
       output = p.stdout + p.stderr + '\n'
 
     if diff := set(post) - set(pre):
-      print(diff)
+      LOG({"twitch clip diff": diff})
       assert len(diff) == 1
       filename = next(iter(diff))
     else:
@@ -54,7 +54,7 @@ def COMMAND_TWITCH_CLIP(args, continuation):
   import subprocess
   import os
 
-  print('LOG: downloading twitch clip:', url)
+  LOG({'downloading twitch clip': url})
 
   output = TWITCH_CLIP.DOWNLOAD(url, title)
   continuation(args['arg'])

@@ -166,7 +166,7 @@ class RENDER:
           s = s[len(code):]
           break
       else:
-        print(f"ERROR: did not find replacement for ANSI code '{s[:5]}'")
+        LOG(f"ERROR: did not find replacement for ANSI code '{s[:5]}'")
         return original
 
     acc.append(s)
@@ -223,7 +223,6 @@ class RENDER:
     """
     if D.bar is None or D.bar == "":
       bar = "".join(RENDER.nav())
-      print('huh')
     else:
       bar = D.bar
 

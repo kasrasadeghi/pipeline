@@ -41,7 +41,7 @@ class PARSER:
 
         title = L[len("--- "):-len(" ---")]
         if not all(map(lambda c: c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', title)):
-          print(f"WARNING: invalid section title '{title}'")
+          LOG(f"WARNING: invalid section title '{title}'")
         curr_section = make_section(title)
       else:
         curr_section['content'].append(L)
@@ -130,7 +130,6 @@ class PARSER:
     indent_counts = []
     for L in block:
       if L[0] != ' ' and L[0] != "-":
-        LOG(f"'{L[0]}': {L}")
         indent_counts.append({"indent": -1, "content": L})
       else:
         indent, rest = L.split("-", 1)
