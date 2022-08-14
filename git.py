@@ -11,7 +11,7 @@ class GIT_HANDLE:
       return redirect(f"/git/diff-staged/{note}", code=302)
 
     else:
-      print(f"ERROR: note '{note}' doesn't exist to 'git add'")
+      LOG(f"ERROR: note '{note}' doesn't exist to 'git add'")
       os.chdir(currdir)
       return Response('', 204)
 
@@ -27,7 +27,7 @@ class GIT_HANDLE:
       return redirect(f"/git/diff/{note}", code=302)
 
     else:
-      print(f"ERROR: note '{note}' doesn't exist to 'git add'")
+      LOG(f"ERROR: note '{note}' doesn't exist to 'git add'")
       os.chdir(currdir)
       return Response('', 204)
 
@@ -168,7 +168,7 @@ class GIT:
     for L in diff.splitlines():
       if L.startswith(prefix):
         pre, sha, post = str(escape(L[:sha_start])), str(escape(L[sha_start:sha_end])), str(escape(L[sha_end:]))
-        print(sha)
+        LOG({"git log": sha})
         acc.append(pre + f'<a href="/git/show/{sha}">{sha}</a>' +post)
       else:
         acc.append(str(escape(L)))
@@ -347,8 +347,8 @@ def git_commit():
     if 'commit_message' in request.form:
       return GIT_HANDLE._commit(request.form['commit_message'])
 
-    print("ERROR: unhandled request with form: ")
-    pprint(request.form)
+    LOG("ERROR: unhandled request with form: ")
+    LOG(request.form)
     return Response('', 204)
 
   return GIT.RENDER_GIT_COMMIT()
@@ -366,8 +366,8 @@ def git_status():
     if 'unstage' in request.form:
       return GIT_HANDLE._unstage(request.form['unstage'])
 
-    print("ERROR: unhandled request with form: ")
-    pprint(request.form)
+    LOG("ERROR: unhandled request with form: ")
+    LOG(request.form)
     return Response('', 204)
 
   return GIT.RENDER_GIT()

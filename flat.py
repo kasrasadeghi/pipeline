@@ -393,8 +393,8 @@ def get_note(note):
       FLAT.edit(request.form['edit'])
       return Response('', 204)
 
-    print("ERROR: unhandled POST request with form:")
-    pprint(request.form)
+    LOG("ERROR: unhandled POST request with form:")
+    LOG(request.form)
     return Response('', 500)
 
   # default case: handle rendering

@@ -49,7 +49,7 @@ class DEBUG:
       LOG(f"set '{k}' to '{v}'")
       DEBUG._STATE[k] = v
     else:
-      print("stateless ", end='')
+      LOG(f"stateless map {k} -> {v}")
 
   @staticmethod
   def get_state(k):
@@ -67,7 +67,6 @@ class DEBUG:
   @staticmethod
   def RENDER_LOG():
     content = f"<pre>DEBUG LOG: \n" + f"{FLASK_UTIL.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
-    print(DEBUG._GLOBAL_LOG)
     return RENDER.base_page(DICT(content, title="DEBUG LOG", bar=""))
 
   @staticmethod
@@ -148,9 +147,9 @@ def route_debuginfo():
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
-  # print('client ip:', request.remote_addr)
-  # print(request.headers)
-  # print(request.json)
+  # LOG('client ip:', request.remote_addr)
+  # LOG(request.headers)
+  # LOG(request.json)
   return Response('', 204)
 
 

@@ -7,8 +7,6 @@ from subprocess import check_output
 
 from flask import Flask, Response, render_template, escape, request, redirect
 
-from pprint import pprint
-
 app = Flask(__name__)
 
 def kaz_import(filepath):

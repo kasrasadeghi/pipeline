@@ -35,7 +35,7 @@ class util:
   def read_file(R, filepath):
 
     if not os.path.isfile(filepath):
-      print(f"ERROR: reading file that does not exist: '{filepath}'")
+      LOG(f"ERROR: reading file that does not exist: '{filepath}'")
       return ""
 
     acc = list()
