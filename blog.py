@@ -151,6 +151,5 @@ def COMMAND_BLOG(args, handle_msg):
         ABORT('unmatched command')
 
   except Exception as e:
-    DEBUG.CATCH(e)
     _, note_referer = FLASK_UTIL.REFERER_NOTE()
     return redirect(note_referer)
