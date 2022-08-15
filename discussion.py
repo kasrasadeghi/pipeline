@@ -81,7 +81,7 @@ class DISCUSSION_RENDER:
       if timerender:
         date = timerender(msg_date)
       else:
-        date = util.date_cmd("-d", msg_date, "+%b %d %T")
+        date = util.date_cmd("-d", msg_date, "+%T")
 
       return (
         (f'<a href="/disc/{origin}">' if origin else "") +
