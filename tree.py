@@ -10,7 +10,8 @@ class TREE:
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
-  def node(item):
+  def node(item, **kwargs):
+    render_msg = kwargs.get('render_msg', None)
     result = None
 
     level = item['indent']
@@ -22,7 +23,10 @@ class TREE:
       indent = (level * "  ") + "- "
 
     if DISCUSSION.is_msg(item):
-      return DISCUSSION_RENDER.msg(item)
+      if render_msg:
+        return render_msg(item)
+      else:
+        return DISCUSSION_RENDER.msg(item)
 
     if item['value'].startswith('link: '):
       url = item['value'].removeprefix('link: ')
@@ -61,17 +65,24 @@ class TREE:
     return f"<pre><br/>(file size: {os.path.getsize(FLAT.to_path(note))} bytes)</pre>"
 
   @staticmethod
+  def blocks_from_section(section):
+    return TREE.squash_messages(TREE.trim_newlines(section['blocks']))
+
+  @staticmethod
   def section(section):
     acc = list()
     if section['section'] != 'entry':
       acc.append(f'<pre>--- {section["section"]} --- </pre>')
+
+    if section['section'] == 'DISCUSSION':
+      return DISCUSSION_RENDER.section(section)
 
     if section['section'] == 'METADATA':
       if JOURNAL.is_journal(section):
         return JOURNAL_RENDER.METADATA(TREE.parse_metadata(section))
 
     # don't print two empty blocks consecutively
-    for block in TREE.squash_messages(TREE.trim_newlines(section['blocks'])):
+    for block in TREE.blocks_from_section(section):
 
       if block == ['']:
         debug("whitespace")
@@ -81,7 +92,6 @@ class TREE:
       for item in block:
         # if item is a tree/node
         if isinstance(item, dict):
-
           acc.append(TREE.node(item))
           continue
 

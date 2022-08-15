@@ -12,6 +12,7 @@ class RENDER:
     base_text_color = "#ddd"
     input_background_color = "#333"
     body_background_color= "#222"
+    banner_color = "#aaa"
 
     meta_tags = ", ".join([
       'height=device-height',
@@ -52,6 +53,30 @@ class RENDER:
        h1.title {
          margin-left: 1em; padding-left: 10px; padding-bottom: 6px; padding-right: 10px;
          border-left: 2px white solid; border-bottom: 2px white solid;
+       }
+
+       .banner-box {
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+         width: -webkit-fill-available;
+         margin-top: 15px;
+       }
+       .banner {
+         border: solid """ + banner_color + """;
+         padding: 3px;
+         width: 10em;
+       }
+       .banner-bar {
+         width: -webkit-fill-available;
+         height: 3px;
+         background: """ + banner_color + """;
+       }
+       .banner-bar-left {
+         width: -webkit-fill-available;
+         height: 3px;
+         width: 30px;
+         background: """ + banner_color + """;
        }
 
        .editor_textarea {
@@ -210,6 +235,14 @@ class RENDER:
 
     navbar.append(f'</header>')
     return "".join(navbar)
+
+  @staticmethod
+  def banner(title):
+    return ('<div class="banner-box">' +
+              "<div class='banner-bar-left'></div>" +
+              "<span class='banner'>" + title + "</span>" +
+              "<div class='banner-bar'></div>" +
+            "</div>")
 
   @staticmethod
   def base_page(D):
