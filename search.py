@@ -20,9 +20,9 @@ def msg_generator():
 
 class SEARCH:
   @classmethod
-  def RENDER(cls, content):
-    content = (f'found {DEBUG.get_state("msg count")} results '
-               f'in {DEBUG.get_state("elapsed time")} seconds '
+  def RENDER(cls, content, **kwargs):
+    content = (f'found {kwargs["msg_count"]} results '
+               f'in {kwargs["elapsed_time"]} seconds '
                + content)
     return RENDER.base_page(DICT(content, title="search", bar=None))
 
@@ -45,12 +45,13 @@ def get_search():
   msgs = list(msg_generator())
   content = "".join(map(DISCUSSION_RENDER.msg, msgs))
 
-  DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
-  DEBUG.set_state("msg count", len(msgs))
   DEBUG.set_state("content size", len(content))
 
-  return SEARCH.RENDER(content)
-
+  return SEARCH.RENDER(
+    content,
+    msg_count=(len(msgs)),
+    elapsed_time=(time.time() - DEBUG.get_state("start time"))
+  )
 
 @app.route('/search/<query>')
 def get_search_with_query(query):
@@ -66,8 +67,10 @@ def get_search_with_query(query):
       acc.append(SEARCH.msg(msg))
   content = "".join(acc)
 
-  DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
-  DEBUG.set_state("msg count", len(acc))
   DEBUG.set_state("content size", len(content))
 
-  return SEARCH.RENDER(content)
+  return SEARCH.RENDER(
+    content,
+    msg_count=(len(msgs)),
+    elapsed_time=(time.time() - DEBUG.get_state("start time"))
+  )
