@@ -39,12 +39,14 @@ class PLAN_RENDER:
         if corresponding_todo_msg in t.block[0]['value']:
           found = True
           t.isDone = True
-          d.startedWhen = t.block[0]['children'][0]
+          d.startedWhen = DISCUSSION.date(t.block[0])
 
       if not found:
         dangling_done.append(d)
 
     undone_todos = list(filter(lambda y: not y.isDone, todo))
+    undangling_done = list(filter(lambda y: y.startedWhen is not None, done))
+
     def render_todos(title, l):
       if l:
         return f"<pre>{title}:</pre>" + "".join(map(lambda x: render_msg(x.block), l))
@@ -52,7 +54,7 @@ class PLAN_RENDER:
         return ""
 
     return (render_todos("TODO", undone_todos)
-            + render_todos("DONE", done)
+            + render_todos("DONE", undangling_done)
             + render_todos("DANGLING DONE", dangling_done)
             + render_todos("MISC", rest))
 
