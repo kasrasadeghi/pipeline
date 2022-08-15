@@ -75,7 +75,6 @@ class DISCUSSION_RENDER:
 
     try:
       msg_date = DISCUSSION.date(msg)
-      origin = msg.get('origin', None)  # second argument of .get() is a default value
       msg_content = DISCUSSION_RENDER.msg_content(msg["value"].removeprefix("msg: "))
 
       if timerender:
@@ -84,12 +83,10 @@ class DISCUSSION_RENDER:
         date = util.date_cmd("-d", msg_date, "+%T")
 
       return (
-        (f'<a href="/disc/{origin}">' if origin else "") +
         f'<div class="msg">'
         f'<div class="msg_timestamp">{date}</div>'
         f'<div class="msg_content">{msg_content}</div>'
-        f'</div>' +
-        (f'</a>' if origin else "")
+        f'</div>'
       )
     except Exception as e:
       import inspect

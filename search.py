@@ -26,6 +26,13 @@ class SEARCH:
                + content)
     return RENDER.base_page(DICT(content, title="search", bar=None))
 
+  @staticmethod
+  def msg(msg):
+    origin = msg['origin']
+
+    return (f'<a href="/disc/{origin}">'
+            + DISCUSSION_RENDER.msg(msg) +
+            '</a>')
 
 @app.route('/search')
 def get_search():
@@ -55,7 +62,7 @@ def get_search_with_query(query):
       if current_note != msg['origin']:
         acc.append(RENDER.banner(FLAT.title(msg['origin'])))
         current_note = msg['origin']
-      acc.append(DISCUSSION_RENDER.msg(msg))
+      acc.append(SEARCH.msg(msg))
   content = "".join(acc)
 
   DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
