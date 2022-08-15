@@ -49,10 +49,14 @@ def get_search_with_query(query):
   DEBUG.init_state()
 
   acc = list()
+  current_note = None
   for msg in msg_generator():
     if query.lower() in msg['value'].lower():
-      acc.append(msg)
-  content = "".join(map(DISCUSSION_RENDER.msg, acc))
+      if current_note != msg['origin']:
+        acc.append(RENDER.banner(FLAT.title(msg['origin'])))
+        current_note = msg['origin']
+      acc.append(DISCUSSION_RENDER.msg(msg))
+  content = "".join(acc)
 
   DEBUG.set_state("elapsed time", time.time() - DEBUG.get_state("start time"))
   DEBUG.set_state("msg count", len(acc))
