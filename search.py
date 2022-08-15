@@ -21,10 +21,10 @@ def msg_generator():
 class SEARCH:
   @classmethod
   def RENDER(cls, content):
-    return DEBUG.TEXT("search",
-                      f'found {DEBUG.get_state("msg count")} results '
-                      f'in {DEBUG.get_state("elapsed time")} seconds '
-                      + content)
+    content = (f'found {DEBUG.get_state("msg count")} results '
+               f'in {DEBUG.get_state("elapsed time")} seconds '
+               + content)
+    return RENDER.base_page(DICT(content, title="search", bar=None))
 
 
 @app.route('/search')

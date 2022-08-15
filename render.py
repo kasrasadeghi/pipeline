@@ -65,7 +65,7 @@ class RENDER:
        .banner {
          border: solid """ + banner_color + """;
          padding: 3px;
-         width: 10em;
+         min-width: fit-content;
        }
        .banner-bar {
          width: -webkit-fill-available;
@@ -73,9 +73,8 @@ class RENDER:
          background: """ + banner_color + """;
        }
        .banner-bar-left {
-         width: -webkit-fill-available;
          height: 3px;
-         width: 30px;
+         min-width: 30px;
          background: """ + banner_color + """;
        }
 
