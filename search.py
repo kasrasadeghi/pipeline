@@ -15,7 +15,7 @@ def msg_generator():
     for L in B:
       if isinstance(L, dict) and L['value'].startswith("msg:"):
         assert 'origin' not in L
-        L |= {'origin': f}
+        L |= {'origin': f, 'date': DISCUSSION.date(L)}
         yield L
 
 class SEARCH:
@@ -29,8 +29,9 @@ class SEARCH:
   @staticmethod
   def msg(msg):
     origin = msg['origin']
+    date = msg['date']
 
-    return (f'<a href="/disc/{origin}">'
+    return (f'<a href="/disc/{origin}#{date}">'
             + DISCUSSION_RENDER.msg(msg) +
             '</a>')
 
