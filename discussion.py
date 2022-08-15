@@ -17,6 +17,10 @@ class DISCUSSION:
     # - only singleton message blocks, where we'd only use block_is_msg
     # - multimessage blocks, where we could have multiple messages in a block, possible useful for quotes and includes
     return TREE.is_singleton(block) and DISCUSSION.is_msg(block[0])
+
+  @staticmethod
+  def date(msg):
+    return msg['children'][0]['value'].removeprefix('Date: ')
 # end DISCUSSION
 
 
@@ -70,7 +74,7 @@ class DISCUSSION_RENDER:
     timerender = kwargs.get('timerender', None)
 
     try:
-      msg_date = msg['children'][0]['value'].removeprefix('Date: ')
+      msg_date = DISCUSSION.date(msg)
       origin = msg.get('origin', None)  # second argument of .get() is a default value
       msg_content = DISCUSSION_RENDER.msg_content(msg["value"].removeprefix("msg: "))
 
@@ -91,6 +95,48 @@ class DISCUSSION_RENDER:
       import inspect
       LOG({"ERROR while rendering msg": msg, "exception": e})
       return str(msg)
+
+  @staticmethod
+  def section(section):
+    LOG('discussion section')
+
+    current_day = None
+
+    def render_msg(msg):
+      nonlocal current_day
+      day_of_msg = util.date_cmd("-d", DISCUSSION.date(msg), "+%b %d %Y")
+
+      result = DISCUSSION_RENDER.msg(item, timerender=lambda x: util.date_cmd("-d", x, "+%T"))
+
+      # when we detect a new day, prepend a day banner
+      if current_day != day_of_msg:
+        current_day = day_of_msg
+        result = RENDER.banner(current_day) + result
+
+      return result
+
+    acc = list()
+    acc.append(f'<pre>--- {section["section"]} --- </pre>')
+    # don't print two empty blocks consecutively
+    for block in TREE.blocks_from_section(section):
+      if block == ['']:
+        acc.append('<br/>')
+        continue
+
+      for item in block:
+        # if item is a tree/node
+        if isinstance(item, dict):
+          acc.append(TREE.node(item, render_msg=render_msg))
+          continue
+
+        if isinstance(item, str):
+          acc.append(f"<pre>{item}</pre>")
+          continue
+
+        acc.append(repr(item))
+
+    return '\n'.join(acc)
+
 
 
 # end DISCUSSION_RENDER
