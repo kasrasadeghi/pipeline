@@ -13,6 +13,10 @@ class BLOG:
   distpath = "/home/kasra/blog"
 
   @staticmethod
+  def cmd(cmd):
+    return util.cmd(cmd, shell=True, cwd=BLOG.distpath)
+
+  @staticmethod
   def title():
     lines = FLAT.note_read_lines(BLOG.root)
 
@@ -77,6 +81,10 @@ class BLOG:
         return post
     ABORT(f"ERROR: post for note '{note}' not found")
 
+# end BLOG
+
+
+class BLOG_RENDER:
   @staticmethod
   def post(post):
     return f'<a href="blog/posts/{post.filename}">{post.title}</a>'
@@ -91,14 +99,14 @@ class BLOG:
     )
 
   @staticmethod
-  def RENDER():
-    bar = BLOG.bar()
+  def ROOT():
+    bar = BLOG_RENDER.bar()
 
     try:
       acc = []
       for post_slug in BLOG.parse_root():
         blog_post = BLOG.try_note_to_post(post_slug.note)
-        acc.append("<li>" + BLOG.post(blog_post) + "</li>")
+        acc.append("<li>" + BLOG_RENDER.post(blog_post) + "</li>")
       content = "<ul>blog post list:" + "\n".join(acc) + "</ul>"
 
       title = BLOG.title()
@@ -119,11 +127,24 @@ class BLOG:
         </body>
       </html>"""
 
+# end BLOG_RENDER
 
 @app.route("/blog")
 def get_blog():
   DEBUG.init_state()
-  return BLOG.RENDER()
+  return BLOG_RENDER.ROOT()
+
+@app.route("/blog/posts/<filename>")
+def get_internal_blog_post(filename):
+  def filename_to_post(url):
+    for post in BLOG.parse_postlist():
+      if post.filename == filename:
+        return post
+    ABORT(f"ERROR: post for url 'posts/{filename}' not found")
+
+  post = filename_to_post(filename)
+
+  return Response(BLOG.cmd(f"python parser.py {FLAT.to_path(post.note)}"), 200, mimetype="text/html")
 
 
 @COMMAND.REGISTER('BLOG')
@@ -136,7 +157,7 @@ def COMMAND_BLOG(args, handle_msg):
         acc = []
         for post in BLOG.parse_postlist():
           cmd = f"python parser.py {FLAT.to_path(post.note)} | tee posts/{post.filename}"
-          util.cmd(cmd, shell=True, cwd=BLOG.distpath)
+          BLOG.cmd(cmd)
           acc.append(cmd + "\n")
         pass
         # TODO compile root page as index.html
