@@ -95,8 +95,6 @@ class DISCUSSION_RENDER:
 
   @staticmethod
   def section(section):
-    LOG('discussion section')
-
     current_day = None
 
     def render_msg(msg):
@@ -133,8 +131,6 @@ class DISCUSSION_RENDER:
         acc.append(repr(item))
 
     return '\n'.join(acc)
-
-
 
 # end DISCUSSION_RENDER
 
