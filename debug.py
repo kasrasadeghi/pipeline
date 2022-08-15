@@ -115,15 +115,6 @@ class DEBUG:
     DEBUG.clear_state()
     return debug
 
-  # TODO add a traceback section to this
-  @staticmethod
-  def CATCH(exception):
-    LOG('catch: ' + str(exception))
-    if isinstance(exception, Boundary):
-      DEBUG.set_state("error boundary", str(exception))
-      return str(exception)
-    DEBUG.set_state("stacktrace", traceback.format_exc())
-
   @staticmethod
   def TEXT(title, content):
     debug = DEBUG.CONTENT()
