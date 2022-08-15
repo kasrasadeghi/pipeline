@@ -83,7 +83,7 @@ class DISCUSSION_RENDER:
         date = util.date_cmd("-d", msg_date, "+%T")
 
       return (
-        f'<div class="msg">'
+        f'<div id="{msg_date}" class="msg">'
         f'<div class="msg_timestamp">{date}</div>'
         f'<div class="msg_content">{msg_content}</div>'
         f'</div>'
