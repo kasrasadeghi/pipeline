@@ -26,6 +26,8 @@ class Boundary(Exception):
   pass
 
 def ABORT(msg):
+  import inspect
+  LOG({"ABORT": msg, "frame": DEBUG.first_nondebug_frame()})
   raise Boundary(msg)
 
 class DEBUG:
@@ -56,26 +58,42 @@ class DEBUG:
     return DEBUG._STATE[k]
 
   @staticmethod
-  def LOG(s):
-    # find a frame from a function that isn't called "LOG" in this file
-    # - not this one and not toplevel LOG above
+  def frameinfo(frame):
+    return {
+      "filename": frame.f_code.co_filename,
+      "funcname": frame.f_code.co_name,
+      "line": frame.f_lineno
+    }
+
+  @staticmethod
+  def first_nondebug_frame(predicate=None):
+    # find the first frame not from "debug.py" that also passes an optional predicate
     import inspect
+    def check(frame):
+      nonlocal predicate
+      if predicate:
+        return predicate(frame)
+      return False
+
     parent_frame = inspect.currentframe()
-    while parent_frame.f_code.co_name == "LOG" and\
-          parent_frame.f_code.co_filename == "debug.py":
+    while parent_frame.f_code.co_filename == "debug.py" or check(parent_frame):
       parent_frame = parent_frame.f_back
 
+    return parent_frame
+
+  @staticmethod
+  def LOG(s):
     if DEBUG._STATE:
       DEBUG._STATE['LOG'].append(s)
     else:
       print("stateless ", end='')
     print("LOG: " + str(s))
-    DEBUG.parent_frame = parent_frame
-    DEBUG._GLOBAL_LOG.append({"filename": parent_frame.f_code.co_filename, "funcname": parent_frame.f_code.co_name, "line": parent_frame.f_lineno, "content": s})
+    parent_frame = DEBUG.first_nondebug_frame(lambda f: f.f_code.co_name == 'LOG')
+    DEBUG._GLOBAL_LOG.append({"frame": DEBUG.frameinfo(parent_frame), "content": s})
 
   @staticmethod
   def RENDER_LOG():
-    content = f"<pre>DEBUG LOG: \n" + f"{FLASK_UTIL.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
+    content = f"<pre>DEBUG LOG: \n" + f"{PRETTY.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
     return RENDER.base_page(DICT(content, title="DEBUG LOG", bar=""))
 
   @staticmethod
@@ -91,7 +109,7 @@ class DEBUG:
         log = DEBUG._STATE['LOG']
         del DEBUG._STATE['LOG']
         DEBUG._STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{FLASK_UTIL.DUMP(DEBUG._STATE)}\n"
+      debug = f"<pre>DEBUG STATE: \n" + f"{PRETTY.DUMP(DEBUG._STATE)}\n"
       debug += DEBUG._STATE.get("stacktrace", "")
       debug += "</pre>"
     DEBUG.clear_state()
