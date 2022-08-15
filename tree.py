@@ -22,7 +22,7 @@ class TREE:
       indent = (level * "  ") + "- "
 
     if DISCUSSION.is_msg(item):
-      return DISCUSSION_RENDER.msg(item, lambda x: util.date_cmd("-d", x, "+%T"))
+      return DISCUSSION_RENDER.msg(item)
 
     if item['value'].startswith('link: '):
       url = item['value'].removeprefix('link: ')

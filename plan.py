@@ -18,7 +18,7 @@ class PLAN_RENDER:
         msg_blocks.append(block)
 
     def render_msg(msg_block, date_prefix=''):
-      return DISCUSSION_RENDER.msg(msg_block[0], lambda x: date_prefix + util.date_cmd("-d", x, "+%T"))
+      return DISCUSSION_RENDER.msg(msg_block[0], timerender=lambda x: date_prefix + util.date_cmd("-d", x, "+%T"))
 
     try:
       import itertools  # repeat

@@ -1,5 +1,4 @@
 class DISCUSSION:
-
   @staticmethod
   def is_msg(item):
     """ checks whether an item in a block is a msg """
@@ -17,7 +16,7 @@ class DISCUSSION:
     # TODO consider choosing between:
     # - only singleton message blocks, where we'd only use block_is_msg
     # - multimessage blocks, where we could have multiple messages in a block, possible useful for quotes and includes
-    return TREE.is_singleton(block) and DISCUSSIOn.is_msg(block[0])
+    return TREE.is_singleton(block) and DISCUSSION.is_msg(block[0])
 # end DISCUSSION
 
 
@@ -67,7 +66,9 @@ class DISCUSSION_RENDER:
     return parse_url(content, cont=highlight_tags, base=basic_escape)
 
   @staticmethod
-  def msg(msg, timerender=None):
+  def msg(msg, **kwargs):
+    timerender = kwargs.get('timerender', None)
+
     try:
       msg_date = msg['children'][0]['value'].removeprefix('Date: ')
       origin = msg.get('origin', None)  # second argument of .get() is a default value
@@ -77,6 +78,7 @@ class DISCUSSION_RENDER:
         date = timerender(msg_date)
       else:
         date = util.date_cmd("-d", msg_date, "+%b %d %T")
+
       return (
         (f'<a href="/disc/{origin}">' if origin else "") +
         f'<div class="msg">'
@@ -86,8 +88,8 @@ class DISCUSSION_RENDER:
         (f'</a>' if origin else "")
       )
     except Exception as e:
-      LOG("ERROR: could not render msg: '" + str(msg) + "'")
-      LOG("exception: str(e)")
+      import inspect
+      LOG({"ERROR while rendering msg": msg, "exception": e})
       return str(msg)
 
 

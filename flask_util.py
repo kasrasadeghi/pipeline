@@ -23,7 +23,3 @@ class FLASK_UTIL:
   @staticmethod
   def HOST():
     return request.headers["Host"]  # like 192.37.37.3:5000
-
-  @staticmethod
-  def DUMP(o):
-    return str(escape(json.dumps(o, indent=2, default=str)))
