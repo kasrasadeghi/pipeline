@@ -64,7 +64,7 @@ class RENDER:
        }
        .banner {
          border: solid """ + banner_color + """;
-         padding: 3px;
+         padding: 3px 7px 3px 5px;
          min-width: fit-content;
        }
        .banner-bar {
