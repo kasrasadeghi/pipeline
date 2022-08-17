@@ -59,11 +59,13 @@ def get_search_with_query(query):
 
   acc = list()
   current_note = None
+  msg_count = 0
   for msg in msg_generator():
     if query.lower() in msg['value'].lower():
       if current_note != msg['origin']:
         acc.append(RENDER.banner(FLAT.title(msg['origin'])))
         current_note = msg['origin']
+      msg_count += 1
       acc.append(SEARCH.msg(msg))
   content = "".join(acc)
 
@@ -71,6 +73,6 @@ def get_search_with_query(query):
 
   return SEARCH.RENDER(
     content,
-    msg_count=(len(msgs)),
+    msg_count=msg_count,
     elapsed_time=(time.time() - DEBUG.get_state("start time"))
   )
