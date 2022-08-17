@@ -247,6 +247,7 @@ class RENDER:
   def base_page(D):
     """
     D is a magic_dict with keys: { title, bar, content }
+    bar=None renders the default bar with RENDER.nav()
 
     USAGE:
     - RENDER.base_page(DICT(title, bar, content))
