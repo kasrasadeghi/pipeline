@@ -166,9 +166,9 @@ def route_debuginfo():
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
-  # LOG('client ip:', request.remote_addr)
-  # LOG(request.headers)
-  # LOG(request.json)
+  # LOG({'client ip': request.remote_addr})
+  # LOG({'headers': dict(request.headers)})
+  # LOG({'params/args': dict(request.args)})
   return Response('', 204)
 
 
