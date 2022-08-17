@@ -4,7 +4,8 @@ class RENDER:
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
     # .msg_content: overflow: hidden; text-overflow: ellipsis;
     # .msg: overflow: hidden; max-width: 100%;
-    navbar_size = 40 # in pixels
+    pixels_of_navbar_size = 40 # in pixels
+    navbar_size = str(pixels_of_navbar_size) + "px"
     header_color = "#bb6"
     link_button_color = {'main': "orange", 'hover': "red"}
     msg_color = "#a52a2a"
@@ -28,7 +29,8 @@ class RENDER:
      <meta name="viewport" content=" """ + meta_tags + """ ">
      <style>
        body { margin: 0; background: """ + body_background_color + """; }
-       .content { padding-top: """ + str(navbar_size) + """px; margin: 0% 2% 1% 2%; }
+       .content { padding: 5px; margin: """ + navbar_size + """ 1% 1% 1%; height: calc(100vh - """ + navbar_size + """ - 10px); }
+       :target { scroll-margin-top: """ + navbar_size + """; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
              align-content: stretch; align-items: flex-start; }
@@ -39,7 +41,7 @@ class RENDER:
        * { font-size: 18px; color: """ + base_text_color + """; }
        header {
          display: flex; align-items: center;
-         position: fixed; width: 100%; height: """ + str(navbar_size) + """px;
+         position: fixed; top: 0px; width: 100%; height: """ + navbar_size + """;
          background: """ + header_color + """; z-index: 12;
          margin: 0px;
          box-shadow: 0px 0px 11px 2px """ + header_color + """;
