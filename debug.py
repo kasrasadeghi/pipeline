@@ -7,7 +7,7 @@ def helper():
 def get_example():
   DEBUG.init_state()
 
-  helper()  # calls LOG, "huh" will show up in the output
+  helper()  # calls LOG('huh'), "huh" will show up in the output
   ....
   # choose one of:
   return DEBUG.DUMP(content)
