@@ -86,7 +86,7 @@ class BLOG:
 
 class BLOG_RENDER:
   @staticmethod
-  def post(post):
+  def link_to_post(post):
     return f'<a href="blog/posts/{post.filename}">{post.title}</a>'
 
   @staticmethod
@@ -106,12 +106,12 @@ class BLOG_RENDER:
       acc = []
       for post_slug in BLOG.parse_root():
         blog_post = BLOG.try_note_to_post(post_slug.note)
-        acc.append("<li>" + BLOG_RENDER.post(blog_post) + "</li>")
+        acc.append("<li>" + BLOG_RENDER.link_to_post(blog_post) + "</li>")
       content = "<ul>blog post list:" + "\n".join(acc) + "</ul>"
 
       title = BLOG.title()
     except Boundary as e:
-      LOG(str(e))
+      LOG(e)
       return FLAT_RENDER.NOTE(BLOG.root)
 
     # compose html
