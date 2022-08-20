@@ -302,15 +302,13 @@ class FLAT_RENDER:
     """
     @param colsfunc - returns content for the other columns in this item's row in a list
     """
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
-    body = """<table style="table-layout: fixed; width: 100%">"""
+    content = """<table style="table-layout: fixed; width: 100%">"""
     for i in items:
       td_style = '"text-overflow: ellipsis; white-space: nowrap; overflow: hidden;"'
       columns = "".join(map(lambda x: f"<td style={td_style}>" + x + "</td>", colsfunc(i)))
-      body += f'<tr><td style={td_style}><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li>'
-    body += "</ul>"
-    footer = "</div></body></html>"
-    return Response(header + body + footer, mimetype="text/html")
+      content += f'\n<tr><td style={td_style}><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li></tr>'
+    content += "\n</table>"
+    return RENDER.base_page(DICT(title, content, bar=None))
 
 # END FLAT RENDER
 
