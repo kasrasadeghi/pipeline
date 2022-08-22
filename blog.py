@@ -86,8 +86,9 @@ class BLOG:
 
 class BLOG_RENDER:
   @staticmethod
-  def link_to_post(post):
-    return f'<a href="blog/posts/{post.filename}">{post.title}</a>'
+  def link_to_post(post, view):
+    # view is either "internal" or "blog"
+    return f'<a href="/{view}/posts/{post.filename}">{post.title}</a>'
 
   @staticmethod
   def bar():
@@ -99,20 +100,39 @@ class BLOG_RENDER:
     )
 
   @staticmethod
+  def ROOT_CONTENT(view):
+    acc = []
+    for post_slug in BLOG.parse_root():
+      blog_post = BLOG.try_note_to_post(post_slug.note)
+      acc.append("<li>" + BLOG_RENDER.link_to_post(blog_post, view) + "</li>")
+    content = "<ul>blog post list:" + "\n".join(acc) + "</ul>"
+    return content
+
+  @staticmethod
   def ROOT():
     bar = BLOG_RENDER.bar()
 
     try:
-      acc = []
-      for post_slug in BLOG.parse_root():
-        blog_post = BLOG.try_note_to_post(post_slug.note)
-        acc.append("<li>" + BLOG_RENDER.link_to_post(blog_post) + "</li>")
-      content = "<ul>blog post list:" + "\n".join(acc) + "</ul>"
-
+      content = BLOG_RENDER.ROOT_CONTENT("internal")
       title = BLOG.title()
     except Boundary as e:
       LOG(e)
       return FLAT_RENDER.NOTE(BLOG.root)
+
+    return RENDER.base_page(DICT(title, content, bar=None))
+
+# end BLOG_RENDER
+
+
+class BLOG_COMPILE:
+  @staticmethod
+  def ROOT():
+    try:
+      content = BLOG_RENDER.ROOT_CONTENT("blog")
+      title = BLOG.title()
+    except Boundary as e:
+      LOG(e)
+      return 404
 
     # compose html
     return f"""
@@ -127,15 +147,23 @@ class BLOG_RENDER:
         </body>
       </html>"""
 
-# end BLOG_RENDER
+  @staticmethod
+  def POST(post):
+    return BLOG.cmd(f"python parser.py {FLAT.to_path(post.note)}")
+
 
 @app.route("/blog")
-def get_blog():
+@app.route("/internal", defaults={"blog_type": "internal"})
+def get_blog(blog_type = None):
   DEBUG.init_state()
-  return BLOG_RENDER.ROOT()
+  if blog_type == "internal":
+    return BLOG_RENDER.ROOT()
+  else:
+    return BLOG_COMPILE.ROOT()
 
 @app.route("/blog/posts/<filename>")
-def get_internal_blog_post(filename):
+@app.route("/internal/posts/<filename>", defaults={"blog_type": "internal"})
+def get_internal_blog_post(filename, blog_type=None):
   def filename_to_post(url):
     for post in BLOG.parse_postlist():
       if post.filename == filename:
@@ -144,7 +172,10 @@ def get_internal_blog_post(filename):
 
   post = filename_to_post(filename)
 
-  return Response(BLOG.cmd(f"python parser.py {FLAT.to_path(post.note)}"), 200, mimetype="text/html")
+  if blog_type == "internal":
+    return FLAT_RENDER.NOTE(post.note)
+  else:
+    return Response(BLOG_COMPILE.POST(post), 200, mimetype="text/html")
 
 
 @COMMAND.REGISTER('BLOG')
