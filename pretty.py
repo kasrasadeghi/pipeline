@@ -33,7 +33,11 @@ class PRETTY:
       result = PRETTY.DUMP(obj)
 
     if isinstance(o, str):
-      if len(o.splitlines()) == 1:
+      if o == "\n":
+        result = "\\n"
+      elif o == '':
+        result = '""'
+      elif len(o.splitlines()) == 1:
         result = o
       else:
         result = '\n' + indent('"""\n' + o + '"""')
