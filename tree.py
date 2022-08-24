@@ -106,12 +106,7 @@ class TREE:
 
   @staticmethod
   def page(note, sections):
-
-    acc = list()
-    for section in sections:
-      acc.append(TREE.section(section))
-
-    return '\n'.join(acc) + TREE.filesize(note)
+    return '\n'.join(map(TREE.section, sections)) + TREE.filesize(note)
 
   @staticmethod
   def is_newline(block):
