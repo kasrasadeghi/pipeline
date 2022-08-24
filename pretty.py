@@ -3,20 +3,27 @@
 
 class PRETTY:
   @staticmethod
-  def DUMP(o):
+  def DUMP(o, no_symbol=False):
     import pprint
 
     result = None
     indent_str = "  "
-    def indent(s):
+    def indent(s, color="#111"):
       #return s
-      return "".join(map(lambda l: '<span style="background: #111"> </span> ' + l + "\n", s.splitlines()))
+      return "".join(map(lambda l: f'<span style="background: {color}"> </span> ' + l + "\n", s.splitlines()))
+
+    def symbol(s):
+      nonlocal no_symbol
+      if no_symbol:
+        return ""
+      else:
+        return s
 
     if isinstance(o, dict):
       acc = list()
       for k, v in o.items():
-        acc.append(f"{k}: {PRETTY.DUMP(v)}")
-      result = "{\n" + indent("\n".join(acc)) + "}"
+        acc.append(f"{k}: {PRETTY.DUMP(v, no_symbol)}")
+      result = symbol("{") + "\n" + indent("\n".join(acc), color="#833") + symbol("}")
 
     if isinstance(o, list):
       if len(o) == 0:
@@ -24,13 +31,13 @@ class PRETTY:
       else:
         acc = list()
         for el in o:
-          acc.append(PRETTY.DUMP(el))
-        result = "[\n" + indent(",\n".join(acc)) + "]"
+          acc.append(PRETTY.DUMP(el, no_symbol))
+        result = symbol("[") + "\n" + indent(symbol(",") + "\n".join(acc), color='#388') + symbol("]")
 
     if isinstance(o, Exception):
       import traceback
       obj = {"msg": str(o), "traceback": "\n".join(traceback.format_exception(o))}
-      result = PRETTY.DUMP(obj)
+      result = PRETTY.DUMP(obj, no_symbol)
 
     if isinstance(o, str):
       if o == "\n":
