@@ -61,11 +61,7 @@ class PLAN_RENDER:
 
   @staticmethod
   def page(note, sections):
-    acc = list()
-    for section in sections:
-      acc.append(PLAN_RENDER.section(section))
-
-    return '\n'.join(acc) + TREE.filesize(note)
+    return '\n'.join(map(PLAN_RENDER.section, sections)) + TREE.filesize(note)
 
   @staticmethod
   def MAIN(note):
