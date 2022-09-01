@@ -123,7 +123,69 @@ class BLOG_RENDER:
 
 # end BLOG_RENDER
 
-kaz_import('old_blog_parser.py')
+
+class BLOG_TREE:
+  @staticmethod
+  def content(note):
+    return BLOG_TREE.page(note, PARSER.parse_file(FLAT.to_path(note)))
+
+  @staticmethod
+  def page(note, sections):
+    return '\n'.join(map(BLOG_TREE.section, sections))
+
+  @staticmethod
+  def node(item):
+    result = None
+
+    if item['value'].startswith('note: '):
+      note = item['value'].removeprefix('note: ').strip()
+      result = f"<pre style='color: red'>{indent}note: {TREE.note(note)}</pre>"
+
+    if None == result:
+      result = item['value']
+
+    if item['indent'] > -1:
+      result = f"\n<li>{result}</li>"
+
+    if len(item['children']) != 0:
+      acc = list()
+      for child in item['children']:
+        acc.append(BLOG_TREE.node(child))
+      return f"{result}<ul class='list'>{''.join(acc)}</ul>\n"
+
+    return result + "\n"
+
+
+  @staticmethod
+  def section(section):
+    if section['section'] != 'entry':
+      return ''
+
+    acc = list()
+    for block in section['blocks']:
+      if len(block) == 1 and block[0] == '':
+        acc.append('<br/>')
+        continue
+
+      acc.append('<div class="kscroll block">')
+      for item in block:
+        # if item is a tree/node
+        if isinstance(item, dict):
+          acc.append(BLOG_TREE.node(item))
+          continue
+
+        if isinstance(item, str):
+          acc.append(f"<pre style='color: red'>{item}</pre>")
+          debug("string:", item)
+          continue
+      acc.append('</div>')
+
+      # acc.append(repr(item))
+
+    return "\n".join(acc)
+
+# end BLOG_TREE
+
 
 class BLOG_COMPILE:
   @staticmethod
@@ -150,17 +212,26 @@ class BLOG_COMPILE:
 
   @staticmethod
   def POST(post):
-    return BLOG_COMPILE.base_post(title=FLAT.title(post.note), content=BLOG_PARSER.content(FLAT.to_path(post.note)))
+    note_content = PARSER.parse_file(FLAT.to_path(post.note))
+    content = (BLOG_TREE.content(post.note) + \
+               # "<pre>\n" + PRETTY.DUMP(note_content[0], no_symbol=True) + "</pre>"
+               "")
+    return BLOG_COMPILE.base_post(title=FLAT.title(post.note), content=content)
 
   @staticmethod
   def base_post(title, content):
+    scroll = RENDER.kscroll(
+      foreground="#f88",
+      background="#888"
+    )
+
     return """
     <!DOCTYPE hmtl>
 <html>
   <head>
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <style>
-       body { margin: 1% 2%; }
+       body { margin: 1% 1.5%; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
              align-content: stretch; align-items: flex-start; }
@@ -168,6 +239,10 @@ class BLOG_COMPILE:
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
        .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background-color: rgb(0, 130, 250); color: rgb(250, 250, 250); overflow-wrap: anywhere;}
+
+       """ + scroll + """
+
+       .block { border: 2px solid black; overflow-x: auto; padding: 2px; }
 
        body { font-size: 1.1em; }
        ul { margin-block-start: 0px;
