@@ -152,6 +152,28 @@ class RENDER:
        }
      </style>""" + FLASK_UTIL.TELEMETRY()
 
+  @staticmethod
+  def kscroll(**kwargs):
+    foreground = kwargs.get('foreground', "#777")
+    background = kwargs.get('background', "#333")
+    size = kwargs.get('size', "10px");
+    return """
+       .kscroll {
+         /* Foreground, Background */
+         scrollbar-color: """ + (foreground + " " + background) + """;
+       }
+       .kscroll::-webkit-scrollbar {
+         width: """ + size + """; /* Mostly for vertical scrollbars */
+         height: """ + size + """; /* Mostly for horizontal scrollbars */
+       }
+       .kscroll::-webkit-scrollbar-thumb {
+         background: """ + foreground + """;
+       }
+       .kscroll::-webkit-scrollbar-track {
+         background: """ + background + """;
+       }
+    """
+
   @classmethod
   def ANSI(R):
     return '\x1B['
