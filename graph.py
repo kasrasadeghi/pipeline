@@ -1,6 +1,6 @@
 class GRAPH:
-  @classmethod
-  def backlinks_refmap(cls):
+  @staticmethod
+  def backlinks_refmap():
     refmap = dict()
     for note in FLAT.list():
       refmap[note] = list(set(GRAPH.collect_refs(note)))
