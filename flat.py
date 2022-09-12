@@ -64,36 +64,6 @@ class FLAT:
     return "4e0ce4ff-1663-49f9-8ced-30f91202ae08.note"  # hardcoded value, CONSIDER looking for "index" in Tags
 
   @classmethod
-  def collect_refs(cls, note):
-    """@returns a list of notes this note references in the order they appear"""
-    with open(cls.to_path(note)) as f:
-      lines = f.readlines()
-
-    acc = list()
-    for L in lines:
-      if "- note: " in L and len(L.split("- note:", 1)) == 2:
-        note = L.split("- note: ", 1)[1].rstrip()
-        acc.append(note)
-        continue
-
-    return acc
-
-  @classmethod
-  def backlinks_refmap(cls):
-    refmap = dict()
-    for note in FLAT.list():
-      refmap[note] = list(set(FLAT.collect_refs(note)))
-
-    backlinks = dict()  # maps from note to set of referrers
-    for note, refs in refmap.items():
-      for ref in refs:
-        if ref not in backlinks:
-          backlinks[ref] = set()
-        backlinks[ref].add(note)
-
-    return backlinks, refmap
-
-  @classmethod
   def init_note(cls, note, title):
     with open(cls.to_path(note), "w+") as f:
       f.write("--- METADATA ---\n")
@@ -235,7 +205,7 @@ class FLAT_RENDER:
 
   @classmethod
   def _section_forward_links(R, note):
-    forward_link_list = FLAT.collect_refs(note)
+    forward_link_list = GRAPH.collect_refs(note)
     if 0 != len(forward_link_list):
       return "\n\n--- LINKS ---\n" + "\n".join([R._render_link(L) for L in forward_link_list])
     else:
@@ -243,7 +213,7 @@ class FLAT_RENDER:
 
   @classmethod
   def _section_backward_links(R, note):
-    backlink_map = FLAT.backlinks_refmap()[0]
+    backlink_map = GRAPH.backlinks_refmap()[0]
     if note in backlink_map:
       return "\n\n--- BACKLINKS ---\n" + "\n".join([R._render_link(L) for L in backlink_map[note]])
     else:
