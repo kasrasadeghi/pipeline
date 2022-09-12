@@ -1,3 +1,33 @@
+class GRAPH:
+  @classmethod
+  def backlinks_refmap(cls):
+    refmap = dict()
+    for note in FLAT.list():
+      refmap[note] = list(set(GRAPH.collect_refs(note)))
+
+    backlinks = dict()  # maps from note to set of referrers
+    for note, refs in refmap.items():
+      for ref in refs:
+        if ref not in backlinks:
+          backlinks[ref] = set()
+        backlinks[ref].add(note)
+
+    return backlinks, refmap
+
+  @staticmethod
+  def collect_refs(note):
+    """@returns a list of notes this note references in the order they appear"""
+    with open(FLAT.to_path(note)) as f:
+      lines = f.readlines()
+
+    acc = list()
+    for L in lines:
+      if "- note: " in L and len(L.split("- note:", 1)) == 2:
+        note = L.split("- note: ", 1)[1].rstrip()
+        acc.append(note)
+        continue
+
+    return acc
 
 @app.route("/graph")
 def get_graph():
@@ -23,7 +53,7 @@ def get_graph():
         legible_result.append("  " + p[0] + "\n")
     return "".join(legible_result)
 
-  backlinks, refmap = FLAT.backlinks_refmap()
+  backlinks, refmap = GRAPH.backlinks_refmap()
 
   limit = len(refmap)
   if 'limit' in request.args:
