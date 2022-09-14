@@ -52,15 +52,6 @@ class TREE:
     return "".join(acc)
 
   @staticmethod
-  def parse_metadata(section):
-    metadata_section = "\n".join(map(
-      lambda x: "\n".join(x),
-      section['blocks']))
-    metadata = {p[0]: p[1].strip() for p in
-                [x.split(":", 1) for x in metadata_section.split('\n') if x]}
-    return metadata
-
-  @staticmethod
   def filesize(note):
     return f"<pre><br/>(file size: {os.path.getsize(FLAT.to_path(note))} bytes)</pre>"
 
@@ -79,7 +70,7 @@ class TREE:
 
     if section['section'] == 'METADATA':
       if JOURNAL.is_journal(section):
-        return JOURNAL_RENDER.METADATA(TREE.parse_metadata(section))
+        return JOURNAL_RENDER.METADATA(FLAT.metadata_section(section))
 
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):

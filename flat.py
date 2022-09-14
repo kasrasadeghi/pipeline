@@ -107,6 +107,15 @@ class FLAT:
     result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
     return result
 
+  @staticmethod
+  def metadata_section(section):
+    metadata_section = "\n".join(map(
+      lambda x: "\n".join(x),
+      section['blocks']))
+    metadata = {p[0]: p[1].strip() for p in
+                [x.split(":", 1) for x in metadata_section.split('\n') if x]}
+    return metadata
+
   @classmethod
   def title(cls, note):
     return cls.metadata(note)['Title']
