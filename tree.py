@@ -1,56 +1,6 @@
-# tree renderer, not to be confused with the general purpose rendering utils in render.py
+# tree shaping utilities
 
 class TREE:
-  @staticmethod
-  def link(url):
-    return f'<a href="{url}">{url}</a>'
-
-  @staticmethod
-  def note(note):
-    return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
-
-  @staticmethod
-  def node(item, **kwargs):
-    render_msg = kwargs.get('render_msg', None)
-    result = None
-
-    level = item['indent']
-    if level == -1:  # toplevel
-      indent = ""
-    elif level == 0:
-      indent = "- "
-    else:
-      indent = (level * "  ") + "- "
-
-    if DISCUSSION.is_msg(item):
-      if render_msg:
-        return render_msg(item)
-      else:
-        return DISCUSSION_RENDER.msg(item)
-
-    if item['value'].startswith('link: '):
-      url = item['value'].removeprefix('link: ')
-      result = f'<pre>{indent}link: {TREE.link(url)}</pre>'
-      debug("link:", repr(item), debugmode='RENDER LINK')
-
-    if item['value'].startswith('note: '):
-      note = item['value'].removeprefix('note: ').strip()
-      result = f"<pre>{indent}note: {TREE.note(note)}</pre>"
-
-    if None == result:
-      debug('item, but none matched:', repr(item), debugmode='RENDER')
-      result = "<pre>" + indent + str(escape(item['value'])) \
-        + (": " if item['children'] and not item['value'].strip().endswith(':') else "") \
-        + "</pre>"
-
-    acc = list()
-    acc.append(result)
-
-    for child in item['children']:
-      acc.append(TREE.node(child))
-
-    return "".join(acc)
-
   @staticmethod
   def filesize(note):
     return f"<pre><br/>(file size: {os.path.getsize(FLAT.to_path(note))} bytes)</pre>"
@@ -58,46 +8,6 @@ class TREE:
   @staticmethod
   def blocks_from_section(section):
     return TREE.squash_messages(TREE.trim_newlines(section['blocks']))
-
-  @staticmethod
-  def section(section):
-    acc = list()
-    if section['section'] != 'entry':
-      acc.append(f'<pre>--- {section["section"]} --- </pre>')
-
-    if section['section'] == 'DISCUSSION':
-      return DISCUSSION_RENDER.section(section)
-
-    if section['section'] == 'METADATA':
-      if JOURNAL.is_journal(section):
-        return JOURNAL_RENDER.METADATA(FLAT.metadata_section(section))
-
-    # don't print two empty blocks consecutively
-    for block in TREE.blocks_from_section(section):
-
-      if block == ['']:
-        debug("whitespace")
-        acc.append('<br/>')
-        continue
-
-      for item in block:
-        # if item is a tree/node
-        if isinstance(item, dict):
-          acc.append(TREE.node(item))
-          continue
-
-        if isinstance(item, str):
-          acc.append(f"<pre>{item}</pre>")
-          debug("string:", item)
-          continue
-
-        acc.append(repr(item))
-
-    return '\n'.join(acc)
-
-  @staticmethod
-  def page(note, sections):
-    return '\n'.join(map(TREE.section, sections)) + TREE.filesize(note)
 
   @staticmethod
   def is_newline(block):
