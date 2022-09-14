@@ -27,7 +27,7 @@ class DISCUSSION:
 class DISCUSSION_RENDER:
   @staticmethod
   def MAIN(note):
-    content = TREE.page(note, PARSER.parse_file(FLAT.to_path(note)))
+    content = RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)))
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/note/{note}">note</a>'
@@ -53,11 +53,11 @@ class DISCUSSION_RENDER:
         prefix, potentially_url = S.rsplit(': ', 1)
 
         if potentially_url.strip().startswith('https://'):
-          return cont(prefix, base) + ": " + TREE.link(potentially_url)
+          return cont(prefix, base) + ": " + RENDER.link(potentially_url)
 
         if potentially_url.strip().endswith(".note") and \
            len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
-          return cont(prefix, base) + ": " + TREE.note(potentially_url)
+          return cont(prefix, base) + ": " + RENDER.note(potentially_url)
 
       return cont(S, base)
 
@@ -121,7 +121,7 @@ class DISCUSSION_RENDER:
       for item in block:
         # if item is a tree/node
         if isinstance(item, dict):
-          acc.append(TREE.node(item, render_msg=render_msg))
+          acc.append(RENDER.node(item, render_msg=render_msg))
           continue
 
         if isinstance(item, str):
