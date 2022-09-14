@@ -220,7 +220,7 @@ class BLOG_COMPILE:
 
   @staticmethod
   def base_post(title, content):
-    scroll = RENDER.kscroll(
+    scroll = RENDER_UTIL.kscroll(
       foreground="#f88",
       background="#888"
     )

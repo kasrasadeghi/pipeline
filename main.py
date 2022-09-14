@@ -20,31 +20,33 @@ kaz_import('magic.py')
 kaz_import('util.py')
 kaz_import('flask_util.py')
 
+kaz_import('block_parser.py')
+kaz_import('tree.py')
 kaz_import('node.py')
-kaz_import('pretty.py')
-
-kaz_import('flat.py')
+kaz_import('render.py')
+kaz_import('render_util.py')
+kaz_import('sidebar.py')
 kaz_import('git.py')
-kaz_import('journal.py')
-kaz_import('graph.py')
-kaz_import('rm.py')
+
+kaz_import('search.py')
 
 kaz_import('command.py')
 kaz_import('commands/new_note.py')
 kaz_import('commands/twitch_clip.py')
 
-kaz_import('block_parser.py')
-kaz_import('tree.py')
-
+kaz_import('flat.py')
+kaz_import('journal.py')
+kaz_import('blog.py')
 kaz_import('edit.py')
 kaz_import('discussion.py')
 kaz_import('plan.py')
-kaz_import('search.py')
-kaz_import('blog.py')
 
-kaz_import('sidebar.py')
-kaz_import('render.py')
+kaz_import('graph.py')
+kaz_import('rm.py')
+
 kaz_import('debug.py')
+kaz_import('pretty.py')
+
 
 # END IMPORTS
 

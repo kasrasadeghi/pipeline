@@ -4,8 +4,8 @@ class SIDEBAR:
     return f"""
       <aside>
         <div class="sidebar-content">
-          {RENDER.button(action='/', name='New Note')}
-          {RENDER.button(action='/search', name='Search', method='GET')}
+          {RENDER_UTIL.button(action='/', name='New Note')}
+          {RENDER_UTIL.button(action='/search', name='Search', method='GET')}
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
         </div>
@@ -16,7 +16,7 @@ class SIDEBAR:
   def render_routine():
     """parse the routine file in order to render common things in my daily routine"""
     content = parse_file(FLAT.to_path(routine()))
-
+    # TODO
 
   @classmethod
   def routine():

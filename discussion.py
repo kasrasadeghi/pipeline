@@ -106,7 +106,7 @@ class DISCUSSION_RENDER:
       # when we detect a new day, prepend a day banner
       if current_day != day_of_msg:
         current_day = day_of_msg
-        result = RENDER.banner(current_day) + result
+        result = RENDER_UTIL.banner(current_day) + result
 
       return result
 

@@ -129,14 +129,14 @@ class GIT:
   def _git_diff_single(R, note):
     """the diff between working and stage"""
     diff = check_output(['git', '-c', 'color.ui=always', 'diff', note]).decode('utf8').strip()
-    diff = RENDER._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(str(escape(diff)))
     return diff
 
   @classmethod
   def _git_diff_staged(R, note):
     """the diff between stage and head"""
     diff = check_output(['git', '-c', 'color.ui=always', 'diff', '--staged', note]).decode('utf8').strip()
-    diff = RENDER._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(str(escape(diff)))
     return diff
 
   @classmethod
@@ -144,14 +144,14 @@ class GIT:
     """the diff between work and stage"""
     # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
     diff = check_output(['git', '-c', 'color.ui=always', 'diff']).decode('utf8').strip()
-    diff = RENDER._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(str(escape(diff)))
     return diff
 
   @classmethod
   def _git_stage(R):
     """show the stage as the diff between it and HEAD"""
     diff = check_output(['git', '-c', 'color.ui=always', 'diff', '--staged']).decode('utf8').strip()
-    diff = RENDER._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(str(escape(diff)))
     return diff
 
   @classmethod
@@ -159,7 +159,7 @@ class GIT:
     diff = check_output(['git', '-c', 'color.ui=always', '--no-pager', 'log', '--decorate=short']).decode('utf8')
 
     # add links for every commit
-    prefix = RENDER.ANSI() + "33m" + "commit "
+    prefix = RENDER_UTIL.ANSI() + "33m" + "commit "
     len_prefix = len(prefix)
     len_sha = len("da365d2d6a9c6c7dc5a748d382eab0434f20c04c")
     sha_start = len_prefix
@@ -174,14 +174,14 @@ class GIT:
         acc.append(str(escape(L)))
 
     diff = "\n".join(acc)
-    diff = RENDER._parse_color(diff)
+    diff = RENDER_UTIL._parse_color(diff)
 
     return diff
 
   @classmethod
   def _git_show_commit(R, sha):
     output = check_output(['git', '-c', 'color.ui=always', 'show', sha]).decode('utf8')
-    output = RENDER._parse_color(str(escape(output)))
+    output = RENDER_UTIL._parse_color(str(escape(output)))
     return output
 
   @classmethod
@@ -201,7 +201,7 @@ class GIT:
   @classmethod
   def RENDER_GIT(R):
     title = "Git Status"
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     currdir = os.getcwd()
     os.chdir(FLAT.path)
@@ -219,9 +219,9 @@ class GIT:
     untracked = "".join(untracked_files)
 
     content = (R._cmd("git status", status) +
-               RENDER.bar() +
+               RENDER_UTIL.bar() +
                R._cmd("git diff", diff) +
-               RENDER.bar() +
+               RENDER_UTIL.bar() +
                f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
 
     return Response(header + content  + "</div></body></html>", mimetype="text/html")
@@ -229,7 +229,7 @@ class GIT:
   @classmethod
   def RENDER_GIT_MENU(R):
     title = "Git Menu"
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     content = (
       R._git_menu() +
@@ -247,7 +247,7 @@ class GIT:
     is_uuid = not ('/' in filename or not filename.endswith('.note'))
     filename_title = (FLAT.title(filename) if is_uuid else filename)
     title = "Git Diff: " + filename_title
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     currdir = os.getcwd()
     os.chdir(FLAT.path)
@@ -259,7 +259,7 @@ class GIT:
 
     content = (
       R._git_menu() +
-      RENDER.bar() +
+      RENDER_UTIL.bar() +
       R._cmd(f"git diff {'--staged ' if staged else ''}'{filename_title}'", output)
     )
 
@@ -268,7 +268,7 @@ class GIT:
   @classmethod
   def RENDER_GIT_STAGE(R):
     title = "Git Stage"
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     currdir = os.getcwd()
     os.chdir(FLAT.path)
@@ -278,7 +278,7 @@ class GIT:
 
     content = (
       R._git_menu() +
-      RENDER.bar() +
+      RENDER_UTIL.bar() +
       f'<a href="/git/commit" class="link-button">commit</a>' +
       R._cmd("git diff --staged", output)
     )
@@ -288,7 +288,7 @@ class GIT:
   @classmethod
   def RENDER_GIT_COMMIT(R):
     title = "Git Commit"
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     currdir = os.getcwd()
     os.chdir(FLAT.path)
@@ -307,7 +307,7 @@ class GIT:
   def RENDER_GIT_SHOW(R, sha):
     """the @param sha is the specific sha of the commit you want to render"""
     title = "Git Commit"
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     currdir = os.getcwd()
     os.chdir(FLAT.path)
@@ -324,7 +324,7 @@ class GIT:
   @classmethod
   def RENDER_GIT_LOG(R):
     title = "Git Log"
-    header = f"<!DOCTYPE html><html><head>{RENDER.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
+    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     currdir = os.getcwd()
     os.chdir(FLAT.path)
