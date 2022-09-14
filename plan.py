@@ -4,10 +4,7 @@ class PLAN_RENDER:
   @staticmethod
   def section(section, **kwargs):
     if section['section'] == 'METADATA':
-      default_section_render = kwargs
-      if 'render_section' in default_section_render:
-        del default_section_render['render_section']
-      return RENDER.section(section, **default_section_render)
+      return RENDER.section(section, **CONTEXT.DEFAULT(kwargs, 'render_section'))
 
     if section['section'] != 'entry':
       return ''
