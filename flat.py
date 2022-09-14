@@ -214,6 +214,7 @@ class FLAT_RENDER:
 
   @classmethod
   def _section_forward_links(R, note):
+    LOG('forward link section')
     forward_link_list = GRAPH.collect_refs(note)
     if 0 != len(forward_link_list):
       return "\n\n--- LINKS ---\n" + "\n".join([R._render_link(L) for L in forward_link_list])
