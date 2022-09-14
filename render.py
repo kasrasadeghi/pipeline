@@ -8,7 +8,7 @@ class CONTEXT:
       del default[key]
     return default
 
-# the tree renderer
+# the tree renderer, with hooks
 class RENDER:
   @staticmethod
   def link(url, **kwargs):
@@ -16,10 +16,14 @@ class RENDER:
 
   @staticmethod
   def note(note, **kwargs):
+    LOG({'kwargs': kwargs})
+    if 'render_note' in kwargs:
+      return kwargs['render_note'](note, **kwargs)
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
   def node(item, **kwargs):
+    LOG({'kwargs': kwargs})
     render_msg = kwargs.get('render_msg', None)
     result = None
 
@@ -35,7 +39,7 @@ class RENDER:
       if render_msg:
         return render_msg(item)
       else:
-        return DISCUSSION_RENDER.msg(item)
+        return DISCUSSION_RENDER.msg(item, **kwargs)
 
     if item['value'].startswith('link: '):
       url = item['value'].removeprefix('link: ')
@@ -44,7 +48,7 @@ class RENDER:
 
     if item['value'].startswith('note: '):
       note = item['value'].removeprefix('note: ').strip()
-      result = f"<pre>{indent}note: {RENDER.note(note)}</pre>"
+      result = f"<pre>{indent}note: {RENDER.note(note, **kwargs)}</pre>"
 
     if None == result:
       debug('item, but none matched:', repr(item), debugmode='RENDER')
@@ -56,12 +60,13 @@ class RENDER:
     acc.append(result)
 
     for child in item['children']:
-      acc.append(RENDER.node(child))
+      acc.append(RENDER.node(child, **kwargs))
 
     return "".join(acc)
 
   @staticmethod
   def section(section, **kwargs):
+    LOG({'kwargs': kwargs, 'section': section['section']})
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
@@ -70,11 +75,11 @@ class RENDER:
       acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
     if section['section'] == 'DISCUSSION':
-      return DISCUSSION_RENDER.section(section)
+      return DISCUSSION_RENDER.section(section, **kwargs)
 
     if section['section'] == 'METADATA':
       if JOURNAL.is_journal(section):
-        return JOURNAL_RENDER.METADATA(FLAT.metadata_section(section))
+        return JOURNAL_RENDER.METADATA(FLAT.metadata_section(section), **kwargs)
 
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):
@@ -87,7 +92,7 @@ class RENDER:
       for item in block:
         # if item is a tree/node
         if isinstance(item, dict):
-          acc.append(RENDER.node(item))
+          acc.append(RENDER.node(item, **kwargs))
           continue
 
         if isinstance(item, str):
@@ -105,6 +110,7 @@ class RENDER:
 
   @staticmethod
   def root(note, **kwargs):
+    LOG('RENDER.root')
     content = RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)), **kwargs)
 
     bar = FLAT_RENDER._bar(note,

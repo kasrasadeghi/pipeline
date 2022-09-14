@@ -1,6 +1,6 @@
 class JOURNAL_RENDER:
   @staticmethod
-  def METADATA(metadata):
+  def METADATA(metadata, **kwargs):
     """ @param metadata - must be parsed metadata"""
     return (f"<pre>Journal for {metadata['Title']}\n"
             f"- created at {util.date_cmd('-d', metadata['Date'], '+%T %Z')}\n"

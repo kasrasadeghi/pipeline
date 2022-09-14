@@ -21,11 +21,13 @@ class GRAPH:
       lines = f.readlines()
 
     acc = list()
-    for L in lines:
-      if "- note: " in L and len(L.split("- note:", 1)) == 2:
-        note = L.split("- note: ", 1)[1].rstrip()
-        acc.append(note)
-        continue
+    def render_note(note, **kwargs):
+      LOG(note)
+      nonlocal acc
+      acc.append(note)
+
+    RENDER.root(note, render_note=render_note)
+    LOG({'note': note, 'refs': acc})
 
     return acc
 
