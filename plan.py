@@ -2,9 +2,12 @@
 
 class PLAN_RENDER:
   @staticmethod
-  def section(section):
+  def section(section, **kwargs):
     if section['section'] == 'METADATA':
-      return TREE.section(section)
+      default_section_render = kwargs
+      if 'render_section' in default_section_render:
+        del default_section_render['render_section']
+      return RENDER.section(section, **default_section_render)
 
     if section['section'] != 'entry':
       return ''
@@ -58,29 +61,6 @@ class PLAN_RENDER:
             + render_todos("DANGLING DONE", dangling_done)
             + render_todos("MISC", rest))
 
-
-  @staticmethod
-  def page(note, sections):
-    return '\n'.join(map(PLAN_RENDER.section, sections)) + TREE.filesize(note)
-
-  @staticmethod
-  def MAIN(note):
-    content = PLAN_RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)))
-
-    bar = FLAT_RENDER._bar(note,
-                           f'<a href="/disc/{note}">disc</a>'
-                           )
-
-    # compose html
-    title = FLAT.title(note)
-    result = (
-      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
-      f"{content}</div>"
-      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
-    )
-    return RENDER.base_page(DICT(title, bar, content=result))
-
-
 @app.route('/daily', defaults={"note": None})
 @app.route('/daily/<note>')
 def get_plan_note(note):
@@ -89,4 +69,4 @@ def get_plan_note(note):
     return redirect(FLAT.to_url(note, view='daily'))
 
   DEBUG.init_state()
-  return PLAN_RENDER.MAIN(note)
+  return RENDER.root(note, render_section=PLAN_RENDER.section)
