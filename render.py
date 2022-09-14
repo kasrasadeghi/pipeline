@@ -52,6 +52,9 @@ class RENDER:
 
   @staticmethod
   def section(section, **kwargs):
+    if 'render_section' in kwargs:
+      return kwargs['render_section'](section, **kwargs)
+
     acc = list()
     if section['section'] != 'entry':
       acc.append(f'<pre>--- {section["section"]} --- </pre>')
