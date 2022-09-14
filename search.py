@@ -63,7 +63,7 @@ def get_search_with_query(query):
   for msg in msg_generator():
     if query.lower() in msg['value'].lower():
       if current_note != msg['origin']:
-        acc.append(RENDER.banner(FLAT.title(msg['origin'])))
+        acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
         current_note = msg['origin']
       msg_count += 1
       acc.append(SEARCH.msg(msg))

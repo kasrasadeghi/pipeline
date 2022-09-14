@@ -230,7 +230,7 @@ class FLAT_RENDER:
 
   @classmethod
   def _bar(R, note, *extras):
-    navbar = RENDER.nav(*extras)
+    navbar = RENDER_UTIL.nav(*extras)
     return "".join(navbar)
 
   @classmethod

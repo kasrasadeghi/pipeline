@@ -89,7 +89,7 @@ class DEBUG:
       print("stateless ", end='')
     print("LOG: " + str(s))
     parent_frame = DEBUG.first_nondebug_frame(lambda f: f.f_code.co_name == 'LOG')
-    DEBUG._GLOBAL_LOG.append({"frame": DEBUG.frameinfo(parent_frame), "content": s})
+    DEBUG._GLOBAL_LOG.append({"i": len(DEBUG._GLOBAL_LOG), "frame": DEBUG.frameinfo(parent_frame), "content": s})
 
   @staticmethod
   def RENDER_LOG():
@@ -119,7 +119,7 @@ class DEBUG:
   def TEXT(title, content):
     debug = DEBUG.CONTENT()
 
-    r = Response(f"<!DOCTYPE hmtl><html><head>{RENDER.STYLE()}<title>{title}</title></head>"
+    r = Response(f"<!DOCTYPE hmtl><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head>"
                  f"<body><div class=\"content\">"
                  f"<pre>{content}</pre>" +
                  debug +
