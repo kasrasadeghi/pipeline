@@ -1,3 +1,13 @@
+# a context and hook management system, using kwargs-style hooks like RENDER below
+class CONTEXT:
+  @staticmethod
+  def DEFAULT(kwargs, key):
+    """ return a copy with the given key removed """
+    default = dict(kwargs)
+    if key in default:
+      del default[key]
+    return default
+
 # the tree renderer
 class RENDER:
   @staticmethod
