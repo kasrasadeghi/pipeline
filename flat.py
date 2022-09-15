@@ -303,7 +303,7 @@ def recents():
   return FLAT_RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
                                         root_path=FLAT.path)),
                      title="Recent Notes",
-                     linkfunc=FLAT.to_url,
+                     linkfunc=lambda x: FLAT.to_url(x, view='disc'),
                      colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
                      namefunc=FLAT.title)
 
