@@ -42,7 +42,6 @@ kaz_import('discussion.py')
 kaz_import('plan.py')
 
 kaz_import('graph.py')
-kaz_import('rm.py')
 
 kaz_import('debug.py')
 kaz_import('pretty.py')
