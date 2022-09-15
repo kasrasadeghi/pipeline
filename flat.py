@@ -1,6 +1,12 @@
 class FLAT:
   path = "/home/kasra/notes"
 
+  @staticmethod
+  def cmd(*args, **kwargs):
+    if 'cwd' not in kwargs:
+      kwargs['cwd'] = FLAT.path
+    return util.cmd(*args, **kwargs)
+
   @classmethod
   def list(cls):
     return [x for x in os.listdir(cls.path) if cls.exists(x) and not (x[0] == '#' and x[-1] == '#')]
