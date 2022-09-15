@@ -86,7 +86,7 @@ class FLAT:
   @classmethod
   def metadata(cls, note):
     if not FLAT.exists(note):
-      raise FileNotFoundError("cannot find notes file at " + note)
+      raise FileNotFoundError(f"metadata does not exist for note '{note}'")
 
     with open(cls.to_path(note)) as f:
       reading = False
