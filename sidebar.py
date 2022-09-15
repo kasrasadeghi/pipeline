@@ -1,6 +1,14 @@
 class SIDEBAR:
   @classmethod
   def render(cls):
+    view, note = FLASK_UTIL.CURRENT_NOTE()
+    forward_link_list = []
+    if note.endswith('.note'):
+      forward_link_list = GRAPH.collect_refs(note)
+
+    def render_forward(note):
+      return f'<li class="link-button"><a style="margin-top: 20px" href="{FLAT.to_url(note, view="disc")}">{FLAT.title(note)}</a></li>'
+
     return f"""
       <aside>
         <div class="sidebar-content">
@@ -8,6 +16,8 @@ class SIDEBAR:
           {RENDER_UTIL.button(action='/search', name='Search', method='GET')}
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
+          <br/>
+          <ul>""" + "<br/>".join(map(render_forward, forward_link_list)) + """</ul>
         </div>
       </aside>
     """

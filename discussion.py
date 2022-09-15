@@ -34,14 +34,11 @@ class DISCUSSION_RENDER:
                            f'<a href="/edit/{note}">edit</a>'
                            )
 
-    LOG('call forward link')
-    forward_links = FLAT_RENDER._section_forward_links(note)
-
     # compose html
     title = FLAT.title(note)
     result = (
       f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
-      f"{content}<pre>{forward_links}</pre></div>"
+      f"{content}</div>"
       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
     )
     return RENDER.base_page(DICT(title, bar, content=result))
