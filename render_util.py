@@ -14,6 +14,7 @@ class RENDER_UTIL:
     input_background_color = "#333"
     body_background_color= "#222"
     banner_color = "#aaa"
+    sidebar_animation_time = "0.1s"
 
     meta_tags = ", ".join([
       'height=device-height',
@@ -119,7 +120,7 @@ class RENDER_UTIL:
        }
 
        input#toggler:checked ~ aside {
-         transition: all 0.2s ease-in 0s;
+         transition: all """ + sidebar_animation_time + """ ease-in 0s;
          transform: translateX(-100%);
        }
 
@@ -130,7 +131,7 @@ class RENDER_UTIL:
          width: 100%;
          height: -webkit-fill-available;
          background-color: #000a;
-         transition: all 0.2s ease-in 0s;
+         transition: all """ + sidebar_animation_time + """ ease-in 0s;
        }
 
        div.sidebar-content {
