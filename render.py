@@ -109,9 +109,13 @@ class RENDER:
     return '\n'.join(map(lambda x: RENDER.section(x, **kwargs), sections)) + TREE.filesize(note)
 
   @staticmethod
+  def content(note, **kwargs):
+    return RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)), **kwargs)
+
+  @staticmethod
   def root(note, **kwargs):
     LOG('RENDER.root')
-    content = RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)), **kwargs)
+    content = RENDER.content(note, **kwargs)
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/disc/{note}">disc</a>'

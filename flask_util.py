@@ -5,6 +5,13 @@
 
 class FLASK_UTIL:
   @staticmethod
+  def CURRENT_URL():
+    return request.path
+
+  def CURRENT_NOTE():
+    return FLAT.try_from_url(FLASK_UTIL.CURRENT_URL())
+
+  @staticmethod
   def REFERER_NOTE():
     view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
     return view, note

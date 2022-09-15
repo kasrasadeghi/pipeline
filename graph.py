@@ -26,7 +26,7 @@ class GRAPH:
       nonlocal acc
       acc.append(note)
 
-    RENDER.root(note, render_note=render_note)
+    RENDER.content(note, render_note=render_note)
     LOG({'note': note, 'refs': acc})
 
     return acc
