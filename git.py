@@ -47,7 +47,7 @@ class GIT_HANDLE:
 
     # if we have nothing staged, then show the log
     os.chdir(currdir)
-    return redirecit("/git/log")
+    return redirect("/git/log")
 
 # END HANDLE
 
