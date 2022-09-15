@@ -176,10 +176,13 @@ class GIT:
   def _cmd(R, cmd, output):
     return f"<pre><h1>$ {cmd}</h1>{output}</pre>"
 
+  @staticmethod
+  def base_page(title, content):
+    return
+
   @classmethod
   def RENDER_GIT(R):
     title = "Git Status"
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     status = R._git_status()
     diff = R._git_diff()
@@ -199,12 +202,11 @@ class GIT:
                RENDER_UTIL.bar() +
                f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
   @classmethod
   def RENDER_GIT_MENU(R):
     title = "Git Menu"
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     content = (
       R._git_menu() +
@@ -215,14 +217,13 @@ class GIT:
       "</div>"
     )
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
   @classmethod
   def RENDER_GIT_DIFF(R, filename, staged):
     is_uuid = not ('/' in filename or not filename.endswith('.note'))
     filename_title = (FLAT.title(filename) if is_uuid else filename)
     title = "Git Diff: " + filename_title
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     if staged:
       output = R._git_diff_staged(filename)
@@ -235,12 +236,11 @@ class GIT:
       R._cmd(f"git diff {'--staged ' if staged else ''}'{filename_title}'", output)
     )
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
   @classmethod
   def RENDER_GIT_STAGE(R):
     title = "Git Stage"
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     output = R._git_stage()
 
@@ -251,12 +251,11 @@ class GIT:
       R._cmd("git diff --staged", output)
     )
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
   @classmethod
   def RENDER_GIT_COMMIT(R):
     title = "Git Commit"
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     output = R._git_stage()
 
@@ -265,14 +264,13 @@ class GIT:
       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="commit_message"></form>' +
       R._cmd("git diff --staged", output))
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
 
   @classmethod
   def RENDER_GIT_SHOW(R, sha):
     """the @param sha is the specific sha of the commit you want to render"""
     title = "Git Commit"
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     output = R._git_show_commit(sha)
 
@@ -281,12 +279,11 @@ class GIT:
       R._cmd("git show", output))
     # ^ TODO have the commit's first line in this, maybe along with the sha
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
   @classmethod
   def RENDER_GIT_LOG(R):
     title = "Git Log"
-    header = f"<!DOCTYPE html><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head><body><div class=\"content\">"
 
     log = R._git_log()
 
@@ -294,7 +291,7 @@ class GIT:
       R._git_menu() +
       R._cmd("git log", log))
 
-    return Response(header + content  + "</div></body></html>", mimetype="text/html")
+    return RENDER.base_page(DICT(title, content, bar=None))
 
   # END RENDER
 
