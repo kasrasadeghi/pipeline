@@ -33,6 +33,7 @@ kaz_import('search.py')
 kaz_import('command.py')
 kaz_import('commands/new_note.py')
 kaz_import('commands/twitch_clip.py')
+kaz_import('commands/full_sync.py')
 
 kaz_import('flat.py')
 kaz_import('journal.py')

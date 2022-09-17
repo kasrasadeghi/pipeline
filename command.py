@@ -14,7 +14,7 @@ class COMMAND:
 
     # a command must start with \
     if not message.startswith('\\'):
-      return True
+      return True, None
 
     end_of_cmd = message.find(' ')
     if end_of_cmd == -1:
@@ -29,19 +29,24 @@ class COMMAND:
       argument = message[end_of_cmd + 1:]
 
     if cmd not in COMMAND.handlers:
-      return True
+      return True, None
 
     def continuation(handler_result):
       form = dict()
-      new_message = '\\' + cmd + ' ' + handler_result
+      new_message = '\\' + cmd + (' ' + handler_result if handler_result else '')
       form['msg'] = new_message
       FLAT.handle_msg(note, form)
+
+    result_link = None
+    def redirect_page(internal_link):
+      nonlocal result_link
+      result_link = internal_link
 
     args = dict()
     args['arg'] = argument
     args['origin'] = note
 
     handler = COMMAND.handlers[cmd]
-    handler(args, continuation)
+    handler(args, continuation, redirect_page)
 
-    return False
+    return False, result_link

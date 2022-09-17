@@ -339,7 +339,7 @@ def get_internal_blog_post(filename, blog_type=None):
 
 
 @COMMAND.REGISTER('BLOG')
-def COMMAND_BLOG(args, handle_msg):
+def COMMAND_BLOG(args, handle_msg, redirect_page):
   arg = args['arg'].strip()
 
   try:

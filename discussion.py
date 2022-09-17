@@ -144,9 +144,13 @@ def get_disc(note):
 
   # handle messages
   if request.method == 'POST':
-    if COMMAND.PARSE(note, request.form['msg']):
+    unhandled, result_url = COMMAND.PARSE(note, request.form['msg'])
+    LOG({'unhandled': unhandled, 'result_url': result_url, 'commands': COMMAND.handlers})
+    if unhandled:
       FLAT.handle_msg(note, request.form)
-    return redirect(f"/disc/{note}")
+    if result_url:
+      return redirect(result_url)
+    return redirect(FLAT.to_url(note, view='disc'))
 
   # default case: handle rendering
   return DISCUSSION_RENDER.MAIN(note)

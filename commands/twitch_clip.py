@@ -42,7 +42,7 @@ class TWITCH_CLIP:
 
 
 @COMMAND.REGISTER('TWITCH-CLIP')
-def COMMAND_TWITCH_CLIP(args, continuation):
+def COMMAND_TWITCH_CLIP(args, continuation, redirect_page):
 
   rest = args['arg']
 
