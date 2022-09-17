@@ -248,7 +248,7 @@ class FLAT_RENDER:
     content = FLAT_PARSER.parse(content)
 
     forward_links = R._section_forward_links(note)
-    backlinks = R._section_backward_links(note)
+    # backlinks = R._section_backward_links(note)
 
     bar = R._bar(note,
                  f'<a href="/disc/{note}">disc</a>',

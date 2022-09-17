@@ -3,7 +3,7 @@ class SIDEBAR:
   def render(cls):
     view, note = FLASK_UTIL.CURRENT_NOTE()
     forward_link_list = []
-    if note.endswith('.note'):
+    if note.endswith('.note') and view == 'disc':
       forward_link_list = GRAPH.collect_refs(note)
 
     def render_forward(note):
