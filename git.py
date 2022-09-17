@@ -2,7 +2,7 @@ class GIT_HANDLE:
   @classmethod
   def _add(cls, note):
     if FLAT.exists(note):
-      check_output(['git', 'add', note]).strip()
+      FLAT.cmd(['git', 'add', note]).strip()
       return redirect(f"/git/diff-staged/{note}", code=302)
 
     else:
@@ -12,7 +12,7 @@ class GIT_HANDLE:
   @classmethod
   def _unstage(cls, note):
     if FLAT.exists(note):
-      check_output(['git', 'restore', '--staged', note]).strip()
+      FLAT.cmd(['git', 'restore', '--staged', note]).strip()
       return redirect(f"/git/diff/{note}")
 
     else:
@@ -61,7 +61,7 @@ class GIT:
     acc = list()
     acc_untracked = list()
     for (before, filename, is_uuid) in acc_sorted:
-      filename_repr = f'<a href="/note/{filename}">{FLAT.title(filename)}</a>' \
+      filename_repr = f'<a href="{FLAT.to_url(filename, view="disc")}">{FLAT.title(filename)}</a>' \
         if is_uuid == 'uuid' else filename
 
       if '??' in before:
@@ -226,14 +226,16 @@ class GIT:
     title = "Git Diff: " + filename_title
 
     if staged:
+      flag = ' --staged'
       output = R._git_diff_staged(filename)
     else:
+      flag = ' '
       output = R._git_diff_single(filename)
 
     content = (
       R._git_menu() +
       RENDER_UTIL.bar() +
-      R._cmd(f"git diff {'--staged ' if staged else ''}'{filename_title}'", output)
+      R._cmd(f"git diff{flag} '{filename_title}'", output)
     )
 
     return RENDER.base_page(DICT(title, content, bar=None))
@@ -241,27 +243,26 @@ class GIT:
   @classmethod
   def RENDER_GIT_STAGE(R):
     title = "Git Stage"
-
-    output = R._git_stage()
-
     content = (
       R._git_menu() +
       RENDER_UTIL.bar() +
       f'<a href="/git/commit" class="link-button">commit</a>' +
-      R._cmd("git diff --staged", output)
+      R._cmd("git diff --staged", R._git_stage())
     )
 
     return RENDER.base_page(DICT(title, content, bar=None))
 
   @classmethod
-  def RENDER_GIT_COMMIT(R):
+  def RENDER_GIT_COMMIT(R, message=None):
     title = "Git Commit"
 
     output = R._git_stage()
 
+    default_value = " value=\"" + message + "\"" if message else ""
     content = (
-      f'<pre><h1>return to <a href="/git/menu">git menu</a></h1></pre>' +
-      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="commit_message"></form>' +
+      f'<form method="post"><input class="msg_input" autocomplete="off" ' +
+        f'autofocus type="text" name="commit_message"{default_value}>' +
+      '</form>' +
       R._cmd("git diff --staged", output))
 
     return RENDER.base_page(DICT(title, content, bar=None))
@@ -275,9 +276,7 @@ class GIT:
     output = R._git_show_commit(sha)
 
     content = (
-      f'<pre><h1>return to <a href="/git/menu">git menu</a></h1></pre>' +
       R._cmd("git show", output))
-    # ^ TODO have the commit's first line in this, maybe along with the sha
 
     return RENDER.base_page(DICT(title, content, bar=None))
 
@@ -307,7 +306,11 @@ def git_commit():
     LOG(request.form)
     return Response('', 204)
 
-  return GIT.RENDER_GIT_COMMIT()
+  message = None
+  if 'message' in request.args:
+    message = request.args['message']
+
+  return GIT.RENDER_GIT_COMMIT(message)
 
 @app.route("/git/show/<sha>")
 def git_show_commit(sha):
