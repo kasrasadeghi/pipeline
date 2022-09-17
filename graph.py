@@ -22,12 +22,10 @@ class GRAPH:
 
     acc = list()
     def render_note(note, **kwargs):
-      LOG(note)
       nonlocal acc
       acc.append(note)
 
     RENDER.content(note, render_note=render_note)
-    LOG({'note': note, 'refs': acc})
 
     return acc
 

@@ -16,14 +16,14 @@ class RENDER:
 
   @staticmethod
   def note(note, **kwargs):
-    LOG({'kwargs': kwargs})
+    # LOG({'kwargs': kwargs})
     if 'render_note' in kwargs:
       return kwargs['render_note'](note, **kwargs)
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
   def node(item, **kwargs):
-    LOG({'kwargs': kwargs})
+    # LOG({'kwargs': kwargs})
     render_msg = kwargs.get('render_msg', None)
     result = None
 
@@ -66,7 +66,7 @@ class RENDER:
 
   @staticmethod
   def section(section, **kwargs):
-    LOG({'kwargs': kwargs, 'section': section['section']})
+    # LOG({'kwargs': kwargs, 'section': section['section']})
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
@@ -114,7 +114,7 @@ class RENDER:
 
   @staticmethod
   def root(note, **kwargs):
-    LOG('RENDER.root')
+    # LOG('RENDER.root')
     content = RENDER.content(note, **kwargs)
 
     bar = FLAT_RENDER._bar(note,
