@@ -32,7 +32,7 @@ class PRETTY:
         acc = list()
         for el in o:
           acc.append(PRETTY.DUMP(el, no_symbol))
-        result = symbol("[") + "\n" + indent(symbol(",") + "\n".join(acc), color='#388') + symbol("]")
+        result = symbol("[") + "\n" + indent("\n".join(acc), color='#388') + symbol("]")
 
     if isinstance(o, Exception):
       import traceback
@@ -45,9 +45,9 @@ class PRETTY:
       elif o == '':
         result = '""'
       elif len(o.splitlines()) == 1:
-        result = o
+        result = str(escape(o))
       else:
-        result = '\n' + indent('"""\n' + o + '"""')
+        result = '\n' + indent('"""\n' + str(escape(o)) + '"""')
 
     if result is None:
       result = repr(o)
