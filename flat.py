@@ -205,7 +205,7 @@ class FLAT_PARSER:
         acc.append(result[1])
         continue
 
-      acc.append(L)
+      acc.append(str(escape(L)))
 
     return "\n".join(acc)
 
