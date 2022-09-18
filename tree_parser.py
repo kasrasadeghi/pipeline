@@ -6,7 +6,8 @@ class TREE_PARSER:
       # search for toplevels, will have indent -1
       # - toplevels start with something other than ' ' and '-' and are _immediately followed_ by a subnode.
       # - n.b. this even handles toplevels halfway through a block
-      if L and L[0] != ' ' and L[0] != "-" and len(B) > i + 1 and B[i + 1].startswith("-"):
+      if len(L) != 0 and L[0] not in {' ', '-'}\
+         and len(B) > i + 1 and B[i + 1].startswith("-"):
         indent_counts.append(-1)
         continue
       else:
