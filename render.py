@@ -77,6 +77,14 @@ class RENDER:
     if section['section'] == 'DISCUSSION':
       return DISCUSSION_RENDER.section(section, **kwargs)
 
+    if section['section'] == 'HTML':
+      LOG({'html section': section})
+      acc = []
+      for block in section['blocks']:
+        for l in block:
+          acc.append(l)
+      return "\n".join(acc)
+
     if section['section'] == 'METADATA':
       if JOURNAL.is_journal(section):
         return JOURNAL_RENDER.METADATA(FLAT.metadata_section(section), **kwargs)
@@ -96,7 +104,7 @@ class RENDER:
           continue
 
         if isinstance(item, str):
-          acc.append(f"<pre>{item}</pre>")
+          acc.append(f"<pre>{str(escape(item))}</pre>")
           debug("string:", item)
           continue
 
