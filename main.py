@@ -20,6 +20,7 @@ kaz_import('magic.py')
 kaz_import('util.py')
 kaz_import('flask_util.py')
 
+kaz_import('tree_parser.py')
 kaz_import('block_parser.py')
 kaz_import('tree.py')
 kaz_import('node.py')
