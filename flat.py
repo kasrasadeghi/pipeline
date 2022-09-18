@@ -258,7 +258,9 @@ class FLAT_RENDER:
     # compose html
     title = FLAT.title(note)
     result = (f"<pre style='font-feature-settings: \"liga\" 0'>"
-              f"{content}{forward_links}{backlinks}</pre>")
+              f"{content}{forward_links}"
+              # f"{backlinks}"
+              "</pre>")
     return RENDER.base_page(DICT(title, bar, content=result))
 
   @classmethod
