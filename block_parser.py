@@ -17,12 +17,12 @@ class LineReader:
 
 class PARSER:
   @staticmethod
-  def parse_file(filepath):
+  def parse_file(filepath, **kwargs):
     with open(filepath) as f:
-      return PARSER.parse_content(f.read())
+      return PARSER.parse_content(f.read(), **kwargs)
 
   @staticmethod
-  def parse_content(content):
+  def parse_content(content, **kwargs):
     # EXPL: a file is a list of sections, which each have a title and a list of blocks
     # - a block is a list of nodes
     # - a node can be either a line of type 'str', or a parsed tree
@@ -48,13 +48,13 @@ class PARSER:
     sections.append(curr_section)
 
     for S in sections:
-      S['blocks'] = PARSER.parse_section("\n".join(S['content']))
+      S['blocks'] = PARSER.parse_section("\n".join(S['content']), **kwargs)
       del S['content']
 
     return sections
 
   @staticmethod
-  def parse_section(section):
+  def parse_section(section, **kwargs):
     R = LineReader(section)
     # EXPL: a section is a list of blocks, which are each a list of lines
     blocks = []
@@ -70,16 +70,16 @@ class PARSER:
       else:
         curr_block.append(l)
 
+    # avoids empty blocks at the end of sections
     if len(curr_block):
       blocks.append(curr_block)
 
     new_blocks = []
     for B in blocks:
-      if TREE_PARSER.might_be_tree(B):
-        new_blocks.append(TREE_PARSER.parse_tree(B))
+      if 'tree_parser' in kwargs:
+        new_blocks.append(kwargs['tree_parser'](B, **kwargs))
       else:
-        new_blocks.append(B)
-
+        new_blocks.append(TREE_PARSER.process_block(B, **kwargs))
     return new_blocks
 
 @app.route('/parse/<note>')
