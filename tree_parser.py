@@ -1,6 +1,14 @@
 class TREE_PARSER:
   @staticmethod
-  def might_be_tree(B):
+  def process_block(B, **kwargs):
+    if TREE_PARSER.might_be_tree(B, **kwargs):
+      return TREE_PARSER.parse_tree(B, **kwargs)
+    else:
+      return B
+
+
+  @staticmethod
+  def might_be_tree(B, **kwargs):
     indent_counts = []
     for i, L in enumerate(B):
       # search for toplevels, will have indent -1
@@ -44,7 +52,7 @@ class TREE_PARSER:
     return True
 
   @staticmethod
-  def parse_tree(block):
+  def parse_tree(block, **kwargs):
     indent_counts = []
     for L in block:
       if L[0] != ' ' and L[0] != "-":

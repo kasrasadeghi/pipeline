@@ -62,13 +62,11 @@ class BLOG:
       ABORT(f"ERROR: parsing entry section from node: {TREE.dump_tree(node)}")
 
     blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
-    LOG(blocks)
 
     for b in blocks:
       if not TREE.is_singleton(b):
         ABORT(f"ERROR while parsing blog post: block '{b}' is not a singleton")
       blog_post = b[0]
-      LOG(blog_post)
       post = NODE.splay(blog_post, ['title', 'filename', 'note'])
       post.internal_name = blog_post['value']
 
@@ -127,7 +125,7 @@ class BLOG_RENDER:
 class BLOG_TREE:
   @staticmethod
   def content(note):
-    return BLOG_TREE.page(note, PARSER.parse_file(FLAT.to_path(note)))
+    return BLOG_TREE.page(note, PARSER.parse_file(FLAT.to_path(note), tree_parser=ADV_TREE_PARSER.process_block))
 
   @staticmethod
   def page(note, sections):
