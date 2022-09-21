@@ -23,7 +23,10 @@ class PRETTY:
       acc = list()
       for k, v in o.items():
         acc.append(f"{k}: {PRETTY.DUMP(v, no_symbol)}")
-      result = symbol("{") + "\n" + indent("\n".join(acc), color="#833") + symbol("}")
+      if len(o.items()) == 0:
+        result = '{}'
+      else:
+        result = symbol("{\n") + indent("\n".join(acc), color="#833") + symbol("}")
 
     if isinstance(o, list):
       if len(o) == 0:
@@ -32,7 +35,7 @@ class PRETTY:
         acc = list()
         for el in o:
           acc.append(PRETTY.DUMP(el, no_symbol))
-        result = symbol("[") + "\n" + indent("\n".join(acc), color='#388') + symbol("]")
+        result = symbol("[\n") + indent("\n".join(acc), color='#388') + symbol("]")
 
     if isinstance(o, Exception):
       import traceback
