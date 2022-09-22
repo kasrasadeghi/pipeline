@@ -161,7 +161,7 @@ class BLOG_TREE:
 
     acc = list()
     for block in section['blocks']:
-      if len(block) == 1 and block[0] == '':
+      if TREE.is_newline(block):
         acc.append('<br/>')
         continue
 
