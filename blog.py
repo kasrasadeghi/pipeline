@@ -142,14 +142,34 @@ class BLOG_TREE:
     if None == result:
       result = item['value']
 
-    if item['indent'] > -1:
-      result = f"\n<li>{result}</li>"
+    if item['value'].startswith('- '):
+      result = "<li class='dash'>" + result.removeprefix('- ')
+    else:
+      result += "<br/>"
 
     if len(item['children']) != 0:
+      header_acc = list()
       acc = list()
-      for child in item['children']:
+
+      children = item['children']
+      child_iter = iter(children)
+
+      if children[0]['indent'] > item['indent'] + 1:
+        for child in child_iter:
+          # if we see something at just +1, it's not the header's child, it's just a regular child.
+          if child['indent'] == item['indent'] + 1:
+            break
+          header_acc.append(BLOG_TREE.node(child))
+
+      for child in child_iter:
         acc.append(BLOG_TREE.node(child))
-      return f"{result}<ul class='list'>{''.join(acc)}</ul>\n"
+
+      header_children = '' if len(header_acc) == 0 else "\n<ul style='color:red'>" + '\n'.join(header_acc) + "</ul>"
+
+      result= f"{result}<ul>{header_children}{''.join(acc)}</ul>\n"
+
+    if item['value'].startswith('- '):
+      result += "</li>"
 
     return result + "\n"
 
@@ -265,7 +285,8 @@ class BLOG_COMPILE:
 
        /* string value for list-style-type:
           https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type */
-       li { list-style-type: "- "; }
+       li { list-style-type: "  "; }
+       li.dash { list-style-type: "- "; }
 
        .link-button {
          background: none;
@@ -335,6 +356,12 @@ def get_internal_blog_post(filename, blog_type=None):
   else:
     return Response(BLOG_COMPILE.POST(post), 200, mimetype="text/html")
 
+
+@app.route("/test/blog/<note>")
+def test_blog_renderer(note):
+  title = "testing blog render for '" + FLAT.title(note) + "'"
+  content = BLOG_TREE.content(note)
+  return BLOG_COMPILE.base_post(title, content)
 
 @COMMAND.REGISTER('BLOG')
 def COMMAND_BLOG(args, handle_msg, redirect_page):
