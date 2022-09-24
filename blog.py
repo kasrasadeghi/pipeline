@@ -160,16 +160,17 @@ class BLOG_TREE:
     return "<h3>" + " ".join(map(lambda x: x[3:], block[:-1])) + "</h3>"
 
   @staticmethod
-  def linkify(x):
-    if "https://" in x:
-      index = x.index("https://")
-      return x[:index] + f'<a href="{x[index:]}">' + x[index:]+ '</a>'
+  def linkify(s):
+    if "https://" in s:
+      index = s.index("https://")
+      return s[:index] + f'<a href="{s[index:]}">' + s[index:]+ '</a>'
     return None
 
   @staticmethod
-  def codify(x):
-    if x.startswith("$"):
-      return '<code>' + x + "</code>"
+  def codify(s):
+    if s[0] in {"$", '|', '+', '#'}:
+      return '<code class="mono"><pre class="code">' + s + "</pre></code>"
+
     return None
 
   @staticmethod
@@ -328,6 +329,8 @@ class BLOG_COMPILE:
        .block { background: white; border: 2px solid grey; overflow-x: auto; padding: 2px; }
        body { background: rgb(56, 56, 65); }
        .content { max-width: 60em; margin: 0em auto; padding: 0em 1em; }
+
+       pre.code { background: inherit; }
 
        ul { margin-block-start: 0px;
             padding-inline-start: 0.6em;
