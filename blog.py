@@ -132,6 +132,47 @@ class BLOG_TREE:
     return '\n'.join(map(BLOG_TREE.section, sections))
 
   @staticmethod
+  def is_subheading(block):
+    if all(isinstance(b, str) for b in  block)\
+      and all(b.startswith(" " * 4) for b in block[:-1]) \
+      and len(block) > 1 \
+      and block[-1].startswith((" " * 4) + "-") \
+      and all(x == "-" for x in block[-1].strip()):
+        return True
+    return False
+
+  @staticmethod
+  def subheading(block):
+    return "<h3>" + block[0] + "</h3>"
+
+  @staticmethod
+  def is_heading(block):
+    if all(isinstance(b, str) for b in block)\
+      and all(b.startswith(" | ") for b in block[:-1]) \
+      and len(block) > 1 \
+      and block[-1].startswith((" +") + "-") \
+      and all(x == "-" for x in block[-1].removeprefix(" +").strip()):
+        return True
+    return False
+
+  @staticmethod
+  def heading(block):
+    return "<h3>" + " ".join(map(lambda x: x[3:], block[:-1])) + "</h3>"
+
+  @staticmethod
+  def linkify(x):
+    if "https://" in x:
+      index = x.index("https://")
+      return x[:index] + f'<a href="{x[index:]}">' + x[index:]+ '</a>'
+    return None
+
+  @staticmethod
+  def codify(x):
+    if x.startswith("$"):
+      return '<code>' + x + "</code>"
+    return None
+
+  @staticmethod
   def node(item):
     result = None
 
@@ -140,12 +181,18 @@ class BLOG_TREE:
       result = f"<pre style='color: red'>{indent}note: {TREE.note(note)}</pre>"
 
     if None == result:
+      result = BLOG_TREE.linkify(item['value'])
+
+    if None == result:
+      result = BLOG_TREE.codify(item['value'])
+
+    if None == result:
       result = item['value']
 
     if item['value'].startswith('- '):
-      result = "<li class='dash'>" + result.removeprefix('- ')
-    else:
-      result += "<br/>"
+      result = "<ul><li class='dash'>" + result.removeprefix('- ')
+
+    result += "<br/>"
 
     if len(item['children']) != 0:
       header_acc = list()
@@ -162,17 +209,48 @@ class BLOG_TREE:
           header_acc.append(BLOG_TREE.node(child))
 
       for child in child_iter:
-        acc.append(BLOG_TREE.node(child))
+        child_result = BLOG_TREE.node(child)
+        if child['indent'] == item['indent'] + 1\
+           and not child['value'].startswith('- ')\
+           and not item['value'].startswith('- '):
+          acc.append("<ul>" + child_result + "</ul>")
+        else:
+          acc.append(child_result)
 
-      header_children = '' if len(header_acc) == 0 else "\n<ul style='color:red'>" + '\n'.join(header_acc) + "</ul>"
+      header_children = '' if len(header_acc) == 0 else "\n<ul class='trailing_header'>" + '\n'.join(header_acc) + "</ul>"
 
-      result= f"{result}<ul>{header_children}{''.join(acc)}</ul>\n"
+      result= f"{result}{header_children}{''.join(acc)}\n"
 
     if item['value'].startswith('- '):
-      result += "</li>"
+      result += "</li></ul>"
 
     return result + "\n"
 
+  @staticmethod
+  def block(block):
+    if BLOG_TREE.is_heading(block):
+      return BLOG_TREE.heading(block)
+
+    if BLOG_TREE.is_subheading(block):
+      return BLOG_TREE.subheading(block)
+
+    acc = list()
+    acc.append('<div class="kscroll block">')
+    for item in block:
+      # if item is a tree/node
+      if isinstance(item, dict):
+        acc.append(BLOG_TREE.node(item))
+        continue
+
+      if isinstance(item, str):
+        acc.append(f"<pre style='color: red'>{item}</pre>")
+        debug("string:", item)
+        continue
+
+      # acc.append(repr(item))
+
+    acc.append('</div>')
+    return "\n".join(acc)
 
   @staticmethod
   def section(section):
@@ -185,20 +263,7 @@ class BLOG_TREE:
         acc.append('<br/>')
         continue
 
-      acc.append('<div class="kscroll block">')
-      for item in block:
-        # if item is a tree/node
-        if isinstance(item, dict):
-          acc.append(BLOG_TREE.node(item))
-          continue
-
-        if isinstance(item, str):
-          acc.append(f"<pre style='color: red'>{item}</pre>")
-          debug("string:", item)
-          continue
-      acc.append('</div>')
-
-      # acc.append(repr(item))
+      acc.append(BLOG_TREE.block(block))
 
     return "\n".join(acc)
 
@@ -247,9 +312,9 @@ class BLOG_COMPILE:
     <!DOCTYPE hmtl>
 <html>
   <head>
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="viewport" content="initial-scale=1.0">
      <style>
-       body { margin: 1% 1.5%; }
+       body { margin: 0.5% 0.5%; }
        .msgbox { margin: 0px;
              display: flex; flex-direction: column;
              align-content: stretch; align-items: flex-start; }
@@ -260,28 +325,39 @@ class BLOG_COMPILE:
 
        """ + scroll + """
 
-       .block { border: 2px solid black; overflow-x: auto; padding: 2px; }
+       .block { background: white; border: 2px solid grey; overflow-x: auto; padding: 2px; }
+       body { background: rgb(56, 56, 65); }
+       .content { max-width: 60em; margin: 0em auto; padding: 0em 1em; }
 
-       body { font-size: 1.1em; }
        ul { margin-block-start: 0px;
             padding-inline-start: 0.6em;
             margin-block-end: 0px;
           }
 
-       h1 { font-size: 1.15em; border-left: 2px black solid; }
+       body { font-size: 1.1em; }
+       h1 { font-size: 1.15em; border-left: 2px white solid; }
        h2 { font-size: 1.12em; margin-left: 1em; }
        h3 { font-size: 1.12em; margin-left: 1em; }
 
        h1, h2, h3 {
            margin-left: 1em;
-           border-bottom: 2px black solid;
            padding: 0px 10px 6px 10px;
        }
+       h1 { border-bottom: 2px white solid;
+            color: white; }
+       h2, h3 { border-bottom: 2px white solid;
+                color: white; }
        h2, h3 {
            margin-right: 0;
            margin-bottom: 0;
            margin-top: 0;
        }
+
+       code { font-family: "Noticia Text", serif;
+              background: #ddd;
+              padding: 2px 5px;
+              margin-top: 2px;
+            }
 
        /* string value for list-style-type:
           https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type */
@@ -307,6 +383,12 @@ class BLOG_COMPILE:
          .msg { flex-direction: column; align-items: flex-start; }
          .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
          .blogpara { font-family: monospace; background: red; }
+
+         body { font-size: 0.9em; }
+
+         h1 { font-size: 0.95em; border-left: 2px white solid; }
+         h2 { font-size: 0.92em; margin-left: 1em; }
+         h3 { font-size: 0.92em; margin-left: 1em; }
        }
 
        /* desktop */
@@ -324,7 +406,7 @@ class BLOG_COMPILE:
 """ + title + """
     </h1>
 
-""" + content + """
+    <div class='content'>""" + content + """</div>
   </body>
 </html>
     """
