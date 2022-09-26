@@ -168,14 +168,68 @@ class BLOG_TREE:
 
   @staticmethod
   def codify(s):
+    LOG(s)
     if s[0] in {"$", '|', '+', '#'}:
-      return '<code class="mono"><pre class="code">' + s + "</pre></code>"
+      return '<pre class="code">' + s + "</pre>"
 
     return None
 
   @staticmethod
+  def code_blockify(block):
+    def line_check(L):
+      return (len(L) >= 1 and L[0] in {'$', '|', '+', '#'})
+
+    if not any(line_check(b['value']) for b in block):
+      return block
+
+    result = list()
+    prev = None  # invariant: only not None when startswith '$ ' or list of startswith '$ '
+    for node in block:
+      if prev:
+        if line_check(node['value']):
+          if isinstance(prev, list):
+            prev.append(node)
+          elif isinstance(prev, dict):
+            prev = [prev, node]
+          else:
+            ABORT('node is neither list nor dict-item: ' + str(node))
+        else: # not startwith $, so flush prev to result
+          if isinstance(prev, list):
+            result.append({'type': 'code block', 'content': prev})
+          elif isinstance(prev, dict):
+            result.append(prev)
+          prev = None
+      else: # not prev
+        if line_check(node['value']):
+          prev = node
+        else:
+          result.append(node)
+
+    if prev:
+      if isinstance(prev, list):
+        result.append({'type': 'code block', 'content': prev})
+      elif isinstance(prev, dict):
+        result.append(prev)
+      prev = None
+
+    LOG({"result": result, "prev": prev})
+
+    return result
+
+  @staticmethod
   def node(item):
     result = None
+    comment = "<!-- " + str(item) + "-->"
+
+    if 'type' in item:
+      if item['type'] == 'code block':
+        return "<pre class='code'>" + "\n".join(map(lambda x: x['value'], item['content'])) + "</pre>"
+      else:
+        ABORT('unknown item type' + str(item))
+
+    assert('value' in item)
+
+    is_codify = False
 
     if item['value'].startswith('note: '):
       note = item['value'].removeprefix('note: ').strip()
@@ -186,6 +240,8 @@ class BLOG_TREE:
 
     if None == result:
       result = BLOG_TREE.codify(item['value'])
+      if result:
+        is_codify = True
 
     if None == result:
       result = item['value']
@@ -193,9 +249,10 @@ class BLOG_TREE:
     if item['value'].startswith('- '):
       result = "<ul><li class='dash'>" + result.removeprefix('- ')
 
-    result += "<br/>"
+    if not is_codify:
+      result += "<br/>"
 
-    if len(item['children']) != 0:
+    if 'children' in item and len(item['children']) != 0:
       header_acc = list()
       acc = list()
 
@@ -222,10 +279,11 @@ class BLOG_TREE:
 
       result= f"{result}{header_children}{''.join(acc)}\n"
 
+
     if item['value'].startswith('- '):
       result += "</li></ul>"
 
-    return result + "\n"
+    return comment + result + "\n"
 
   @staticmethod
   def block(block):
@@ -234,6 +292,10 @@ class BLOG_TREE:
 
     if BLOG_TREE.is_subheading(block):
       return BLOG_TREE.subheading(block)
+
+    # before = block[:]  # debug
+    block = BLOG_TREE.code_blockify(block)
+    # LOG({"before": before, "block": block})  # debug
 
     acc = list()
     acc.append('<div class="kscroll block">')
@@ -330,7 +392,7 @@ class BLOG_COMPILE:
        body { background: rgb(56, 56, 65); }
        .content { max-width: 60em; margin: 0em auto; padding: 0em 1em; }
 
-       pre.code { background: inherit; }
+       pre.code { background: #ddd; max-width: 60%}
 
        ul { margin-block-start: 0px;
             padding-inline-start: 0.6em;
