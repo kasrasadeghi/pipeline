@@ -392,7 +392,7 @@ class BLOG_COMPILE:
        body { background: rgb(56, 56, 65); }
        .content { max-width: 60em; margin: 0em auto; padding: 0em 1em; }
 
-       pre.code { background: #ddd; max-width: 60%}
+       pre.code { background: #ddd; min-width: min(60%, 400px); }
 
        ul { margin-block-start: 0px;
             padding-inline-start: 0.6em;
