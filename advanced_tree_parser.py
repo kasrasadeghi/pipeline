@@ -50,10 +50,10 @@ class ADV_TREE_PARSER:
 
   @staticmethod
   def parse_tree(block, **kwargs):
-    LOG({"parse tree from block": block})
+    # LOG({"parse tree from block": block})
     indent_counts = []
     for L in block:
-      LOG({"L": L})
+      # LOG({"L": L})
       if L[0] != ' ' and L[0] != "-":
         indent_counts.append({"indent": 0, "content": L})
       else:
