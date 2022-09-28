@@ -24,6 +24,7 @@ class GRAPH:
     def render_note(note, **kwargs):
       nonlocal acc
       acc.append(note)
+      return ''
 
     RENDER.content(note, render_note=render_note)
 
