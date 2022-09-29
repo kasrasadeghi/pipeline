@@ -22,10 +22,65 @@ class RENDER:
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
+  def line(L, **kwargs):
+    # first parse unambiguous lines
+    # then parse urls and tags in ambiguous lines using ': '
+
+    LOG(L)
+
+    result = None
+    indent = kwargs.get('indent', '')
+
+    if L.startswith('link: '):
+      url = L.removeprefix('link: ')
+      result = f'<pre>{indent}link: {RENDER.link(url)}</pre>'
+
+    if L.startswith('note: '):
+      note = L.removeprefix('note: ').strip()
+      result = f"<pre>{indent}note: {RENDER.note(note, **kwargs)}</pre>"
+
+    if result:
+      return result
+
+    # cont is continuation
+    # base is the escape function for when we have no more rendering left to do
+    def parse_url(S, cont, base):
+      nonlocal kwargs
+
+      if ': ' in S:
+        prefix, potentially_url = S.rsplit(': ', 1)
+
+        if potentially_url.strip().startswith('https://'):
+          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
+
+        if potentially_url.strip().endswith(".note") and \
+           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
+          return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
+
+      return cont(S, base)
+
+    def highlight_tags(S, base):
+      # replace DAILY with linked DAILY and run base() on everything between
+      return "<a href='/daily'><b>DAILY</b></a>".join(map(base, S.split("DAILY")))
+
+    basic_escape = lambda x: str(escape(x))
+
+    return parse_url(L, cont=highlight_tags, base=basic_escape)
+
+
+  @staticmethod
   def node(item, **kwargs):
     # LOG({'kwargs': kwargs})
     render_msg = kwargs.get('render_msg', None)
     result = None
+
+    LOG({'item': item, 'render_msg': render_msg})
+
+    if DISCUSSION.is_msg(item):
+      if render_msg:
+        return render_msg(item)
+      else:
+        return DISCUSSION_RENDER.msg(item, **kwargs)
 
     level = item['indent']
     if level == -1:  # toplevel
@@ -35,26 +90,10 @@ class RENDER:
     else:
       indent = (level * "  ") + "- "
 
-    if DISCUSSION.is_msg(item):
-      if render_msg:
-        return render_msg(item)
-      else:
-        return DISCUSSION_RENDER.msg(item, **kwargs)
+    result = RENDER.line(item['value'], indent=indent, **kwargs)
 
-    if item['value'].startswith('link: '):
-      url = item['value'].removeprefix('link: ')
-      result = f'<pre>{indent}link: {RENDER.link(url)}</pre>'
-      debug("link:", repr(item), debugmode='RENDER LINK')
-
-    if item['value'].startswith('note: '):
-      note = item['value'].removeprefix('note: ').strip()
-      result = f"<pre>{indent}note: {RENDER.note(note, **kwargs)}</pre>"
-
-    if None == result:
-      debug('item, but none matched:', repr(item), debugmode='RENDER')
-      result = "<pre>" + indent + str(escape(item['value'])) \
-        + (": " if item['children'] and not item['value'].strip().endswith(':') else "") \
-        + "</pre>"
+    LOG(item)
+    result = "<pre>" + indent + result + "</pre>"
 
     acc = list()
     acc.append(result)
@@ -104,7 +143,8 @@ class RENDER:
           continue
 
         if isinstance(item, str):
-          acc.append(f"<pre>{str(escape(item))}</pre>")
+          line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
+          acc.append(f"<pre>{line_rendered}</pre>")
           debug("string:", item)
           continue
 
