@@ -44,57 +44,28 @@ class DISCUSSION_RENDER:
     return RENDER.base_page(DICT(title, bar, content=result))
 
   @staticmethod
-  def msg_content(content, **kwargs):
-
-    # cont is continuation
-    # base is the escape function for when we have no more rendering left to do
-    def parse_url(S, cont, base):
-      nonlocal kwargs
-
-      if ': ' in content:
-        prefix, potentially_url = S.rsplit(': ', 1)
-
-        if potentially_url.strip().startswith('https://'):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
-
-        if potentially_url.strip().endswith(".note") and \
-           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
-          LOG({'note in message': potentially_url, 'msg': content})
-          return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
-
-      return cont(S, base)
-
-    def highlight_tags(S, base):
-      # replace DAILY with linked DAILY and run base() on everything between
-      return "<a href='/daily'><b>DAILY</b></a>".join(map(base, S.split("DAILY")))
-
-    basic_escape = lambda x: str(escape(x))
-
-    return parse_url(content, cont=highlight_tags, base=basic_escape)
-
-  @staticmethod
   def msg(msg, **kwargs):
     timerender = kwargs.get('timerender', None)
 
-    try:
-      msg_date = DISCUSSION.date(msg)
-      msg_content = DISCUSSION_RENDER.msg_content(msg["value"].removeprefix("msg: "), **kwargs)
+    # try:
+    msg_date = DISCUSSION.date(msg)
+    msg_content = RENDER.line(msg["value"].removeprefix("msg: "), **kwargs)
 
-      if timerender:
-        date = timerender(msg_date)
-      else:
-        date = util.date_cmd("-d", msg_date, "+%T")
+    if timerender:
+      date = timerender(msg_date)
+    else:
+      date = util.date_cmd("-d", msg_date, "+%T")
 
-      return (
-        f'<div id="{msg_date}" class="msg">'
-        f'<div class="msg_timestamp">{date}</div>'
-        f'<div class="msg_content">{msg_content}</div>'
-        f'</div>'
-      )
-    except Exception as e:
-      import inspect
-      LOG({"ERROR while rendering msg": msg, "exception": e})
-      return str(msg)
+    return (
+      f'<div id="{msg_date}" class="msg">'
+      f'<div class="msg_timestamp">{date}</div>'
+      f'<div class="msg_content">{msg_content}</div>'
+      f'</div>'
+    )
+    # except Exception as e:
+      # LOG({"ERROR while rendering msg": msg, "exception": e})
+      # raise e
+      # return str(msg)
 
   @staticmethod
   def section(section, **kwargs):
