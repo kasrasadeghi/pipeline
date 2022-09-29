@@ -118,7 +118,6 @@ class RENDER:
     for block in TREE.blocks_from_section(section):
 
       if block == ['']:
-        debug("whitespace")
         acc.append('<br/>')
         continue
 

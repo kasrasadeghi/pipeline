@@ -267,11 +267,8 @@ class FLAT_RENDER:
   def INDEX(R):
     note = FLAT.get_index()
 
-    content = util.read_file(FLAT.to_path(note))
+    content = RENDER.content(note)
     lines_of_code = util.cmd("tokei", shell=True, cwd="/home/kasra/projects/notes-website")
-
-    # parse references and links in file
-    content = FLAT_PARSER.parse(content)
 
     bar = R._bar(note,
                  f'<a href="/note/{note}">note</a>',
@@ -281,8 +278,8 @@ class FLAT_RENDER:
 
     # compose html
     title = FLAT.title(note)
-    result = (f"<pre style='font-feature-settings: \"liga\" 0'>"
-              f"{content}\n{lines_of_code}</pre>")
+    result = (f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
+              f"{content}\n<pre>{lines_of_code}</pre></div>")
     return RENDER.base_page(DICT(title, bar, content=result))
 
   @classmethod
