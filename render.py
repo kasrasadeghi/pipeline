@@ -23,24 +23,7 @@ class RENDER:
 
   @staticmethod
   def line(L, **kwargs):
-    # first parse unambiguous lines
-    # then parse urls and tags in ambiguous lines using ': '
-
     LOG(L)
-
-    result = None
-    indent = kwargs.get('indent', '')
-
-    if L.startswith('link: '):
-      url = L.removeprefix('link: ')
-      result = f'<pre>{indent}link: {RENDER.link(url)}</pre>'
-
-    if L.startswith('note: '):
-      note = L.removeprefix('note: ').strip()
-      result = f"<pre>{indent}note: {RENDER.note(note, **kwargs)}</pre>"
-
-    if result:
-      return result
 
     # cont is continuation
     # base is the escape function for when we have no more rendering left to do
@@ -56,6 +39,9 @@ class RENDER:
         if potentially_url.strip().endswith(".note") and \
            len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
           return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
+
+        if potentially_url.startswith('/'):
+          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
 
       return cont(S, base)
 
