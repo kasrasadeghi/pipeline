@@ -58,6 +58,10 @@ class DEBUG:
     return DEBUG._STATE[k]
 
   @staticmethod
+  def clear_log():
+    DEBUG._GLOBAL_LOG = list()
+
+  @staticmethod
   def frameinfo(frame):
     return {
       "filename": frame.f_code.co_filename,
@@ -93,7 +97,12 @@ class DEBUG:
 
   @staticmethod
   def RENDER_LOG():
-    content = f"<pre>DEBUG LOG: \n" + f"{PRETTY.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
+    content = (
+      f'<form style="display:inline" method="post">'
+        f'<button class="link-button" name="clear" value="debuglog">clear</button> '
+      f'</form>'
+      f"<pre>DEBUG LOG: \n" + f"{PRETTY.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
+    )
     return RENDER.base_page(DICT(content, title="DEBUG LOG", bar=""))
 
   @staticmethod
@@ -172,6 +181,10 @@ def receive_info():
   return Response('', 204)
 
 
-@app.route("/debuglog")
+@app.route("/debuglog", methods=['GET', 'POST'])
 def get_debuglog():
+  if request.method == 'POST':
+    if 'clear' in request.form:
+      DEBUG.clear_log()
+      return redirect('/debuglog')
   return DEBUG.RENDER_LOG()
