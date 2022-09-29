@@ -67,7 +67,7 @@ class GIT:
       if '??' in before:
         el = (
           before +
-          f'<form style="display:inline "action="/git" method="post">'
+          f'<form style="display:inline" "action="/git" method="post">'
           f'<button class="link-button" name="add" value="{filename}">add</button> '
           f'</form>' +
           filename_repr
