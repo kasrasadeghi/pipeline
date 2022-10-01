@@ -58,6 +58,11 @@ class RENDER_UTIL:
          border-left: 2px white solid; border-bottom: 2px white solid;
        }
 
+       span.mono {
+         font-feature-settings: "liga" 0;
+         font-family: monospace;
+       }
+
        .banner-box {
          display: flex;
          flex-direction: row;
