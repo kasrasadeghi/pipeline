@@ -102,8 +102,8 @@ class BLOG_RENDER:
     acc = []
     for post_slug in BLOG.parse_root():
       blog_post = BLOG.try_note_to_post(post_slug.note)
-      acc.append("<li>" + BLOG_RENDER.link_to_post(blog_post, view) + "</li>")
-    content = "<ul>blog post list:" + "\n".join(acc) + "</ul>"
+      acc.append("<div class='block'>" + BLOG_RENDER.link_to_post(blog_post, view) + "</div>")
+    content = '\n'.join(acc)
     return content
 
   @staticmethod
@@ -117,7 +117,7 @@ class BLOG_RENDER:
       LOG(e)
       return FLAT_RENDER.NOTE(BLOG.root)
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return BLOG_COMPILE.base_page(title, content)
 
 # end BLOG_RENDER
 
@@ -363,10 +363,10 @@ class BLOG_COMPILE:
     content = (BLOG_TREE.content(post.note) + \
                # "<pre>\n" + PRETTY.DUMP(note_content[0], no_symbol=True) + "</pre>"
                "")
-    return BLOG_COMPILE.base_post(title=FLAT.title(post.note), content=content)
+    return BLOG_COMPILE.base_page(title=FLAT.title(post.note), content=content)
 
   @staticmethod
-  def base_post(title, content):
+  def base_page(title, content):
     scroll = RENDER_UTIL.kscroll(
       foreground="#f88",
       background="#888"
@@ -509,7 +509,7 @@ def get_internal_blog_post(filename, blog_type=None):
 def test_blog_renderer(note):
   title = "testing blog render for '" + FLAT.title(note) + "'"
   content = BLOG_TREE.content(note)
-  return BLOG_COMPILE.base_post(title, content)
+  return BLOG_COMPILE.base_page(title, content)
 
 @COMMAND.REGISTER('BLOG')
 def COMMAND_BLOG(args, handle_msg, redirect_page):
