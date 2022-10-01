@@ -75,7 +75,7 @@ class DISCUSSION_RENDER:
       nonlocal current_day
       day_of_msg = util.date_cmd("-d", DISCUSSION.date(msg), "+%b %d %Y")
 
-      result = DISCUSSION_RENDER.msg(item, timerender=lambda x: util.date_cmd("-d", x, "+%T"), **kwargs)
+      result = DISCUSSION_RENDER.msg(msg, timerender=lambda x: util.date_cmd("-d", x, "+%T"), **kwargs)
 
       # when we detect a new day, prepend a day banner
       if current_day != day_of_msg:
@@ -88,21 +88,7 @@ class DISCUSSION_RENDER:
     acc.append(f'<pre>--- {section["section"]} --- </pre>')
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):
-      if block == ['']:
-        acc.append('<br/>')
-        continue
-
-      for item in block:
-        # if item is a tree/node
-        if isinstance(item, dict):
-          acc.append(RENDER.node(item, render_msg=render_msg, **kwargs))
-          continue
-
-        if isinstance(item, str):
-          acc.append(f"<pre>{item}</pre>")
-          continue
-
-        acc.append(repr(item))
+      acc.append(RENDER.block(block, render_msg=render_msg, **kwargs))
 
     return '\n'.join(acc)
 
