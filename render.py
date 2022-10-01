@@ -77,8 +77,6 @@ class RENDER:
       indent = (level * "  ") + "- "
 
     result = RENDER.line(item['value'], indent=indent, **kwargs)
-
-    LOG(item)
     result = "<pre>" + indent + result + "</pre>"
 
     acc = list()
@@ -88,6 +86,27 @@ class RENDER:
       acc.append(RENDER.node(child, **kwargs))
 
     return "".join(acc)
+
+  @staticmethod
+  def block(block, **kwargs):
+    if block == ['']:
+      return '<br/>'
+
+    acc = []
+    for item in block:
+      # if item is a tree/node
+      if isinstance(item, dict):
+        acc.append(RENDER.node(item, **kwargs))
+        continue
+
+      if isinstance(item, str):
+        line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
+        acc.append(f"<pre>{line_rendered}</pre>")
+        continue
+
+      acc.append(repr(item))
+
+    return '\n'.join(acc)
 
   @staticmethod
   def section(section, **kwargs):
@@ -116,24 +135,7 @@ class RENDER:
 
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):
-
-      if block == ['']:
-        acc.append('<br/>')
-        continue
-
-      for item in block:
-        # if item is a tree/node
-        if isinstance(item, dict):
-          acc.append(RENDER.node(item, **kwargs))
-          continue
-
-        if isinstance(item, str):
-          line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
-          acc.append(f"<pre>{line_rendered}</pre>")
-          debug("string:", item)
-          continue
-
-        acc.append(repr(item))
+      acc.append(RENDER.block(block, **kwargs))
 
     return '\n'.join(acc)
 
