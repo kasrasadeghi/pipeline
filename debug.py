@@ -97,11 +97,29 @@ class DEBUG:
 
   @staticmethod
   def RENDER_LOG():
+    def render_log_entry(entry):
+      result = (
+        "<div style='border-top: 1px white solid; margin: 2px'>"
+          "<div>"
+            "<span class='mono' style='color: #aaa'>"
+            f"#{entry['i']} "
+            f"line {entry['frame']['line']} "
+            f"{entry['frame']['filename']} "
+            f"{entry['frame']['funcname']}"
+            "</span>"
+          "</div>"
+          "<div>" +
+            "<pre>" + PRETTY.DUMP(entry['content']) + "</pre>"
+          + "</div>"
+        "</div>"
+      )
+      return result
+
     content = (
       f'<form style="display:inline" method="post">'
         f'<button class="link-button" name="clear" value="debuglog">clear</button> '
       f'</form>'
-      f"<pre>DEBUG LOG: \n" + f"{PRETTY.DUMP(DEBUG._GLOBAL_LOG)}</pre>\n"
+      f"<pre>DEBUG LOG: \n</pre>" + "".join(map(render_log_entry, DEBUG._GLOBAL_LOG))
     )
     return RENDER.base_page(DICT(content, title="DEBUG LOG", bar=""))
 
