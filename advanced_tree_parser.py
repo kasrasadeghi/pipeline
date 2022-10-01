@@ -31,11 +31,14 @@ class ADV_TREE_PARSER:
         return False
 
     prev = None
-    for indent, L in zip(indents, B):
+    prevL = None
+    for i, (indent, L) in enumerate(zip(indents, B)):
+      LOG({"i": i, "indent": indent, "L": L, "prev": (prev, prevL)})
       # initial is indent 0, dashed or not
       if prev is None:
         if indent.spaces == 0:
           prev = indent
+          prevL = L
         else:
           return False
 
@@ -43,8 +46,11 @@ class ADV_TREE_PARSER:
       prev_spaces = normalize_spaces(prev)
       curr_spaces = normalize_spaces(indent)
       if curr_spaces > prev_spaces + 4:
-        LOG({'curr': curr_spaces, 'prev': prev_spaces})
+        LOG({'curr': curr_spaces, 'prev': prev_spaces, "line#": i, "line": L, "indents": list(enumerate(indents)), "prevL": prevL})
         return False
+
+      prev = indent
+      prevL = L
 
     return True
 

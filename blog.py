@@ -179,7 +179,8 @@ class BLOG_TREE:
     def line_check(L):
       return (len(L) >= 1 and L[0] in {'$', '|', '+', '#'})
 
-    if not any(line_check(b['value']) for b in block):
+    LOG(block)
+    if not any(line_check(l['value']) for l in block):
       return block
 
     result = list()
