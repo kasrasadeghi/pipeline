@@ -520,9 +520,10 @@ def COMMAND_BLOG(args, handle_msg, redirect_page):
       case "COMPILE":
         acc = []
         for post in BLOG.parse_postlist():
-          cmd = f"python parser.py {FLAT.to_path(post.note)} | tee posts/{post.filename}"
-          BLOG.cmd(cmd)
-          acc.append(cmd + "\n")
+          with open(BLOG.distpath + "/posts/" + post.filename, "w+") as f:
+            f.write(BLOG_COMPILE.POST(post))
+            acc.append(f"compiled ~/blog/posts/{post.filename}\n")
+          acc.append("\n")
         pass
         # TODO compile root page as index.html
         # TODO track changed files
