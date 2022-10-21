@@ -344,18 +344,7 @@ class BLOG_COMPILE:
       LOG(e)
       return 404
 
-    # compose html
-    return f"""
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>{title}</title>
-        </head>
-        <body>
-          {content}
-        </body>
-      </html>"""
+    return BLOG_COMPILE.base_page(title, content)
 
   @staticmethod
   def POST(post):
@@ -521,11 +510,15 @@ def COMMAND_BLOG(args, handle_msg, redirect_page):
         acc = []
         for post in BLOG.parse_postlist():
           with open(BLOG.distpath + "/posts/" + post.filename, "w+") as f:
+            acc.append(f"compile ~/blog/posts/{post.filename}\n")
             f.write(BLOG_COMPILE.POST(post))
-            acc.append(f"compiled ~/blog/posts/{post.filename}\n")
-          acc.append("\n")
         pass
-        # TODO compile root page as index.html
+
+        # render root
+        acc.append('compile root\n\n')
+        with open(BLOG.distpath + "/index.html", "w+") as f:
+          f.write(BLOG_COMPILE.ROOT())
+
         # TODO track changed files
         handle_msg("COMPILE")
         FLAT.append_to_note(args['origin'], "".join(acc))
