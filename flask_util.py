@@ -28,5 +28,9 @@ class FLASK_UTIL:
      </script>"""
 
   @staticmethod
+  def URL_ROOT():
+    return request.url_root # like http://192.37.37.3:5000/
+
+  @staticmethod
   def HOST():
     return request.headers["Host"]  # like 192.37.37.3:5000

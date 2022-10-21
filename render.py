@@ -12,6 +12,16 @@ class CONTEXT:
 class RENDER:
   @staticmethod
   def link(url, **kwargs):
+    if 'view' in kwargs:
+      if kwargs['view'] == 'ref':
+        note, timestamp = REF.parse_ref(url).split('#')
+        if 'Journal' in FLAT.metadata(note)['Tags']:
+          return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[17:25]}</a>'
+        else:
+          from urllib.parse import unquote_plus
+          return f'<a href="{url}">{FLAT.title(note)} @ {unquote_plus(timestamp)}</a>'
+      else:
+        LOG({'ERROR: unmatched link view': kwargs['view']})
     return f'<a href="{url}">{url}</a>'
 
   @staticmethod
@@ -40,8 +50,11 @@ class RENDER:
            len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
           return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
 
-        if potentially_url.startswith('/'):
+        if potentially_url.strip().startswith('/'):
           return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
+
+        if potentially_url.strip().startswith(FLASK_UTIL.URL_ROOT()):
+          return cont(prefix, base) + ": " + RENDER.link(potentially_url, view='ref', **kwargs)
 
       return cont(S, base)
 

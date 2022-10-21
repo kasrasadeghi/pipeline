@@ -206,3 +206,17 @@ def get_debuglog():
       DEBUG.clear_log()
       return redirect('/debuglog')
   return DEBUG.RENDER_LOG()
+
+@app.route("/debug/headers")
+def debug_headers():
+  headers = dict(request.headers)
+  acc = [f"{k}: {v}" for k, v in headers.items()]
+  acc.append("---")
+  acc.append("request.remote_addr: " + request.remote_addr)
+  acc.append("request.path: " + request.path)
+  acc.append("request.url: " + request.url)
+  acc.append("request.base_url: " + request.base_url)
+  acc.append("request.url_root: " + request.url_root)
+  content = "<pre>" + str(escape(str('\n'.join(acc)))) + "</pre>"
+  title = "request headers"
+  return RENDER.base_page(DICT(title, content, bar=''))

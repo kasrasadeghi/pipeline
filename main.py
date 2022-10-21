@@ -39,11 +39,12 @@ kaz_import('commands/full_sync.py')
 
 kaz_import('flat.py')
 kaz_import('journal.py')
-kaz_import('blog.py')
 kaz_import('edit.py')
 kaz_import('discussion.py')
 kaz_import('plan.py')
+kaz_import('ref.py')
 
+kaz_import('blog.py')
 kaz_import('graph.py')
 
 kaz_import('debug.py')
