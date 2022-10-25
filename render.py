@@ -15,7 +15,7 @@ class RENDER:
     if 'view' in kwargs:
       if kwargs['view'] == 'ref':
         note, timestamp = REF.parse_ref(url).split('#')
-        if 'Journal' in FLAT.metadata(note)['Tags']:
+        if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
           return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[17:25]}</a>'
         else:
           from urllib.parse import unquote_plus
