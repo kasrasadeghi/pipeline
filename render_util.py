@@ -63,6 +63,16 @@ class RENDER_UTIL:
          font-family: monospace;
        }
 
+       details > summary {
+         display: block;
+       }
+       details > summary > div > .msg_content {
+         border-right: solid 10px #ffa0ab;
+       }
+       details[open] > summary > div > .msg_content {
+         border-right: solid 10px #a0abff;
+       }
+
        .banner-box {
          display: flex;
          flex-direction: row;
