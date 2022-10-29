@@ -54,6 +54,7 @@ class DISCUSSION_RENDER:
   @staticmethod
   def msg(msg, **kwargs):
     timerender = kwargs.get('timerender', None)
+    msg_indent = kwargs.get('msg_indent', '')
 
     # try:
     msg_date = DISCUSSION.date(msg)
@@ -67,18 +68,16 @@ class DISCUSSION_RENDER:
     return (
       f'<div id="{msg_date}" class="msg">'
       f'<div class="msg_timestamp">{date}</div>'
-      f'<div class="msg_content">{msg_content}</div>'
+      f'<div class="msg_container">{msg_indent}<div class="msg_content">{msg_content}</div></div>'
       f'</div>'
     )
-    # except Exception as e:
-      # LOG({"ERROR while rendering msg": msg, "exception": e})
-      # raise e
-      # return str(msg)
 
   @staticmethod
   def section(section, **kwargs):
-    def render_msg(msg):
-      return DISCUSSION_RENDER.msg(msg, timerender=lambda x: util.date_cmd("-d", x, "+%T"), **kwargs)
+    def render_msg(msg, **inner_kwargs):
+      nonlocal kwargs
+      LOG({"render_msg kwargs union": [inner_kwargs, kwargs]})
+      return DISCUSSION_RENDER.msg(msg, timerender=lambda x: util.date_cmd("-d", x, "+%T"), **(inner_kwargs | kwargs) )
 
     # a day has roots, each of which has content (the first message) and children (what is collapsed)
 
@@ -124,7 +123,7 @@ class DISCUSSION_RENDER:
 
     acc = list()
 
-    def render_block(block):
+    def render_block(block, **kwargs):
       nonlocal render_msg
       x = RENDER.block(block, render_msg=render_msg, **kwargs)
       LOG({'render block': block, 'result': x})
@@ -143,7 +142,14 @@ class DISCUSSION_RENDER:
           acc.append(render_block(root.content))
           acc.append("</summary>")
           for block in root.children:
-            acc.append(render_block(block))
+            if DISCUSSION.block_is_msg(block):
+              new_msg = {**block[0]}
+              if not new_msg['value'].startswith('- '):
+                LOG({'ERROR': 'message should start with a \'- \'', 'msg': new_msg})
+              new_msg['value'] = "msg: " + new_msg['value'].removeprefix('msg: -')
+              acc.append(render_block([new_msg], msg_indent="<div class='msg_dash'></div>"))
+            else:
+              acc.append(render_block(block))
           acc.append("</details>")
         else:
           acc.append(render_block(root.content))

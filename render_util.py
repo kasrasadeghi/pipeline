@@ -39,11 +39,26 @@ class RENDER_UTIL:
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
        .msg_content {
+         display: inline-block;
          padding: 7px 12px 8px 12px;
          border-radius: 18px;
          background: """ + msg_color + """; color: rgb(250, 250, 250);
          overflow-wrap: anywhere;
        }
+
+       .msg_container {
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+       }
+       .msg_dash {
+         min-width: 10px;
+         max-width: 10px;
+         background: white;
+         border: solid 1px white;
+         margin: 0 5px 0 5px;
+       }
+
        * { font-size: 18px; color: """ + base_text_color + """; }
        header {
          display: flex; align-items: center;
@@ -71,10 +86,10 @@ class RENDER_UTIL:
        details > summary {
          display: block;
        }
-       details > summary > div > .msg_content {
+       details > summary > div > div > .msg_content {
          border-right: solid 10px #ffa0ab;
        }
-       details[open] > summary > div > .msg_content {
+       details[open] > summary > div > div > .msg_content {
          border-right: solid 10px #a0abff;
        }
 
@@ -161,13 +176,13 @@ class RENDER_UTIL:
        /* end sidebar */
 
        /* phones */
-       @media (max-aspect-ratio: 1/1) {
+       @media (max-aspect-ratio: 3/5) {
          .msg { flex-direction: column; align-items: flex-start; }
          .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
        }
 
        /* desktop */
-       @media (min-aspect-ratio: 1/1) {
+       @media (min-aspect-ratio: 3/5) {
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 0px; }
        }
