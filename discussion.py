@@ -123,7 +123,6 @@ class DISCUSSION_RENDER:
       current_root.final = True
 
     acc = list()
-    acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
     def render_block(block):
       nonlocal render_msg

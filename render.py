@@ -127,12 +127,16 @@ class RENDER:
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
-    acc = list()
-    if section['section'] != 'entry':
-      acc.append(f'<pre>--- {section["section"]} --- </pre>')
+    if section['section'] == 'entry' and \
+       'origin_note' in kwargs and 'Tags' in FLAT.metadata(kwargs['origin_note']) and \
+       'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
+      return DISCUSSION_RENDER.section(section, **kwargs)
 
     if section['section'] == 'DISCUSSION':
       return DISCUSSION_RENDER.section(section, **kwargs)
+
+    acc = list()
+    acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
     if section['section'] == 'HTML':
       LOG({'html section': section})
@@ -154,6 +158,7 @@ class RENDER:
 
   @staticmethod
   def page(note, sections, **kwargs):
+    kwargs['origin_note'] = note
     return '\n'.join(map(lambda x: RENDER.section(x, **kwargs), sections)) + TREE.filesize(note)
 
   @staticmethod
