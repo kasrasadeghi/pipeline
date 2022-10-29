@@ -136,7 +136,8 @@ class RENDER:
       return DISCUSSION_RENDER.section(section, **kwargs)
 
     acc = list()
-    acc.append(f'<pre>--- {section["section"]} --- </pre>')
+    if section['section'] != 'entry':
+      acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
     if section['section'] == 'HTML':
       LOG({'html section': section})
