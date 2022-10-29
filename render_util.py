@@ -38,7 +38,12 @@ class RENDER_UTIL:
        pre { margin: 0px; color: """ + base_text_color + """; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
-       .msg_content { padding: 7px 12px 8px 12px; border-radius: 18px; background: """ + msg_color + """; color: rgb(250, 250, 250); overflow-wrap: anywhere; }
+       .msg_content {
+         padding: 7px 12px 8px 12px;
+         border-radius: 18px;
+         background: """ + msg_color + """; color: rgb(250, 250, 250);
+         overflow-wrap: anywhere;
+       }
        * { font-size: 18px; color: """ + base_text_color + """; }
        header {
          display: flex; align-items: center;
