@@ -20,6 +20,10 @@ class DISCUSSION:
 
   @staticmethod
   def date(msg):
+    if not 'children' in msg:
+      LOG({'ERROR': msg})
+    if isinstance(msg, list):
+      LOG({'ERROR': 'msg cannot be list, you\'re probably passing in a block', 'msg': msg})
     return msg['children'][0]['value'].removeprefix('Date: ')
 # end DISCUSSION
 
@@ -44,12 +48,16 @@ class DISCUSSION_RENDER:
     return RENDER.base_page(DICT(title, bar, content=result))
 
   @staticmethod
+  def msg_content(msg):
+    return msg["value"].removeprefix("msg: ")
+
+  @staticmethod
   def msg(msg, **kwargs):
     timerender = kwargs.get('timerender', None)
 
     # try:
     msg_date = DISCUSSION.date(msg)
-    msg_content = RENDER.line(msg["value"].removeprefix("msg: "), **kwargs)
+    msg_content = RENDER.line(DISCUSSION_RENDER.msg_content(msg), **kwargs)
 
     if timerender:
       date = timerender(msg_date)
@@ -69,26 +77,77 @@ class DISCUSSION_RENDER:
 
   @staticmethod
   def section(section, **kwargs):
-    current_day = None
-
     def render_msg(msg):
-      nonlocal current_day
+      return DISCUSSION_RENDER.msg(msg, timerender=lambda x: util.date_cmd("-d", x, "+%T"), **kwargs)
+
+    # a day has roots, each of which has content (the first message) and children (what is collapsed)
+
+    pre_day_acc = list()
+    days = list()
+    current_day = None
+    current_root = None
+
+    for block in TREE.blocks_from_section(section):
+      LOG(block)
+      if not DISCUSSION.block_is_msg(block):
+        # handle regular blocks that are not messages
+        if len(days) == 0:
+          pre_day_acc.append(block)
+          continue
+
+        if len(days[-1].roots) == 0:
+          days[-1].pre_roots.append(block)
+          continue
+
+        days[-1].roots[-1].children.append(block)
+        continue
+
+      # we're handling a message
+      msg = block[0]
+
       day_of_msg = util.date_cmd("-d", DISCUSSION.date(msg), "+%b %d %Y")
-
-      result = DISCUSSION_RENDER.msg(msg, timerender=lambda x: util.date_cmd("-d", x, "+%T"), **kwargs)
-
-      # when we detect a new day, prepend a day banner
+      # we found a new day
       if current_day != day_of_msg:
+        days.append(DICT(day=day_of_msg, pre_roots=list(), roots=list()))
         current_day = day_of_msg
-        result = RENDER_UTIL.banner(current_day) + result
 
-      return result
+      # we found a new root
+      if len(days[-1].roots) == 0 or not msg['value'].startswith('msg: - '):
+        days[-1].roots.append(DICT(content=block, children=list(), final=False))
+        current_root = days[-1].roots[-1]
+        continue
+
+      days[-1].roots[-1].children.append(block)
+
+    if current_root is not None:
+      current_root.final = True
 
     acc = list()
     acc.append(f'<pre>--- {section["section"]} --- </pre>')
+
+    def render_block(block):
+      nonlocal render_msg
+      x = RENDER.block(block, render_msg=render_msg, **kwargs)
+      LOG({'render block': block, 'result': x})
+      # return "<pre>" + str(block) + "\n</pre>"
+      return x
+
     # don't print two empty blocks consecutively
-    for block in TREE.blocks_from_section(section):
-      acc.append(RENDER.block(block, render_msg=render_msg, **kwargs))
+    for day in days:
+      acc.append(RENDER_UTIL.banner(day.day))
+      for root in day.roots:
+        if root.children:
+          if root.final:
+            acc.append("<details open><summary>")
+          else:
+            acc.append("<details><summary>")
+          acc.append(render_block(root.content))
+          acc.append("</summary>")
+          for block in root.children:
+            acc.append(render_block(block))
+          acc.append("</details>")
+        else:
+          acc.append(render_block(root.content))
 
     return '\n'.join(acc)
 
