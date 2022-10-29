@@ -77,7 +77,7 @@ class RENDER:
 
     if DISCUSSION.is_msg(item):
       if render_msg:
-        return render_msg(item)
+        return render_msg(item, **kwargs)
       else:
         return DISCUSSION_RENDER.msg(item, **kwargs)
 
