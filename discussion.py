@@ -147,7 +147,7 @@ class DISCUSSION_RENDER:
               if not new_msg['value'].startswith('- '):
                 LOG({'ERROR': 'message should start with a \'- \'', 'msg': new_msg})
               new_msg['value'] = "msg: " + new_msg['value'].removeprefix('msg: -')
-              acc.append(render_block([new_msg], msg_indent="<div class='msg_dash'></div>"))
+              acc.append(render_block([new_msg], msg_indent="<span class='msg_dash'><b>-</b></span>"))
             else:
               acc.append(render_block(block))
           acc.append("</details>")

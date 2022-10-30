@@ -52,11 +52,7 @@ class RENDER_UTIL:
          align-items: center;
        }
        .msg_dash {
-         min-width: 10px;
-         max-width: 10px;
-         background: white;
-         border: solid 1px white;
-         margin: 0 5px 0 5px;
+         margin: 0 0.5em 0 0.5em;
        }
 
        * { font-size: 18px; color: """ + base_text_color + """; }
