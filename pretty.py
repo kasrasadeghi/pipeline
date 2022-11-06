@@ -19,6 +19,9 @@ class PRETTY:
       else:
         return s
 
+    if isinstance(o, SimpleNamespace):
+      o = o.__dict__  # dict(o) doesn't work for some reason
+
     if isinstance(o, dict):
       acc = list()
       for k, v in o.items():
