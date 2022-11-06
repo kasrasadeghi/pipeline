@@ -14,14 +14,18 @@ class RENDER:
   def link(url, **kwargs):
     if 'view' in kwargs:
       if kwargs['view'] == 'ref':
-        note, timestamp = REF.parse_ref(url).split('#')
-        if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
-          return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[17:25]}</a>'
+        ref = REF.parse_ref(url)
+        if '#' not in ref:
+          LOG({'ref no #': ref})
         else:
-          from urllib.parse import unquote_plus
-          return f'<a href="{url}">{FLAT.title(note)} @ {unquote_plus(timestamp)}</a>'
-      else:
-        LOG({'ERROR: unmatched link view': kwargs['view']})
+          note, timestamp = ref.split('#')
+          if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
+            return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[19:27]}</a>'
+          else:
+            from urllib.parse import unquote_plus
+            return f'<a href="{url}">{FLAT.title(note)} @ {unquote_plus(timestamp)}</a>'
+
+      LOG({'ERROR: unmatched link view': kwargs['view']})
     return f'<a href="{url}">{url}</a>'
 
   @staticmethod
