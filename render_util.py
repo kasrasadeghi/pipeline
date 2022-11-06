@@ -172,13 +172,13 @@ class RENDER_UTIL:
        /* end sidebar */
 
        /* phones */
-       @media (max-aspect-ratio: 3/5) {
+       @media (max-aspect-ratio: 5/4) {
          .msg { flex-direction: column; align-items: flex-start; }
          .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
        }
 
        /* desktop */
-       @media (min-aspect-ratio: 3/5) {
+       @media (min-aspect-ratio: 5/4) {
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 0px; }
        }
