@@ -34,6 +34,7 @@ class DEBUG:
   # TODO should make state request specific so that it can be multithreaded or multi-processed
   _STATE = None
   _GLOBAL_LOG = []
+  _GLOBAL_LOG_ENABLED = False
 
   @staticmethod
   def clear_state():
@@ -92,8 +93,9 @@ class DEBUG:
     else:
       print("stateless ", end='')
     print("LOG: " + str(s))
-    parent_frame = DEBUG.first_nondebug_frame(lambda f: f.f_code.co_name == 'LOG')
-    DEBUG._GLOBAL_LOG.append({"i": len(DEBUG._GLOBAL_LOG), "frame": DEBUG.frameinfo(parent_frame), "content": s})
+    if DEBUG._GLOBAL_LOG_ENABLED:
+      parent_frame = DEBUG.first_nondebug_frame(lambda f: f.f_code.co_name == 'LOG')
+      DEBUG._GLOBAL_LOG.append({"i": len(DEBUG._GLOBAL_LOG), "frame": DEBUG.frameinfo(parent_frame), "content": s})
 
   @staticmethod
   def RENDER_LOG():
@@ -118,6 +120,7 @@ class DEBUG:
     content = (
       f'<form style="display:inline" method="post">'
         f'<button class="link-button" name="clear" value="debuglog">clear</button> '
+        f'<button class="link-button" name="disable" value="debuglog">disable</button> '
       f'</form>'
       f"<pre>DEBUG LOG: \n</pre>" + "".join(map(render_log_entry, DEBUG._GLOBAL_LOG))
     )
@@ -201,11 +204,22 @@ def receive_info():
 
 @app.route("/debuglog", methods=['GET', 'POST'])
 def get_debuglog():
+  DEBUG._GLOBAL_LOG_ENABLED = True
   if request.method == 'POST':
     if 'clear' in request.form:
       DEBUG.clear_log()
       return redirect('/debuglog')
+    if 'disable' in request.form:
+      DEBUG._GLOBAL_LOG_ENABLED = False
+      DEBUG.clear_log()
+      return redirect('/today')
   return DEBUG.RENDER_LOG()
+
+@app.route("/debuglog/clear")
+def clear_debuglog():
+  DEBUG._GLOBAL_LOG_ENABLED = False
+  DEBUG.clear_log()
+  return redirect('/debuglog')
 
 @app.route("/debug/headers")
 def debug_headers():
