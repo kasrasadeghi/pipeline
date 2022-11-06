@@ -118,6 +118,8 @@ class DISCUSSION_RENDER:
 
       days[-1].roots[-1].children.append(block)
 
+    # if we found a root, then we have a final root.
+    # - the current one after the loop is over is the final root.
     if current_root is not None:
       current_root.final = True
 
