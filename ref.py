@@ -19,4 +19,6 @@ class REF:
       LOG({'ERROR while parsing ref': url, 'step': f'(4) check that \'{note}\' is a note'})
       return url
 
+    LOG({'note': note, 'rest': rest})
+
     return note + rest  # chop off the '#' part of the id of the note
