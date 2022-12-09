@@ -69,6 +69,7 @@ class DISCUSSION_RENDER:
       f'<div id="{msg_date}" class="msg">'
       f'<div class="msg_timestamp">{date}</div>'
       f'<div class="msg_container">{msg_indent}<div class="msg_content">{msg_content}</div></div>'
+      #f'<div>{str(TAG.parse(DISCUSSION_RENDER.msg_content(msg)))}</div>'
       f'</div>'
     )
 
@@ -137,21 +138,29 @@ class DISCUSSION_RENDER:
       acc.append(RENDER_UTIL.banner(day.day))
       for root in day.roots:
         if root.children:
-          if root.final:
-            acc.append("<details open><summary>")
-          else:
-            acc.append("<details><summary>")
-          acc.append(render_block(root.content))
-          acc.append("</summary>")
+
+          acc_children = list()
+          tags = list()
           for block in root.children:
             if DISCUSSION.block_is_msg(block):
               new_msg = {**block[0]}
               if not new_msg['value'].startswith('- '):
                 LOG({'ERROR': 'message should start with a \'- \'', 'msg': new_msg})
               new_msg['value'] = "msg: " + new_msg['value'].removeprefix('msg: -')
-              acc.append(render_block([new_msg], msg_indent="<span class='msg_dash'><b>-</b></span>"))
+              tags = tags + TAG.parse(DISCUSSION_RENDER.msg_content(new_msg))
+              acc_children.append(render_block([new_msg], msg_indent="<span class='msg_dash'><b>-</b></span>"))
             else:
-              acc.append(render_block(block))
+              acc_children.append(render_block(block))
+
+          if root.final:
+            acc.append("<details open><summary>")
+          else:
+            acc.append("<details><summary>")
+          acc.append(render_block(root.content))
+          if tags:
+            acc.append("<div class='tags-summary'>" + str(tags) + "</div>")
+          acc.append("</summary>")
+          acc.append('\n'.join(acc_children))
           acc.append("</details>")
         else:
           acc.append(render_block(root.content))
