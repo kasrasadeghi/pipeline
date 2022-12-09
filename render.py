@@ -200,7 +200,7 @@ class RENDER:
     - RENDER.base_page(DICT(title, bar, content=result))
     - RENDER.base_page(DICT(title, content, bar=None))
     """
-    if D.bar is None or D.bar == "":
+    if not hasattr(D, 'bar') or D.bar is None or D.bar == "":
       bar = "".join(RENDER_UTIL.nav())
     else:
       bar = D.bar
