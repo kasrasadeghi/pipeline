@@ -1,0 +1,44 @@
+@app.route('/test/fbconv/<note>')
+def test_fbconv(note):
+  title = 'testing blog render for FBCONV ' + note
+
+  speakers = None
+  def section(s, **kwargs):
+    if s['section'] != 'FBCONV':
+      return RENDER.section(s, **CONTEXT.DEFAULT(kwargs, 'render_section'))
+
+    acc = list()
+    for b in s['blocks']:
+      if TREE.is_newline(b):
+        continue
+
+      if len(b) == 2 and b[0].startswith('left: ') and b[1].startswith('right: '):
+        acc.append('<span style="color:red">' + str(b) + "</span><br/>")
+        speakers = dict()
+        speakers['left'] = b[0].removeprefix('left: ').split(', ')
+        speakers['right'] = b[1].removeprefix('right: ').split(', ')
+        continue
+
+      for l in b:
+        if speakers:
+          if l in speakers['left']:
+            if not speakers.get('current', None) == 'left':
+              speakers['current'] = 'left'
+              acc.append('<span style="color:#f88">' + str(l) + "</span><br/>")
+            continue
+          if l in speakers['right']:
+            if not speakers.get('current', None) == 'right':
+              speakers['current'] = 'right'
+              acc.append('<span style="color:#88f">' + str(l) + "</span><br/>")
+            continue
+          acc.append("&nbsp;&nbsp;" + l + "<br/>")
+
+    return "\n".join(acc)
+
+  content = RENDER.page(
+    note,
+    PARSER.parse_file(FLAT.to_path(note)),
+    render_section=section
+  )
+
+  return RENDER.base_page(DICT(title, content))
