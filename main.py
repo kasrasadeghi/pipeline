@@ -29,6 +29,7 @@ kaz_import('render.py')
 kaz_import('render_util.py')
 kaz_import('sidebar.py')
 kaz_import('git.py')
+kaz_import('tag.py')
 
 kaz_import('search.py')
 

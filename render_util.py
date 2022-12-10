@@ -88,6 +88,12 @@ class RENDER_UTIL:
        details[open] > summary > div > div > .msg_content {
          border-right: solid 10px #a0abff;
        }
+       details > summary > .tags-summary {
+         display: true;
+       }
+       details[open] > summary > .tags-summary {
+         display: none;
+       }
 
        .banner-box {
          display: flex;
