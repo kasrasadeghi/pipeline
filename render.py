@@ -20,7 +20,7 @@ class RENDER:
         else:
           note, timestamp = ref.split('#')
           if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
-            return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[19:27]}</a>'
+            return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[17:25]}</a>'
           else:
             from urllib.parse import unquote_plus
             return f'<a href="{url}">{FLAT.title(note)} @ {unquote_plus(timestamp)}</a>'
