@@ -74,12 +74,12 @@ class TREE:
       acc.append(S['section'])
       for B in S['blocks']:
         if len(B) == 1:
-          acc.append(str(escape(B)))
+          acc.append(FLASK_UTIL.ESCAPE(B))
         else:
           debug('huh', B, debugmode='ACTIVE')
           acc.append('[')
           for EL in B:
-            acc.append(' ' + str(escape(EL)))
+            acc.append(' ' + FLASK_UTIL.ESCAPE(EL))
           acc.append(']')
     return "\n".join(acc)
 

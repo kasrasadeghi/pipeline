@@ -79,8 +79,8 @@ class GIT:
           before +
           f'<a href="/git/diff/{filename}">work</a> '
           f'<form style="display:inline "action="/git" method="post">'
-          f'<button class="link-button" name="unstage" value="{filename}">{str(escape("<"))}unstage</button> '
-          f'<button class="link-button" name="add" value="{filename}">add{str(escape(">"))}</button> '
+          f'<button class="link-button" name="unstage" value="{filename}">{FLASK_UTIL.ESCAPE("<")}unstage</button> '
+          f'<button class="link-button" name="add" value="{filename}">add{FLASK_UTIL.ESCAPE(">")}</button> '
           f'</form>'
           f'<a href="/git/diff-staged/{filename}">stage</a>   ' +
           filename_repr
@@ -103,7 +103,7 @@ class GIT:
         before, uuid = l[:-UUID_LEN], l[-UUID_LEN:]
         acc.append(before + f'<a href="/note/{uuid}">{FLAT.title(uuid)}</a>')
       else:
-        acc.append(str(escape(l)))
+        acc.append(FLASK_UTIL.ESCAPE(l))
     status = "\n".join(acc)
 
     return status
@@ -191,8 +191,8 @@ class GIT:
     for l in untracked_filenames.splitlines():
       with open(FLAT.to_path(l)) as f:
         untracked_files.append(f.read())
-      untracked_files[-1] = ('<span style="font-weight: bold">' + str(escape(l)) + "</span>\n" +
-                             '<span style="color: green">' + str(escape(untracked_files[-1])) + "</span>\n")
+      untracked_files[-1] = ('<span style="font-weight: bold">' + FLASK_UTIL.ESCAPE(l) + "</span>\n" +
+                             '<span style="color: green">' + FLASK_UTIL.ESCAPE(untracked_files[-1]) + "</span>\n")
     untracked = "".join(untracked_files)
 
     content = (R._cmd("git status", status) +

@@ -66,9 +66,7 @@ class RENDER:
       # replace DAILY with linked DAILY and run base() on everything between
       return "<a href='/daily'><b>DAILY</b></a>".join(map(base, S.split("DAILY")))
 
-    basic_escape = lambda x: str(escape(x))
-
-    return parse_url(L, cont=highlight_tags, base=basic_escape)
+    return parse_url(L, cont=highlight_tags, base=FLASK_UTIL.ESCAPE)
 
 
   @staticmethod

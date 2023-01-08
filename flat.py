@@ -243,7 +243,7 @@ class FLAT_PARSER:
         acc.append(result[1])
         continue
 
-      acc.append(str(escape(L)))
+      acc.append(FLASK_UTIL.ESCAPE(L))
 
     return "\n".join(acc)
 
