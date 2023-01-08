@@ -35,7 +35,7 @@ class EDIT_RENDER:
         f'<input class="link-button" type="submit" value="Submit"/>'
       f'</form>'
     )
-    return RENDER.base_page(DICT(title, bar, content=result))
+    return RENDER.base_page({'title': title, 'content': result, 'bar': bar})
 
 
 @app.route("/edit/<note>", methods=['GET', 'POST'])

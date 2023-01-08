@@ -16,7 +16,6 @@ def kaz_import(filepath):
 
 # IMPORTS
 
-kaz_import('magic.py')
 kaz_import('util.py')
 kaz_import('flask_util.py')
 

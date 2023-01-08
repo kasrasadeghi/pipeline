@@ -24,7 +24,7 @@ class SEARCH:
     content = (f'found {kwargs["msg_count"]} results '
                f'in {kwargs["elapsed_time"]} seconds '
                + content)
-    return RENDER.base_page(DICT(content, title="search", bar=None))
+    return RENDER.base_page({'title': 'search', 'content': content})
 
   @staticmethod
   def msg(msg):

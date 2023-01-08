@@ -19,18 +19,18 @@ class JOURNAL:
     day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
     month, year = util.date_cmd("-d", date_str, "+%B %Y").split()
     title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
-    return DICT(day_of_month, day_of_month_suffix, month, year, title)
+    return {'day_of_month': day_of_month, 'day_of_month_suffix': day_of_month_suffix, 'month': month, 'year': year, 'title': title}
 
   @staticmethod
   def date_to_title(date_str):
-    return JOURNAL.date_to_parts(date_str).title
+    return JOURNAL.date_to_parts(date_str)['title']
 
   @staticmethod
   def init_journal(note, D):
     with open(FLAT.to_path(note)) as f:
       content = f.read()
     with open(FLAT.to_path(note), "w") as f:
-      f.write(f"# {D.month} {D.day_of_month}\n\n{content}Tags: Journal\n")
+      f.write(f"# {D['month']} {D['day_of_month']}\n\n{content}Tags: Journal\n")
     return note
 
   @staticmethod
@@ -40,7 +40,7 @@ class JOURNAL:
   @staticmethod
   def create_journal_for_day(date):
     D = JOURNAL.date_to_parts(date)
-    new_note = FLAT.make_new(D.title)
+    new_note = FLAT.make_new(D['title'])
     JOURNAL.init_journal(new_note, D)
     return new_note
 

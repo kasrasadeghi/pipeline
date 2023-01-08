@@ -112,14 +112,14 @@ class GIT:
   def _git_diff_single(R, note):
     """the diff between working and stage"""
     diff = FLAT.cmd(['git', '-c', 'color.ui=always', 'diff', note]).strip()
-    diff = RENDER_UTIL._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(FLASK_UTIL.ESCAPE(diff))
     return diff
 
   @classmethod
   def _git_diff_staged(R, note):
     """the diff between stage and head"""
     diff = FLAT.cmd(['git', '-c', 'color.ui=always', 'diff', '--staged', note]).strip()
-    diff = RENDER_UTIL._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(FLASK_UTIL.ESCAPE(diff))
     return diff
 
   @classmethod
@@ -127,14 +127,14 @@ class GIT:
     """the diff between work and stage"""
     # git color always: https://stackoverflow.com/questions/16073708/force-git-status-to-output-color-on-the-terminal-inside-a-script
     diff = FLAT.cmd(['git', '-c', 'color.ui=always', 'diff']).strip()
-    diff = RENDER_UTIL._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(FLASK_UTIL.ESCAPE(diff))
     return diff
 
   @classmethod
   def _git_stage(R):
     """show the stage as the diff between it and HEAD"""
     diff = FLAT.cmd(['git', '-c', 'color.ui=always', 'diff', '--staged']).strip()
-    diff = RENDER_UTIL._parse_color(str(escape(diff)))
+    diff = RENDER_UTIL._parse_color(FLASK_UTIL.ESCAPE(diff))
     return diff
 
   @classmethod
@@ -148,13 +148,16 @@ class GIT:
     sha_start = len_prefix
     sha_end = sha_start + len_sha
     acc = list()
+
+    ESC = lambda x: FLASK_UTIL.ESCAPE(x)
+
     for L in diff.splitlines():
       if L.startswith(prefix):
-        pre, sha, post = str(escape(L[:sha_start])), str(escape(L[sha_start:sha_end])), str(escape(L[sha_end:]))
+        pre, sha, post = ESC(L[:sha_start]), ESC(L[sha_start:sha_end]), ESC(L[sha_end:])
         LOG({"git log": sha})
         acc.append(pre + f'<a href="/git/show/{sha}">{sha}</a>' +post)
       else:
-        acc.append(str(escape(L)))
+        acc.append(ESC(L))
 
     diff = "\n".join(acc)
     diff = RENDER_UTIL._parse_color(diff)
@@ -164,7 +167,7 @@ class GIT:
   @classmethod
   def _git_show_commit(R, sha):
     output = FLAT.cmd(['git', '-c', 'color.ui=always', 'show', sha])
-    output = RENDER_UTIL._parse_color(str(escape(output)))
+    output = RENDER_UTIL._parse_color(FLASK_UTIL.ESCAPE(output))
     return output
 
   @classmethod
@@ -175,10 +178,6 @@ class GIT:
   @classmethod
   def _cmd(R, cmd, output):
     return f"<pre><h1>$ {cmd}</h1>{output}</pre>"
-
-  @staticmethod
-  def base_page(title, content):
-    return
 
   @classmethod
   def RENDER_GIT(R):
@@ -202,12 +201,10 @@ class GIT:
                RENDER_UTIL.bar() +
                f'<pre><h1>UNTRACKED FILES</h1>\n{untracked}</pre>')
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({'title': 'Git Status', 'content': content})
 
   @classmethod
   def RENDER_GIT_MENU(R):
-    title = "Git Menu"
-
     content = (
       R._git_menu() +
       '<div style="margin-top: 8px">'
@@ -217,7 +214,7 @@ class GIT:
       "</div>"
     )
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({'title': 'Git Menu', 'content': content})
 
   @classmethod
   def RENDER_GIT_DIFF(R, filename, staged):
@@ -238,7 +235,7 @@ class GIT:
       R._cmd(f"git diff{flag} '{filename_title}'", output)
     )
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({'title': title, 'content': content})
 
   @classmethod
   def RENDER_GIT_STAGE(R):
@@ -250,47 +247,37 @@ class GIT:
       R._cmd("git diff --staged", R._git_stage())
     )
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({'title': title, 'content': content})
 
   @classmethod
   def RENDER_GIT_COMMIT(R, message=None):
     title = "Git Commit"
-
-    output = R._git_stage()
-
     default_value = " value=\"" + message + "\"" if message else ""
     content = (
       f'<form method="post"><input class="msg_input" autocomplete="off" ' +
         f'autofocus type="text" name="commit_message"{default_value}>' +
       '</form>' +
-      R._cmd("git diff --staged", output))
+      R._cmd("git diff --staged", R._git_stage()))
 
-    return RENDER.base_page(DICT(title, content, bar=None))
-
+    return RENDER.base_page({'title': title, 'content': content})
 
   @classmethod
   def RENDER_GIT_SHOW(R, sha):
     """the @param sha is the specific sha of the commit you want to render"""
     title = "Git Commit"
-
-    output = R._git_show_commit(sha)
-
     content = (
-      R._cmd("git show", output))
+      R._cmd("git show", R._git_show_commit(sha)))
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({'title': title, 'content': content})
 
   @classmethod
   def RENDER_GIT_LOG(R):
     title = "Git Log"
-
-    log = R._git_log()
-
     content = (
       R._git_menu() +
-      R._cmd("git log", log))
+      R._cmd("git log", R._git_log()))
 
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({'title': title, 'content': content})
 
   # END RENDER
 

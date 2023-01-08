@@ -19,9 +19,6 @@ class PRETTY:
       else:
         return s
 
-    if isinstance(o, SimpleNamespace):
-      o = o.__dict__  # dict(o) doesn't work for some reason
-
     if isinstance(o, dict):
       acc = list()
       for k, v in o.items():
@@ -85,4 +82,5 @@ def test_pretty():
     }
   }
 
-  return RENDER.base_page(DICT(title="PRETTY.DUMP", bar=None, content='<pre style="font-feature-settings: \"liga\" 0">' + PRETTY.DUMP(obj) + "</pre>"))
+  return RENDER.base_page({'title': "PRETTY.DUMP",
+                           'content': '<pre style="font-feature-settings: \"liga\" 0">' + PRETTY.DUMP(obj) + "</pre>"})

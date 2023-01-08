@@ -1,6 +1,5 @@
 @app.route('/test/fbconv/<note>')
 def test_fbconv(note):
-  title = 'testing blog render for FBCONV ' + note
 
   speakers = None
   def section(s, **kwargs):
@@ -35,10 +34,12 @@ def test_fbconv(note):
 
     return "\n".join(acc)
 
-  content = RENDER.page(
+  rendered_page = RENDER.page(
     note,
     PARSER.parse_file(FLAT.to_path(note)),
     render_section=section
   )
 
-  return RENDER.base_page(DICT(title, content))
+  return RENDER.base_page(
+    {'title': 'testing blog render for FBCONV ' + note,
+     'content': rendered_page})
