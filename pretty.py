@@ -48,9 +48,9 @@ class PRETTY:
       elif o == '':
         result = '""'
       elif len(o.splitlines()) == 1:
-        result = str(escape(o))
+        result = FLASK_UTIL.ESCAPE(o)
       else:
-        result = '\n' + indent('"""\n' + str(escape(o)) + '"""')
+        result = '\n' + indent('"""\n' + FLASK_UTIL.ESCAPE(o) + '"""')
 
     if result is None:
       result = repr(o)

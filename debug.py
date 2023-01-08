@@ -231,6 +231,6 @@ def debug_headers():
   acc.append("request.url: " + request.url)
   acc.append("request.base_url: " + request.base_url)
   acc.append("request.url_root: " + request.url_root)
-  content = "<pre>" + str(escape(str('\n'.join(acc)))) + "</pre>"
+  content = "<pre>" + FLASK_UTIL.ESCAPE(str('\n'.join(acc))) + "</pre>"
   title = "request headers"
   return RENDER.base_page({'title': title, 'content': content})
