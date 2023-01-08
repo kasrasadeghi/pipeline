@@ -45,7 +45,7 @@ class DISCUSSION_RENDER:
       f"{content}</div>"
       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
     )
-    return RENDER.base_page(DICT(title, bar, content=result))
+    return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
   @staticmethod
   def msg_content(msg):
@@ -95,11 +95,11 @@ class DISCUSSION_RENDER:
           pre_day_acc.append(block)
           continue
 
-        if len(days[-1].roots) == 0:
-          days[-1].pre_roots.append(block)
+        if len(days[-1]['roots']) == 0:
+          days[-1]['pre_roots'].append(block)
           continue
 
-        days[-1].roots[-1].children.append(block)
+        days[-1]['roots'][-1]['children'].append(block)
         continue
 
       # we're handling a message
@@ -108,21 +108,21 @@ class DISCUSSION_RENDER:
       day_of_msg = util.date_cmd("-d", DISCUSSION.date(msg), "+%b %d %Y")
       # we found a new day
       if current_day != day_of_msg:
-        days.append(DICT(day=day_of_msg, pre_roots=list(), roots=list()))
+        days.append({'day': day_of_msg, 'pre_roots': list(), 'roots': list()})
         current_day = day_of_msg
 
       # we found a new root
-      if len(days[-1].roots) == 0 or not msg['value'].startswith('msg: - '):
-        days[-1].roots.append(DICT(content=block, children=list(), final=False))
-        current_root = days[-1].roots[-1]
+      if len(days[-1]['roots']) == 0 or not msg['value'].startswith('msg: - '):
+        days[-1]['roots'].append({'content': block, 'children': list(), 'final': False})
+        current_root = days[-1]['roots'][-1]
         continue
 
-      days[-1].roots[-1].children.append(block)
+      days[-1]['roots'][-1]['children'].append(block)
 
     # if we found a root, then we have a final root.
     # - the current one after the loop is over is the final root.
     if current_root is not None:
-      current_root.final = True
+      current_root['final'] = True
 
     acc = list()
 
@@ -135,13 +135,13 @@ class DISCUSSION_RENDER:
 
     # don't print two empty blocks consecutively
     for day in days:
-      acc.append(RENDER_UTIL.banner(day.day))
-      for root in day.roots:
-        if root.children:
+      acc.append(RENDER_UTIL.banner(day['day']))
+      for root in day['roots']:
+        if root['children']:
 
           acc_children = list()
           tags = list()
-          for block in root.children:
+          for block in root['children']:
             if DISCUSSION.block_is_msg(block):
               new_msg = {**block[0]}
               if not new_msg['value'].startswith('- '):
@@ -152,18 +152,18 @@ class DISCUSSION_RENDER:
             else:
               acc_children.append(render_block(block))
 
-          if root.final:
+          if root['final']:
             acc.append("<details open><summary>")
           else:
             acc.append("<details><summary>")
-          acc.append(render_block(root.content))
+          acc.append(render_block(root['content']))
           if tags:
             acc.append("<div class='tags-summary'>" + str(tags) + "</div>")
           acc.append("</summary>")
           acc.append('\n'.join(acc_children))
           acc.append("</details>")
         else:
-          acc.append(render_block(root.content))
+          acc.append(render_block(root['content']))
 
     return '\n'.join(acc)
 

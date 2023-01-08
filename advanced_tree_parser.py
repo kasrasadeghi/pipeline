@@ -15,8 +15,8 @@ class ADV_TREE_PARSER:
     for spaces, c in enumerate(L):
       if c != ' ':
         is_dash = c == '-'
-        return DICT(spaces, is_dash)
-    return DICT(spaces=0, is_dash=False)
+        return {'spaces': spaces, 'is_dash': is_dash}
+    return {'spaces': 0, 'is_dash': False}
 
   @staticmethod
   def might_be_tree(B, **kwargs):
@@ -26,7 +26,7 @@ class ADV_TREE_PARSER:
     indents = [ADV_TREE_PARSER.count_spaces(L) for L in B]  # list of (space_count, is_dash)
 
     for i, indent in enumerate(indents):
-      if indent.spaces % 2 != 0:
+      if indent['spaces'] % 2 != 0:
         LOG({'line#': i, 'line': B[i], 'uneven indent': indent})
         return False
 
@@ -36,13 +36,13 @@ class ADV_TREE_PARSER:
       LOG({"i": i, "indent": indent, "L": L, "prev": (prev, prevL)})
       # initial is indent 0, dashed or not
       if prev is None:
-        if indent.spaces == 0:
+        if indent['spaces'] == 0:
           prev = indent
           prevL = L
         else:
           return False
 
-      normalize_spaces = lambda x: x.spaces + 2 if x.is_dash else x.spaces
+      normalize_spaces = lambda x: x['spaces'] + 2 if x['is_dash'] else x['spaces']
       prev_spaces = normalize_spaces(prev)
       curr_spaces = normalize_spaces(indent)
       if curr_spaces > prev_spaces + 4:
@@ -63,7 +63,7 @@ class ADV_TREE_PARSER:
       if L[0] != ' ' and L[0] != "-":
         indent_counts.append({"indent": 0, "content": L})
       else:
-        spaces = ADV_TREE_PARSER.count_spaces(L).spaces
+        spaces = ADV_TREE_PARSER.count_spaces(L)['spaces']
         assert(spaces % 2 == 0)
         indent_counts.append({"indent": spaces // 2, "content": L.lstrip()})
 

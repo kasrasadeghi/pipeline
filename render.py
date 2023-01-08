@@ -186,30 +186,22 @@ class RENDER:
       f"{content}</div>"
       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
     )
-    return RENDER.base_page(DICT(title, bar, content=result))
+    return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
 
   @staticmethod
   def base_page(D):
-    """
-    D is a magic_dict with keys: { title, bar, content }
-    bar=None renders the default bar with RENDER_UTIL.nav()
-
-    USAGE:
-    - RENDER.base_page(DICT(title, bar, content))
-    - RENDER.base_page(DICT(title, bar, content=result))
-    - RENDER.base_page(DICT(title, content, bar=None))
-    """
-    if not hasattr(D, 'bar') or D.bar is None or D.bar == "":
+    """ D is a dict with keys: { title, bar, content } """
+    if 'bar' not in D or D['bar'] is None or D['bar'] == "":
       bar = "".join(RENDER_UTIL.nav())
     else:
-      bar = D.bar
+      bar = D['bar']
 
     result = (
-      f"<!DOCTYPE hmtl><html><head>{RENDER_UTIL.STYLE()}<title>{D.title}</title></head>"
+      f"<!DOCTYPE hmtl><html><head>{RENDER_UTIL.STYLE()}<title>{D['title']}</title></head>"
       f"<body>{bar}<div class=\"content\">"
-        f'<h1 class="title">{D.title}</h1>'
-        f"{D.content}"
+        f"<h1 class='title'>{D['title']}</h1>"
+        f"{D['content']}"
       f"</div></body></html>"
     )
     return Response(result, mimetype="text/html")

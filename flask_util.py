@@ -34,3 +34,7 @@ class FLASK_UTIL:
   @staticmethod
   def HOST():
     return request.headers["Host"]  # like 192.37.37.3:5000
+
+  @staticmethod
+  def ESCAPE(s):
+    return str(escape(s))

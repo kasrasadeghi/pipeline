@@ -124,7 +124,7 @@ class DEBUG:
       f'</form>'
       f"<pre>DEBUG LOG: \n</pre>" + "".join(map(render_log_entry, DEBUG._GLOBAL_LOG))
     )
-    return RENDER.base_page(DICT(content, title="DEBUG LOG", bar=""))
+    return RENDER.base_page({'content': content, 'title': "DEBUG LOG"})
 
   @staticmethod
   def CONTENT():
@@ -233,4 +233,4 @@ def debug_headers():
   acc.append("request.url_root: " + request.url_root)
   content = "<pre>" + str(escape(str('\n'.join(acc)))) + "</pre>"
   title = "request headers"
-  return RENDER.base_page(DICT(title, content, bar=''))
+  return RENDER.base_page({'title': title, 'content': content})

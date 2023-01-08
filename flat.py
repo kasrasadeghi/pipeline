@@ -299,7 +299,7 @@ class FLAT_RENDER:
               f"{content}{forward_links}"
               # f"{backlinks}"
               "</pre>")
-    return RENDER.base_page(DICT(title, bar, content=result))
+    return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
   @classmethod
   def INDEX(R):
@@ -318,7 +318,7 @@ class FLAT_RENDER:
     title = FLAT.title(note)
     result = (f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
               f"{content}\n<pre>{lines_of_code}</pre></div>")
-    return RENDER.base_page(DICT(title, bar, content=result))
+    return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
   @classmethod
   def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
@@ -331,7 +331,7 @@ class FLAT_RENDER:
       columns = "".join(map(lambda x: f"<td style={td_style}>" + x + "</td>", colsfunc(i)))
       content += f'\n<tr><td style={td_style}><a href="{linkfunc(i)}">{namefunc(i)}</a></td>{columns}</li></tr>'
     content += "\n</table>"
-    return RENDER.base_page(DICT(title, content, bar=None))
+    return RENDER.base_page({"title": title, 'content': content})
 
 # END FLAT RENDER
 
