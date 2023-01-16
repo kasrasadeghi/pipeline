@@ -49,9 +49,9 @@ kaz_import('graph.py')
 
 kaz_import('debug.py')
 kaz_import('pretty.py')
+kaz_import('latency.py')
 
 kaz_import('fbconv.py')
-
 
 # END IMPORTS
 
