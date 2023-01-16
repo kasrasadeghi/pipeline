@@ -180,7 +180,7 @@ class BLOG_TREE:
       return (len(L) >= 1 and L[0] in {'$', '|', '+', '#'})
 
     LOG(block)
-    if not any(line_check(l['value']) for l in block):
+    if not any('value' in l and line_check(l['value']) for l in block):
       return block
 
     result = list()
