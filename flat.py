@@ -316,7 +316,7 @@ class FLAT_RENDER:
 
     # compose html
     title = FLAT.title(note)
-    result = (f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
+    result = (f"<div class='msgbox'>"
               f"{content}\n<pre>{lines_of_code}</pre></div>")
     return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 

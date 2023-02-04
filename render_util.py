@@ -32,9 +32,14 @@ class RENDER_UTIL:
        body { margin: 0; background: """ + body_background_color + """; }
        .content { padding: 5px; margin: """ + navbar_size + """ 1% 1% 1%; height: calc(100vh - """ + navbar_size + """ - 10px); }
        :target { scroll-margin-top: """ + navbar_size + """; }
-       .msgbox { margin: 0px;
-             display: flex; flex-direction: column;
-             align-content: stretch; align-items: flex-start; }
+       .msgbox {
+         margin: 0px;
+         display: flex;
+         flex-direction: column;
+         align-content: stretch;
+         align-items: flex-start;
+         font-feature-settings: "liga" 0
+       }
        pre { margin: 0px; color: """ + base_text_color + """; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; }
