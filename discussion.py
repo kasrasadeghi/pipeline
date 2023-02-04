@@ -41,7 +41,7 @@ class DISCUSSION_RENDER:
     # compose html
     title = FLAT.title(note)
     result = (
-      f"<div class=\"msgbox\" style='font-feature-settings: \"liga\" 0'>"
+      f"<div class='msgbox'>"
       f"{content}</div>"
       f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
     )
