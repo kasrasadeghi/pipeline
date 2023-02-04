@@ -26,15 +26,6 @@ class SEARCH:
                + content)
     return RENDER.base_page({'title': 'search', 'content': content})
 
-  @staticmethod
-  def msg(msg):
-    origin = msg['origin']
-    date = msg['date']
-
-    return (f'<a href="/disc/{origin}#{date}">'
-            + DISCUSSION_RENDER.msg(msg) +
-            '</a>')
-
 @app.route('/search')
 def get_search():
   if 'content' in request.args:
@@ -66,7 +57,7 @@ def get_search_with_query(query):
         acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
         current_note = msg['origin']
       msg_count += 1
-      acc.append(SEARCH.msg(msg))
+      acc.append(DISCUSSION_RENDER.msg(msg))
   content = "".join(acc)
 
   DEBUG.set_state("content size", len(content))
