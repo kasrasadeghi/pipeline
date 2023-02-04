@@ -37,7 +37,8 @@ class RENDER_UTIL:
              align-content: stretch; align-items: flex-start; }
        pre { margin: 0px; color: """ + base_text_color + """; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
-       .msg_timestamp { border-radius: 18px; color: rgb(230, 50, 120); }
+       .msg_timestamp { border-radius: 18px; }
+       .msg_timestamp > a { color: rgb(230, 50, 120); }
        .msg_content {
          display: inline-block;
          padding: 7px 12px 8px 12px;

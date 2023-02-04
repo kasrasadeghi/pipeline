@@ -56,9 +56,11 @@ class DISCUSSION_RENDER:
     timerender = kwargs.get('timerender', None)
     msg_indent = kwargs.get('msg_indent', '')
 
-    # try:
     msg_date = DISCUSSION.date(msg)
     msg_content = RENDER.line(DISCUSSION_RENDER.msg_content(msg), **kwargs)
+    msg_origin = ''
+    if 'origin' in msg:
+      msg_origin = '/disc/' + msg['origin']
 
     if timerender:
       date = timerender(msg_date)
@@ -67,7 +69,7 @@ class DISCUSSION_RENDER:
 
     return (
       f'<div id="{msg_date}" class="msg">'
-      f'<div class="msg_timestamp">{date}</div>'
+      f'<div class="msg_timestamp"><a href="{msg_origin}#{msg_date}"/>{date}</a></div>'
       f'<div class="msg_container">{msg_indent}<div class="msg_content">{msg_content}</div></div>'
       #f'<div>{str(TAG.parse(DISCUSSION_RENDER.msg_content(msg)))}</div>'
       f'</div>'
