@@ -2,7 +2,7 @@ class JOURNAL_RENDER:
   @staticmethod
   def METADATA(metadata, **kwargs):
     """ @param metadata - must be parsed metadata"""
-    return (f"<pre>Journal for {metadata['Title']}\n"
+    return (f"<pre>Journal for {JOURNAL.date_to_parts(metadata['Date'])['brief_weekday']}, {metadata['Title']}\n"
             f"- created at {util.date_cmd('-d', metadata['Date'], '+%T %Z')}\n"
             f'- see the day <a href="/before">before</a> <a href="/after">after</a>'
             f"</pre>")
@@ -17,9 +17,9 @@ class JOURNAL:
   def date_to_parts(date_str):
     day_of_month = util.date_cmd("-d", date_str, "+%e")
     day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
-    month, year = util.date_cmd("-d", date_str, "+%B %Y").split()
+    brief_weekday, month, year = util.date_cmd("-d", date_str, "+ %a %B %Y").split()
     title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
-    return {'day_of_month': day_of_month, 'day_of_month_suffix': day_of_month_suffix, 'month': month, 'year': year, 'title': title}
+    return {'day_of_month': day_of_month, 'day_of_month_suffix': day_of_month_suffix, 'month': month, 'year': year, 'title': title, 'brief_weekday': brief_weekday}
 
   @staticmethod
   def date_to_title(date_str):
