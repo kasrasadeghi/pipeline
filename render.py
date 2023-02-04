@@ -197,9 +197,11 @@ class RENDER:
 
     result = (
       f"<!DOCTYPE hmtl><html><head>{RENDER_UTIL.STYLE()}<title>{D['title']}</title></head>"
-      f"<body>{bar}<div class=\"content\">"
+      f"<body>"
+        f"{bar}"
+        f"<div class=\"content\">"
         f"<h1 class='title'>{D['title']}</h1>"
-        f"{D['content']}"
+        f"<main id='main'>{D['content']}</main>"
       f"</div></body></html>"
     )
     return Response(result, mimetype="text/html")
