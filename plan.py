@@ -66,4 +66,4 @@ def get_plan_note(note):
     return redirect(FLAT.to_url(note, view='daily'))
 
   DEBUG.init_state()
-  return RENDER.root(note, render_section=PLAN_RENDER.section)
+  return DISCUSSION_RENDER.MAIN(note, render_section=PLAN_RENDER.section)

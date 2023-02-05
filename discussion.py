@@ -30,8 +30,8 @@ class DISCUSSION:
 
 class DISCUSSION_RENDER:
   @staticmethod
-  def MAIN(note):
-    content = RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)))
+  def MAIN(note, **kwargs):
+    content = RENDER.content(note, **kwargs)
 
     bar = FLAT_RENDER._bar(note,
                            f'<a href="/note/{note}">note</a>'
