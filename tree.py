@@ -110,3 +110,8 @@ def test_render_trim_and_squash(note):
     new_page.append(new_S)
 
   return DEBUG.TEXT('test_parse', TREE.dump_tree(new_page))
+
+@app.route('/api/parse/<note>')
+def api_parse(note):
+  page = PARSER.parse_file(FLAT.to_path(note))
+  return {'note': note, 'page': page}

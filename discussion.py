@@ -43,7 +43,10 @@ class DISCUSSION_RENDER:
     result = (
       f"<div class='msgbox'>"
       f"{content}</div>"
-      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
+      f"<script src='/js/disc.js'></script>"
+      f'<form onsubmit="return handle_msg(event);" method="post">'
+        f'<input class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
+      f'</form>'
     )
     return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
