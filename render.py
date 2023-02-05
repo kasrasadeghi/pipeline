@@ -169,25 +169,6 @@ class RENDER:
     return RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)), **kwargs)
 
   @staticmethod
-  def root(note, **kwargs):
-    # LOG('RENDER.root')
-    content = RENDER.content(note, **kwargs)
-
-    bar = FLAT_RENDER._bar(note,
-                           f'<a href="/disc/{note}">disc</a>'
-                           )
-
-    # compose html
-    title = FLAT.title(note)
-    result = (
-      f"<div class='msgbox'>"
-      f"{content}</div>"
-      f'<form method="post"><input class="msg_input" autocomplete="off" autofocus type="text" name="msg"></form>'
-    )
-    return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
-
-
-  @staticmethod
   def base_page(D):
     """ D is a dict with keys: { title, bar, content } """
     if 'bar' not in D or D['bar'] is None or D['bar'] == "":
