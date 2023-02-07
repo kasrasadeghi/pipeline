@@ -1,6 +1,4 @@
 class ADV_TREE_PARSER:
-  INDENT_TOPLEVEL = -1
-
   @staticmethod
   def process_block(B, **kwargs):
     if ADV_TREE_PARSER.might_be_tree(B, **kwargs):
