@@ -72,7 +72,7 @@ class DISCUSSION_RENDER:
 
     return (
       f'<div id="{msg_date}" class="msg">'
-      f'<div class="msg_timestamp"><a href="{msg_origin}#{msg_date}"/>{date}</a></div>'
+      f'<a class="msg_timestamp" href="{msg_origin}#{msg_date}"/>{date}</a>'
       f'<div class="msg_container">{msg_indent}<div class="msg_content">{msg_content}</div></div>'
       #f'<div>{str(TAG.parse(DISCUSSION_RENDER.msg_content(msg)))}</div>'
       f'</div>'
