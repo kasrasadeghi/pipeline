@@ -13,7 +13,7 @@ class EDIT_RENDER:
       linecount = el.innerHTML.split(/\\n/).length;
       el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
     }
-    window.onload = () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight };
+    window.addEventListener('load', () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });
     """
 
     bar = FLAT_RENDER._bar(note,
