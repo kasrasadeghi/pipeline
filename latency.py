@@ -16,7 +16,7 @@ def test_latency():
              document.getElementById('content-result').innerHTML = JSON.stringify(data, null, 2);
           });
       }
-      window.onload(() => {
+      window.addEventListener('load', () => {
         test_latency();
       });
     </script>"""
