@@ -3,6 +3,14 @@ def get_pagesize():
   # ideas:
   content = (
     """<script>
+      window.addEventListener('load', () => {
+        let url = new URL(window.location);
+        let path = url.searchParams.get('url');
+        if (path)
+          document.getElementById('path_input').value = path;
+        test_pagesize();
+      });
+
       function test_pagesize() {
         const start = performance.now();
         const path = document.getElementById('path_input').value;
@@ -12,6 +20,9 @@ def get_pagesize():
         const escapeHtml = (unsafe) => {
           return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
         };
+        let url = new URL(window.location);
+        url.searchParams.set('url', path);
+        window.history.pushState({}, '', url);
         fetch(path)
           .then((res) => res.text())
           .then((data) => {
@@ -21,15 +32,20 @@ def get_pagesize():
              document.getElementById('content-result').innerHTML = escapeHtml(data);
           })
           .catch((err) => {
-             docuemnt.getElementById('content-result').innerHTML = err;
+             document.getElementById('content-result').innerHTML = err;
           });
+        event.preventDefault();
       }
-      window.addEventListener('load', () => {
-        test_pagesize();
-      });
+
+      function huh() {
+        console.log('huh');
+      }
     </script>"""
-    "<input style='color:black' type=text name='path' id='path_input' value='/test/latency/ping'></input>"
-    "<button style='color:black' onclick='test_pagesize()'>test pagesize and latency</button>"
+    "<form onsubmit='test_pagesize()'>"
+      "<input type=text style='color:black' name='path' id='path_input' value='/test/latency/ping'></input>"
+      "<br/>"
+      "<input type=submit style='color:black' value='test pagesize and latency'></input>"
+    "</form>"
     "<p id='url-requested'>result:<p>"
     "<p id='size-result'>size:<p>"
     "<p id='latency-result'>ping:<p>"
