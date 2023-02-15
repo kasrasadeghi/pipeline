@@ -22,9 +22,11 @@ def get_profile_target(dump):
   outputstream = io.StringIO()
   import pstats
   p = pstats.Stats(filename, stream=outputstream)
-  p.strip_dirs()
-  p.sort_stats(-1)
+  # p.strip_dirs()
+  p.sort_stats('cumulative')
   p.print_stats()
+  p.print_callers()
+  p.print_callees()
   return outputstream.getvalue()
 
 @app.route('/test/profile')
@@ -51,10 +53,17 @@ def get_profile_data_viewer():
         event.preventDefault();
       }
       function refresh_profiles() {
-        // TODO
+        fetch('/api/profile-dumps')
+          .then((res) => res.text())
+          .then((data) => {
+             document.getElementById('select-profile').innerHTML = data;
+          })
+          .catch((err) => {
+             document.getElementById('content-result').innerHTML = err;
+          });
         event.preventDefault();
       }
-      function clear_profiles() {
+      function clear_profile_folder() {
         // TODO
         refresh_profiles();
         event.preventDefault();
@@ -67,9 +76,8 @@ def get_profile_data_viewer():
       "<br/>"
       "<input type=button value='get profile' onclick='get_profile()'></input>"
       "<input type=button value='refresh profile targets' onclick='refresh_profiles()'></input>"
-      "<input type=button value='clear profiles folder' onclick='clear_profiles()'></input>"
     "</form>"
-    "<p id='profile-requested'>result:<p>"
+    "<p id='profile-requested'>no result yet<p>"
     "<pre id='content-result'></pre>"
   )
   return RENDER.base_page({'title': 'Profiler Output', 'content': content})
