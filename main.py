@@ -8,6 +8,8 @@ from subprocess import check_output
 from flask import Flask, Response, render_template, escape, request, redirect
 
 app = Flask(__name__)
+from werkzeug.middleware.profiler import ProfilerMiddleware
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[], profile_dir='profile-dumps')
 
 def kaz_import(filepath):
   with open(filepath) as f:
@@ -52,6 +54,7 @@ kaz_import('debug.py')
 kaz_import('pretty.py')
 kaz_import('latency.py')
 kaz_import('pagesize.py')
+kaz_import('profiler.py')
 
 kaz_import('fbconv.py')
 
