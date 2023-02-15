@@ -16,6 +16,10 @@ class SIDEBAR:
           {RENDER_UTIL.button(action='/search', name='Search', method='GET')}
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
+          <a class="link-button" href='javascript:void(0)'>
+            <input onclick="store_preventing()" type="checkbox" id="prevent-default" name="prevent-default" value="Boat">
+            <label for="prevent-default">prevent default</label>
+          </a>
           <br/>
           <ul>""" + "<br/>".join(map(render_forward, forward_link_list)) + """</ul>
         </div>

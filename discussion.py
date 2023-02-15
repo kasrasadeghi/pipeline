@@ -43,8 +43,9 @@ class DISCUSSION_RENDER:
     result = (
       f"<div class='msgbox'>"
       f"{content}</div>"
+      f"<div class='msgbox' id='message-queue'></div>"
       f"<script src='/js/disc.js'></script>"
-      f'<form onsubmit="return handle_msg(event);" method="post">'
+      f'<form onsubmit="handle_msg(event, \'{note}\')" method="post">'
         f'<input class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
       f'</form>'
     )
