@@ -29,7 +29,6 @@ kaz_import('render_util.py')
 kaz_import('sidebar.py')
 kaz_import('git.py')
 kaz_import('tag.py')
-kaz_import('pagesize.py')
 kaz_import('js.py')
 
 kaz_import('search.py')
@@ -52,6 +51,7 @@ kaz_import('graph.py')
 kaz_import('debug.py')
 kaz_import('pretty.py')
 kaz_import('latency.py')
+kaz_import('pagesize.py')
 
 kaz_import('fbconv.py')
 
