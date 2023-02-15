@@ -36,10 +36,6 @@ def get_pagesize():
           });
         event.preventDefault();
       }
-
-      function huh() {
-        console.log('huh');
-      }
     </script>"""
     "<form onsubmit='test_pagesize()'>"
       "<input type=text style='color:black' name='path' id='path_input' value='/test/latency/ping'></input>"
