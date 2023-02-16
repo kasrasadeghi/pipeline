@@ -111,7 +111,7 @@ class DISCUSSION_RENDER:
       # we're handling a message
       msg = block[0]
 
-      day_of_msg = util.date_cmd("-d", DISCUSSION.date(msg), "+%b %d %Y")
+      day_of_msg = util.date_cmd("-d", DISCUSSION.date(msg), "+%b %e %Y")
       # we found a new day
       if current_day != day_of_msg:
         days.append({'day': day_of_msg, 'pre_roots': list(), 'roots': list()})
