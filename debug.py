@@ -90,9 +90,6 @@ class DEBUG:
   def LOG(s):
     if DEBUG._STATE:
       DEBUG._STATE['LOG'].append(s)
-    else:
-      print("stateless ", end='')
-    print("LOG: " + str(s))
     if DEBUG._GLOBAL_LOG_ENABLED:
       parent_frame = DEBUG.first_nondebug_frame(lambda f: f.f_code.co_name == 'LOG')
       DEBUG._GLOBAL_LOG.append({"i": len(DEBUG._GLOBAL_LOG), "frame": DEBUG.frameinfo(parent_frame), "content": s})

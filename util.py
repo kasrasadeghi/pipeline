@@ -27,8 +27,13 @@ class util:
     clean_time = check_output(["date", "-d", time, "-u", "+%a %b %d %T %Z %Y"]).decode('utf8').strip()
     return datetime.datetime.strptime(clean_time, "%a %b %d %H:%M:%S %Z %Y")
 
-  @classmethod
-  def date_cmd(_, *l):
+  @staticmethod
+  def date_cmd(*l):
+    match l:
+      case ['-d', date, output_pattern]:
+        if (x := fastparse_datetime(date, l[2])):
+          return x
+
     return check_output(["date", *l]).decode('utf8').strip()
 
   @classmethod
