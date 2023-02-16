@@ -15,9 +15,8 @@ class JOURNAL:
 
   @staticmethod
   def date_to_parts(date_str):
-    day_of_month = util.date_cmd("-d", date_str, "+%e")
+    day_of_month, brief_weekday, month, year = util.date_cmd("-d", date_str, "+%e %a %B %Y").split()
     day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
-    brief_weekday, month, year = util.date_cmd("-d", date_str, "+ %a %B %Y").split()
     title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
     return {'day_of_month': day_of_month, 'day_of_month_suffix': day_of_month_suffix, 'month': month, 'year': year, 'title': title, 'brief_weekday': brief_weekday}
 
