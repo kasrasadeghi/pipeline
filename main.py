@@ -9,7 +9,7 @@ from flask import Flask, Response, render_template, escape, request, redirect
 
 app = Flask(__name__)
 from werkzeug.middleware.profiler import ProfilerMiddleware
-app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[], profile_dir='profile-dumps')
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, stream=None, profile_dir='profile-dumps')
 
 def kaz_import(filepath):
   with open(filepath) as f:
@@ -32,6 +32,7 @@ kaz_import('sidebar.py')
 kaz_import('git.py')
 kaz_import('tag.py')
 kaz_import('js.py')
+kaz_import('pattern.py')
 
 kaz_import('flat.py')
 kaz_import('search.py')
