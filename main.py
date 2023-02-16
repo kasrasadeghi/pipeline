@@ -55,6 +55,7 @@ kaz_import('pretty.py')
 kaz_import('latency.py')
 kaz_import('pagesize.py')
 kaz_import('profiler.py')
+kaz_import('unit_tests.py')
 
 kaz_import('fbconv.py')
 
