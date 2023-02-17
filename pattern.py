@@ -1,8 +1,9 @@
-def deformat_pattern(text, pattern):
+def pattern_scatter(text, pattern, keys):
   """
   motivational example:
   'Tue Feb 04 20:59:49 PST 2023'
   'WWW mmm DD HH:MM:SS ZZZ YYYY'
+  'WmDHMSZY'
   """
 
   if len(text) != len(pattern):
@@ -11,7 +12,7 @@ def deformat_pattern(text, pattern):
   from collections import defaultdict
   result = defaultdict(lambda: '')
   for a, match in zip(text, pattern):
-    if match.isalpha():
+    if match in keys:
       result[match] += a
     else:
       if a != match:
@@ -41,9 +42,10 @@ def fastparse_datetime(date, output_pattern):
   }
 
   # %e is day of month with spaces as left padding instead of a zero, i.e. ' 4' instead of '04'
+  # %d uses zero padding, so '04'
   #                              "+%a %b %e %T %Z %Y"
   #                              "+%a %b %e %H:%M:%S %Z %Y"
-  if (x := deformat_pattern(date, 'WWW mmm DD HH:MM:SS ZZZ YYYY')) != False:
+  if (x := pattern_scatter(date, 'WWW mmm DD HH:MM:SS ZZZ YYYY', 'WmDHMSZY')) != False:
     match output_pattern:
       # used for a concise timestamp on the page
       case '+%T':
