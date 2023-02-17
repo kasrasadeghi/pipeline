@@ -146,6 +146,7 @@ class RENDER_UTIL:
        .link-button:active { color: """ + link_button_color['hover'] + """; }
 
        .msg_input { background: """ + input_background_color + """;width: -webkit-fill-available; margin: 5px}
+       input[type=text].msg_input { color: """ + base_text_color + """}
 
        /* sidebar */
 
