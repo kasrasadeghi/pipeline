@@ -15,6 +15,7 @@ class RENDER_UTIL:
     body_background_color= "#222"
     banner_color = "#aaa"
     sidebar_animation_time = "0.1s"
+    desktopview_device_width_threshold = '1034px'
 
     meta_tags = ", ".join([
       'height=device-height',
@@ -185,13 +186,13 @@ class RENDER_UTIL:
        /* end sidebar */
 
        /* phones */
-       @media (max-aspect-ratio: 5/4) {
+       @media (max-width: """ + desktopview_device_width_threshold + """) {
          .msg { flex-direction: column; align-items: flex-start; }
          .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
        }
 
        /* desktop */
-       @media (min-aspect-ratio: 5/4) {
+       @media (min-width: """ + desktopview_device_width_threshold + """) {
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 0px; }
        }
