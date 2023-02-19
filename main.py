@@ -1,8 +1,7 @@
 import os  # listdir, stat
 import os.path  # isfile
 import sys  # argv
-import json  # load, dump
-import datetime
+import json  # load, dump, dumps
 from subprocess import check_output
 
 from flask import Flask, Response, render_template, escape, request, redirect
