@@ -114,4 +114,5 @@ def test_render_trim_and_squash(note):
 @app.route('/api/parse/<note>')
 def api_parse(note):
   page = PARSER.parse_file(FLAT.to_path(note))
-  return {'note': note, 'page': page}
+  result = {'note': note, 'page': page}
+  return json.dumps(result)
