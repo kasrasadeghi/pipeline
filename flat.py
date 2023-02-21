@@ -183,7 +183,7 @@ class FLAT:
     if '' == form['msg']:
       return
 
-    msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n"
+    msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n\n"
 
     FLAT.append_to_note(note, msg)
 
