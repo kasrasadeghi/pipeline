@@ -91,11 +91,8 @@ class BLOG_RENDER:
   @staticmethod
   def bar():
     note = BLOG.root
-    return FLAT_RENDER._bar(
-      note,
-      f'<a href="/note/{note}">note</a>'
-      f'<a href="/edit/{note}">edit</a>'
-    )
+    return RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
+                           f'<a href="/edit/{note}">edit</a>')
 
   @staticmethod
   def ROOT_CONTENT(view):

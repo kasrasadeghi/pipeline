@@ -33,10 +33,8 @@ class DISCUSSION_RENDER:
   def MAIN(note, **kwargs):
     content = RENDER.content(note, **kwargs)
 
-    bar = FLAT_RENDER._bar(note,
-                           f'<a href="/note/{note}">note</a>'
-                           f'<a href="/edit/{note}">edit</a>'
-                           )
+    bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
+                          f'<a href="/edit/{note}">edit</a>')
 
     # compose html
     title = FLAT.title(note)
