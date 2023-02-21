@@ -30,7 +30,8 @@ def test_fbconv(note):
               speakers['current'] = 'right'
               acc.append('<span style="color:#88f">' + str(l) + "</span><br/>")
             continue
-          acc.append("&nbsp;&nbsp;" + l + "<br/>")
+          if isinstance(l, str): # TODO render "dict()" as well or just put this into /disc/ mode
+            acc.append("&nbsp;&nbsp;" + l + "<br/>")
 
     return "\n".join(acc)
 
