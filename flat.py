@@ -60,6 +60,10 @@ class FLAT:
   def to_path(cls, note):
     return cls.path + "/" + note
 
+  @classmethod
+  def from_path(cls, path):
+    return util.basename(path)
+
   @staticmethod
   def find_note_with_title(title):
     for n in FLAT.list():
@@ -95,17 +99,17 @@ class FLAT:
 
     return None, url
 
-  @classmethod
-  def exists(cls, note):
-    return os.path.isfile(cls.to_path(note))
+  @staticmethod
+  def exists(note):
+    return os.path.isfile(FLAT.to_path(note))
 
-  @classmethod
-  def get_index(cls):
+  @staticmethod
+  def get_index():
     return "4e0ce4ff-1663-49f9-8ced-30f91202ae08.note"  # hardcoded value, CONSIDER looking for "index" in Tags
 
-  @classmethod
-  def init_note(cls, note, title):
-    with open(cls.to_path(note), "w+") as f:
+  @staticmethod
+  def init_note(note, title):
+    with open(FLAT.to_path(note), "w+") as f:
       f.write("--- METADATA ---\n")
       f.write("Date: ")
       f.write(util.get_current_time())
@@ -125,8 +129,10 @@ class FLAT:
 
   @classmethod
   def metadata(cls, note):
+    if note.startswith(cls.path):
+      note = FLAT.from_path(note)
     if not FLAT.exists(note):
-      raise FileNotFoundError(f"metadata does not exist for note '{note}'")
+      raise FileNotFoundError(f"cannot parse metadata for note '{note}'")
 
     with open(cls.to_path(note)) as f:
       reading = False
@@ -317,7 +323,10 @@ class FLAT_RENDER:
     return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
   @classmethod
-  def LIST(R, items, title, linkfunc, colsfunc=lambda x: tuple(), namefunc=lambda x: x):
+  def LIST(R, items, title,
+           linkfunc=lambda x: FLAT.to_url(x, view='disc'),
+           colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
+           namefunc=FLAT.title):
     """
     @param colsfunc - returns content for the other columns in this item's row in a list
     """
@@ -334,35 +343,24 @@ class FLAT_RENDER:
 @app.route("/all")
 def get_all():
   return FLAT_RENDER.LIST(FLAT.list(), title="Notes", linkfunc=FLAT.to_url,
-                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=FLAT.title)
+                          colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
+                          namefunc=FLAT.title)
 
 @app.route("/recents")
 def recents():
-  return FLAT_RENDER.LIST(reversed(util.sort_recent(files=FLAT.list(),
-                                        root_path=FLAT.path)),
-                     title="Recent Notes",
-                     linkfunc=lambda x: FLAT.to_url(x, view='disc'),
-                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=FLAT.title)
+  return FLAT_RENDER.LIST(reversed(util.sort_mtime(map(FLAT.to_path, FLAT.list()))),
+                          title="Recently Edited Notes")
 
 @app.route("/creation")
 def creation():
   """returns a list of notes by creation date"""
   return FLAT_RENDER.LIST(reversed(FLAT.list_by_create_date()),
-                     title="Recent Notes",
-                     linkfunc=FLAT.to_url,
-                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=FLAT.title)
-
+                          title="Notes by Create Date")
 
 @app.route("/tag/<tag>")
 def tag(tag):
   return FLAT_RENDER.LIST(reversed([x for x in FLAT.list_by_create_date() if 'Tags' in FLAT.metadata(x) and tag in set(FLAT.metadata(x)['Tags'].split())]),
-                     title="Tag: " + tag,
-                     linkfunc=FLAT.to_url,
-                     colsfunc=lambda x: (FLAT.metadata(x)['Date'],),
-                     namefunc=FLAT.title)
+                          title="Tag: " + tag)
 
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
