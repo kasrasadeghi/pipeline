@@ -140,18 +140,12 @@ class FLAT:
 
     sections = PARSER.parse_file(path)
     assert sections[-1]['section'] == 'METADATA'
-
-    result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in sections[-1]['lines'] if x != '']}
-    return result
+    return FLAT.parse_metadata_from_section(sections[-1])
 
   @staticmethod
-  def metadata_section(section):
-    metadata_section = "\n".join(map(
-      lambda x: "\n".join(x),
-      section['blocks']))
-    metadata = {p[0]: p[1].strip() for p in
-                [x.split(":", 1) for x in metadata_section.split('\n') if x]}
-    return metadata
+  def parse_metadata_from_section(section):
+    return {p[0]: p[1].strip() for p in
+              [x.split(":", 1) for x in section['lines'] if x != '']}
 
   @classmethod
   def title(cls, note):

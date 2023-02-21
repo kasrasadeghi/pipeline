@@ -151,7 +151,7 @@ class RENDER:
 
     if section['section'] == 'METADATA':
       if JOURNAL.is_journal(section):
-        return JOURNAL_RENDER.METADATA(FLAT.metadata_section(section), **kwargs)
+        return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
 
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):
