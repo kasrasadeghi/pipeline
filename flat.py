@@ -110,10 +110,10 @@ class FLAT:
   @staticmethod
   def init_note(note, title):
     with open(FLAT.to_path(note), "w+") as f:
-      f.write("--- METADATA ---\n")
-      f.write("Date: ")
-      f.write(util.get_current_time())
-      f.write(f"\nTitle: {title}\n")
+      f.write("--- METADATA ---\n"
+              f"Date: {util.get_current_time()}\n"
+              f"Title: {title}\n")
+      f.flush()
 
   @staticmethod
   def make_new(title):
