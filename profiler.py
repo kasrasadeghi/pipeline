@@ -1,9 +1,11 @@
 # NOTE this file cannot be called "profile.py" because python won't be able to distinguish it from the builtin 'profile' module
 # see: https://github.com/google/ci_edit/issues/192#issuecomment-517118503
 
-@app.route('/api/profile-dumps')
-def get_profile_targets():
-  dumps = os.listdir('profile-dumps')
+@app.route('/api/profile-dumps', defaults={'profile_dir': 'profile-dumps'})
+@app.route('/api/saved-profile-dumps', defaults={'profile_dir': 'saved-profile-dumps'})
+def get_profile_targets(profile_dir='profile-dumps'):
+  dumps = os.listdir(profile_dir)
+  print(profile_dir)
   get_timestamp = lambda x: x.rsplit('.', 2)[1]
   dumps.sort(key=get_timestamp)
   dumps.reverse()
@@ -19,7 +21,7 @@ def get_profile_targets():
     duration_acc.append(int(ms))
     LOG({'filename': filename})
     acc.append(f"     <option value='{filename}'>{get_timestamp(filename)}: {filename}</option>")
-  return {'options': "\n".join(acc), 'average': sum(duration_acc[:10]) / len(duration_acc[:10])}
+  return {'options': "\n".join(acc), 'average': 0 if len(acc) == 0 else sum(duration_acc[:10]) / len(duration_acc[:10])}
 
 @app.route('/api/profile-dump/<dump>')
 def get_profile_target(dump):
@@ -36,6 +38,23 @@ def get_profile_target(dump):
   p.print_callers()
   p.print_callees()
   return FLASK_UTIL.ESCAPE(outputstream.getvalue())
+
+@app.route('/api/clear-unsaved-profiles')
+def clear_unsaved_profiles():
+  assert util.basename(os.getcwd()) == 'notes-website', f"'{os.getcwd()}' is not 'notes-website'"
+  assert 'profile-dumps' in os.listdir()
+  import subprocess
+  subprocess.run('rm profile-dumps/*', shell=True)
+  return 'DONE'
+
+@app.route('/api/save-profile/<dump>')
+def save_profile_target(dump):
+  filename = os.path.join('profile-dumps', dump)
+  destination = os.path.join('saved-profile-dumps', dump)
+
+  import shutil
+  shutil.copy2(filename, destination)  # copy and preserve metadata
+  return 'DONE'
 
 @app.route('/test/profile')
 def get_profile_data_viewer():
@@ -65,24 +84,53 @@ def get_profile_data_viewer():
           });
         event.preventDefault();
       }
+      function save_profile() {
+        const selected_profile = document.getElementById('select-profile').value;
+        const use_saved = document.getElementById('use-saved').checked;
+
+        let url = new URL(window.location);
+        url.searchParams.set('profile', selected_profile);
+        url.searchParams.set('saved', use_saved);
+        window.history.pushState({}, '', url);
+        fetch('/api/save-profile/' + selected_profile)
+          .then((res) => res.text())
+          .then((data) => {
+            if (data === 'DONE') { alert('successfully saved profile'); }
+            refresh_profiles();
+            get_profile();
+          })
+        event.preventDefault();
+      }
       function refresh_profiles() {
-        let url = new URL('/api/profile-dumps', window.location.origin);
+        const use_saved = document.getElementById('use-saved').checked;
         const prefix = document.getElementById('prefix').value;
+
+        const route = use_saved ? '/api/saved-profile-dumps' : '/api/profile-dumps';
+        let url = new URL(route, window.location.origin);
         url.searchParams.set('prefix', prefix);
+
+        let new_history = new URL(window.location);
+        new_history.searchParams.set('prefix', prefix);
+        new_history.searchParams.set('saved', use_saved);
+        window.history.pushState({}, '', new_history);
+
         fetch(url.href)
           .then((res) => res.json())
           .then((data) => {
              document.getElementById('select-profile').innerHTML = data['options'];
              document.getElementById('profile-average').innerHTML = data['average'];
-          })
-          .catch((err) => {
-             document.getElementById('content-result').innerHTML = err;
           });
-        event.preventDefault();
+        if (event) {
+          event.preventDefault();
+        }
       }
-      function clear_profile_folder() {
-        // TODO
-        refresh_profiles();
+      function clear_profiles() {
+        fetch('/api/clear-unsaved-profiles')
+          .then((res) => res.text())
+          .then((data) => {
+             if (data === 'DONE') { alert('successfully cleared unsaved profiles'); }
+             refresh_profiles();
+          });
         event.preventDefault();
       }
     </script>"""
@@ -92,11 +140,17 @@ def get_profile_data_viewer():
       "</select>"
       "<br/>"
       "<input type=button value='get profile' onclick='get_profile()'></input>"
+      "<input type=button value='save profile' onclick='save_profile()'></input>"
     "</form>"
     "<form>"
-      "<label for='prefix' value='filter prefix'></label>"
+      "<label for='prefix'>filter prefix</label>"
       "<input type=text value='' id='prefix' onsubmit='refresh_profiles()()'></input>"
       "<input type=button value='refresh profile targets' onclick='refresh_profiles()'></input>"
+      "<input type=button value='clear unsaved profiles' onclick='clear_profiles()'></input>"
+      "<div style='margin: 0.5rem'>"
+        "<label for='use-saved'>only saved profiles</label>"
+        "<input type=checkbox id='use-saved'>"
+      "</div>"
     "</form>"
     "<p id='profile-requested'>no result yet<p>"
     "<p id='profile-average'>no average time yet<p>"

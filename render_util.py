@@ -149,6 +149,8 @@ class RENDER_UTIL:
        .msg_input { background: """ + input_background_color + """;width: -webkit-fill-available; margin: 5px}
        input[type=text].msg_input { color: """ + base_text_color + """}
 
+       input[type=checkbox] { width: 18px; height: 18px; margin: 1 3 1 3; padding: 0 }
+
        /* sidebar */
 
        .unselectable {
