@@ -33,4 +33,4 @@ class NODE:
 
       result[tag] = child_value.removeprefix(tag_prefix)
 
-    return SimpleNamespace(**result)
+    return result

@@ -43,12 +43,12 @@ class BLOG:
     blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
 
     for b in blocks:
-      if not TREE.is_singleton(b):
-        ABORT("ERROR: parsing blog post")
+      if not TREE.is_line(b):
+        ABORT(f"ERROR: block is not singleton '{b}'")
       blog_post = b[0]
       LOG(blog_post)
-      post = NODE.splay(blog_post, ['note'])
-      post.internal_name = blog_post['value']
+      post = dict()
+      post['internal_name'], post['note'] = blog_post.rsplit(': ', 2)
 
       yield post
 
@@ -68,14 +68,14 @@ class BLOG:
         ABORT(f"ERROR while parsing blog post: block '{b}' is not a singleton")
       blog_post = b[0]
       post = NODE.splay(blog_post, ['title', 'filename', 'note'])
-      post.internal_name = blog_post['value']
+      post['internal_name'] = blog_post['value']
 
       yield post
 
   @staticmethod
   def try_note_to_post(note):
     for post in BLOG.parse_postlist():
-      if post.note == note:
+      if post['note'] == note:
         return post
     ABORT(f"ERROR: post for note '{note}' not found")
 
@@ -86,7 +86,7 @@ class BLOG_RENDER:
   @staticmethod
   def link_to_post(post, view):
     # view is either "internal" or "blog"
-    return f'<a href="/{view}/posts/{post.filename}">{post.title}</a>'
+    return f"""<a href="/{view}/posts/{post['filename']}">{post['title']}</a>"""
 
   @staticmethod
   def bar():
@@ -98,7 +98,7 @@ class BLOG_RENDER:
   def ROOT_CONTENT(view):
     acc = []
     for post_slug in BLOG.parse_root():
-      blog_post = BLOG.try_note_to_post(post_slug.note)
+      blog_post = BLOG.try_note_to_post(post_slug['note'])
       acc.append("<div class='block'>" + BLOG_RENDER.link_to_post(blog_post, view) + "</div>")
     content = '\n'.join(acc)
     return content
@@ -339,7 +339,7 @@ class BLOG_COMPILE:
       title = BLOG.title()
     except Boundary as e:
       LOG(e)
-      return 404
+      return ('internal server error', 404)
 
     return BLOG_COMPILE.base_page(title, content)
 
@@ -464,15 +464,13 @@ class BLOG_COMPILE:
     """
 
 
-
 @app.route("/blog")
-@app.route("/internal", defaults={"blog_type": "internal"})
-def get_blog(blog_type = None):
-  DEBUG.init_state()
-  if blog_type == "internal":
-    return BLOG_RENDER.ROOT()
-  else:
-    return BLOG_COMPILE.ROOT()
+def get_blog():
+  return BLOG_COMPILE.ROOT()
+
+@app.route("/internal")
+def get_internal_blog():
+  return BLOG_RENDER.ROOT()
 
 @app.route("/blog/posts/<filename>")
 @app.route("/internal/posts/<filename>", defaults={"blog_type": "internal"})
