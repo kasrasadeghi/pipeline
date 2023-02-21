@@ -113,7 +113,7 @@ class FLAT:
       f.write("--- METADATA ---\n")
       f.write("Date: ")
       f.write(util.get_current_time())
-      f.write(f"Title: {title}\n")
+      f.write(f"\nTitle: {title}\n")
 
   @staticmethod
   def make_new(title):
@@ -122,8 +122,6 @@ class FLAT:
     if FLAT.exists(FLAT.to_path(note)):
       return "/try-again"
     else:
-      with open(FLAT.to_path(note), "w+") as new_note:
-        new_note.write("")
       FLAT.init_note(note, title)
       return note
 
@@ -147,9 +145,9 @@ class FLAT:
     return {p[0]: p[1].strip() for p in
               [x.split(":", 1) for x in section['lines'] if x != '']}
 
-  @classmethod
-  def title(cls, note):
-    return cls.metadata(note)['Title']
+  @staticmethod
+  def title(note):
+    return FLAT.metadata(note)['Title']
 
   @classmethod
   def list_by_create_date(cls):
