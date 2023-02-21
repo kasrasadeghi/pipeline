@@ -51,7 +51,7 @@ class RENDER:
           return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
 
         if potentially_url.strip().endswith(".note") and \
-           len('f177969a-aa24-410d-970d-93cd1fc09678.note') == len(potentially_url.strip()):
+           FLAT.note_id_len() == len(potentially_url.strip()):
           return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
 
         if potentially_url.strip().startswith('/'):
