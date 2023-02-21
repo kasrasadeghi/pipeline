@@ -16,10 +16,8 @@ class EDIT_RENDER:
     window.addEventListener('load', () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });
     """
 
-    bar = FLAT_RENDER._bar(note,
-                           f'<a href="/note/{note}">note</a>'
-                           f'<a href="/disc/{note}">disc</a>'
-                           )
+    bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
+                          f'<a href="/disc/{note}">disc</a>')
 
     # compose html
     try:

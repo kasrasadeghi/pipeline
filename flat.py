@@ -259,11 +259,6 @@ class FLAT_RENDER:
       return ""
 
   @classmethod
-  def _bar(R, note, *extras):
-    navbar = RENDER_UTIL.nav(*extras)
-    return "".join(navbar)
-
-  @classmethod
   def NOTE(R, note):
     content = util.read_file(FLAT.to_path(note))
 
@@ -273,10 +268,8 @@ class FLAT_RENDER:
     forward_links = R._section_forward_links(note)
     # backlinks = R._section_backward_links(note)
 
-    bar = R._bar(note,
-                 f'<a href="/disc/{note}">disc</a>',
-                 f'<a href="/edit/{note}">edit</a>',
-                 )
+    bar = RENDER_UTIL.nav(f'<a href="/disc/{note}">disc</a>',
+                          f'<a href="/edit/{note}">edit</a>')
 
     # compose html
     title = FLAT.title(note)
@@ -293,11 +286,9 @@ class FLAT_RENDER:
     content = RENDER.content(note)
     lines_of_code = util.cmd("tokei", shell=True, cwd="/home/kasra/projects/notes-website")
 
-    bar = R._bar(note,
-                 f'<a href="/note/{note}">note</a>',
-                 f'<a href="/disc/{note}">disc</a>',
-                 f'<a href="/edit/{note}">edit</a>',
-                 )
+    bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>',
+                          f'<a href="/disc/{note}">disc</a>',
+                          f'<a href="/edit/{note}">edit</a>')
 
     # compose html
     title = FLAT.title(note)
