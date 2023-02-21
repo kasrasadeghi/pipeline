@@ -85,7 +85,7 @@ class FLAT:
     # I think splitlines handles weird cases with empty last lines and empty
     # front matter correctly, actually preserving them instead of randomly
     # chopping them off
-    return read_note(note).split('\n')
+    return FLAT.read_note(note).split('\n')
 
   @staticmethod
   def try_from_url(url):
