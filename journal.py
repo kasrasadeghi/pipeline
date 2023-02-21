@@ -10,7 +10,7 @@ class JOURNAL_RENDER:
 class JOURNAL:
   @staticmethod
   def is_journal(metadata_section):
-    metadata = FLAT.metadata_section(metadata_section)
+    metadata = FLAT.parse_metadata_from_section(metadata_section)
     return 'Tags' in metadata and "Journal" in metadata['Tags']
 
   @staticmethod
