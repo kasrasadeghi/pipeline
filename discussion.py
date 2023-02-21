@@ -3,9 +3,9 @@ class DISCUSSION:
   def is_msg(item):
     """ checks whether an item in a block is a msg """
     if not isinstance(item, dict):
-      LOG("ERROR: cannot check a non-dictionary:", item)
+      LOG({"ERROR: cannot check a non-dictionary:", item})
       return False
-    return item['value'].startswith('msg: ')
+    return item['value'].startswith('msg: ') and len(item['children']) == 1 and item['children'][0]['value'].startswith('Date: ')
 
   @staticmethod
   def block_is_msg(block):
@@ -25,6 +25,10 @@ class DISCUSSION:
     if isinstance(msg, list):
       LOG({'ERROR': 'msg cannot be list, you\'re probably passing in a block', 'msg': msg})
     return msg['children'][0]['value'].removeprefix('Date: ')
+
+  @staticmethod
+  def msg_content(msg):
+    return msg["value"].removeprefix("msg: ")
 # end DISCUSSION
 
 
@@ -50,16 +54,12 @@ class DISCUSSION_RENDER:
     return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
   @staticmethod
-  def msg_content(msg):
-    return msg["value"].removeprefix("msg: ")
-
-  @staticmethod
   def msg(msg, **kwargs):
     timerender = kwargs.get('timerender', None)
     msg_indent = kwargs.get('msg_indent', '')
 
     msg_date = DISCUSSION.date(msg)
-    msg_content = RENDER.line(DISCUSSION_RENDER.msg_content(msg), **kwargs)
+    msg_content = RENDER.line(DISCUSSION.msg_content(msg), **kwargs)
     msg_origin = ''
     if 'origin' in msg:
       msg_origin = '/disc/' + msg['origin']
@@ -73,7 +73,7 @@ class DISCUSSION_RENDER:
       f'<div id="{msg_date}" class="msg">'
       f'<a class="msg_timestamp" href="{msg_origin}#{msg_date}"/>{date}</a>'
       f'<div class="msg_container">{msg_indent}<div class="msg_content">{msg_content}</div></div>'
-      #f'<div>{str(TAG.parse(DISCUSSION_RENDER.msg_content(msg)))}</div>'
+      #f'<div>{str(TAG.parse(DISCUSSION.msg_content(msg)))}</div>'
       f'</div>'
     )
 
@@ -151,7 +151,7 @@ class DISCUSSION_RENDER:
               if not new_msg['value'].startswith('- '):
                 LOG({'ERROR': 'message should start with a \'- \'', 'msg': new_msg})
               new_msg['value'] = "msg: " + new_msg['value'].removeprefix('msg: -')
-              tags = tags + TAG.parse(DISCUSSION_RENDER.msg_content(new_msg))
+              tags = tags + TAG.parse(DISCUSSION.msg_content(new_msg))
               acc_children.append(render_block([new_msg], msg_indent="<span class='msg_dash'><b>-</b></span>"))
             else:
               acc_children.append(render_block(block))
