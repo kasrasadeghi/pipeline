@@ -136,14 +136,27 @@ class FLAT:
     if not FLAT.exists(note):
       raise FileNotFoundError(f"cannot parse metadata for note '{note}'")
 
-    sections = PARSER.parse_file(path)
-    assert sections[-1]['section'] == 'METADATA'
-    return FLAT.parse_metadata_from_section(sections[-1])
+    lines = FLAT.note_read_lines(note)
+
+    # find metadata
+    metadata_linenum = -1
+    for i, l in reversed(list(enumerate(lines))):
+      if l == "--- METADATA ---":
+        metadata_linenum = i
+    assert metadata_linenum != -1, "couldnt find metadata in lines:\n" + "\n".join(lines)
+
+    section = dict()
+    section['lines'] = lines[metadata_linenum+1:]
+    return FLAT.parse_metadata_from_section(section)
 
   @staticmethod
   def parse_metadata_from_section(section):
-    return {p[0]: p[1].strip() for p in
-              [x.split(":", 1) for x in section['lines'] if x != '']}
+    acc = dict()
+    for L in section['lines']:
+      if L != '':
+        key, value = L.split(":", 1)
+        acc[key] = value.strip()
+    return acc
 
   @staticmethod
   def title(note):
@@ -155,22 +168,20 @@ class FLAT:
 
   @classmethod
   def append_to_note(_, note, content):
-    # read note
-    with open(FLAT.to_path(note), "r") as f:
-      lines = f.readlines()
+    lines = FLAT.note_read_lines(note)
 
     # find metadata
     metadata_linenum = -1
     for i, l in reversed(list(enumerate(lines))):
-      if l == "--- METADATA ---\n":
+      if l == "--- METADATA ---":
         metadata_linenum = i
     assert(metadata_linenum != -1)
 
     # write note with msg
     with open(FLAT.to_path(note), "w") as f:
-      f.write("".join(lines[:metadata_linenum]))
+      f.write("\n".join(lines[:metadata_linenum]) + "\n")
       f.write(content)
-      f.write("".join(lines[metadata_linenum:]))
+      f.write("\n".join(lines[metadata_linenum:]))
 
 
   @classmethod
