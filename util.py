@@ -4,20 +4,20 @@ class util:
     import subprocess
     return subprocess.check_output(*args, **kwargs).decode('utf8')
 
-  @classmethod
-  def sort_mtime(_, files, key=lambda x: x):
+  @staticmethod
+  def sort_mtime(files, key=lambda x: x):
     return [p[0] for p in sorted([(f, os.stat(f).st_mtime) for f in files], key=lambda p: p[1])]
 
-  @classmethod
-  def basename(_, filename):
+  @staticmethod
+  def basename(filename):
     return filename.rsplit("/", 1)[1]
 
-  @classmethod
-  def get_current_time(_):
+  @staticmethod
+  def get_current_time():
     return util.date_cmd("+%a %b %e %T %Z %Y")  # from emacs/lisp/kaz.el's kaz/current-time
 
-  @classmethod
-  def parse_time_to_utc(_, time):
+  @staticmethod
+  def parse_time_to_utc(time):
     """
     translated from date '+%a %b %e %T %Z %Y'
     - used for comparisons and sorting
