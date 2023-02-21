@@ -1,15 +1,57 @@
+class REWRITE_RESULT:
+  @staticmethod
+  def block_is_msg(block):
+    return isinstance(block, dict) and 'date' in block and 'msg' in block
+
 class REWRITE:
+  @staticmethod
+  def line(line, **kwargs):
+    # cont is continuation
+    # base is the escape function for when we have no more rendering left to do
+    def parse_url(S, cont, base):
+      nonlocal kwargs
+
+      if ': ' in S:
+        prefix, url = S.rsplit(': ', 1)
+        url = url.strip()
+
+        if url.startswith('https://'):
+          return cont(prefix, base) + [": ", {'link': potentially_url}]
+
+        if url.endswith(".note") and \
+           FLAT.note_id_len() == len(potentially_url.strip()):
+          return cont(prefix, base) + [": ", {'note': potentially_url}]
+
+        if url.startswith('/'):
+          return cont(prefix, base) + [": ", {'internal-link': potentially_url}]
+
+        if url.startswith(FLASK_UTIL.URL_ROOT()):
+          from urllib.parse import unquote_plus
+          return cont(prefix, base) + [": ", {'url-internal-link': unquote_plus(potentially_url)}]
+
+      return cont(S, base)
+
+    def highlight_tags(S, base):
+      return base(S)
+
+    return parse_url(line, cont=highlight_tags, base=lambda x: [x])
+
   @staticmethod
   def block(block, **kwargs):
     if DISCUSSION.block_is_msg(block):
-      return {'date': DISCUSSION.date(block[0]), 'msg': DISCUSSION.msg_content(block[0])}
+      return {'date': DISCUSSION.date(block[0]), 'msg': REWRITE.line(DISCUSSION.msg_content(block[0]), **kwargs)}
     return block
 
   @staticmethod
   def section(section, **kwargs):
     acc = {'blocks': list()}
+    prev_is_msg = False
     for block in section['blocks']:
-      acc['blocks'].append(REWRITE.block(block, **kwargs))
+      block = REWRITE.block(block, **kwargs)
+      if prev_is_msg and TREE.is_newline(block):
+        continue
+      acc['blocks'].append(block)
+      prev_is_msg = REWRITE_RESULT.block_is_msg(block)
     return acc
 
   @staticmethod
