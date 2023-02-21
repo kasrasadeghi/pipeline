@@ -5,8 +5,8 @@ class util:
     return subprocess.check_output(*args, **kwargs).decode('utf8')
 
   @classmethod
-  def sort_recent(_, files, root_path):
-    return [p[0] for p in sorted([(f, os.stat(root_path +'/'+ f).st_mtime) for f in files], key = lambda p: p[1])]
+  def sort_mtime(_, files, key=lambda x: x):
+    return [p[0] for p in sorted([(f, os.stat(f).st_mtime) for f in files], key=lambda p: p[1])]
 
   @classmethod
   def basename(_, filename):
@@ -14,8 +14,7 @@ class util:
 
   @classmethod
   def get_current_time(_):
-    datecmd=["date", "+%a %b %e %T %Z %Y"]  # from emacs/lisp/kaz.el's kaz/current-time
-    return check_output(datecmd).decode('latin-1')
+    return util.date_cmd("+%a %b %e %T %Z %Y")  # from emacs/lisp/kaz.el's kaz/current-time
 
   @classmethod
   def parse_time_to_utc(_, time):
