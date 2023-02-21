@@ -25,7 +25,10 @@ def get_profile_targets(profile_dir='profile-dumps'):
 
 @app.route('/api/profile-dump/<dump>')
 def get_profile_target(dump):
-  filename = os.path.join('profile-dumps', dump)
+  if request.args.get('saved', 'false') == 'true':
+    filename = os.path.join('saved-profile-dumps', dump)
+  else:
+    filename = os.path.join('profile-dumps', dump)
 
   # pstats to string: https://stackoverflow.com/questions/51536411/saving-cprofile-results-to-readable-external-file
   import io
@@ -68,12 +71,16 @@ def get_profile_data_viewer():
       });
       function get_profile() {
         const path = document.getElementById('select-profile').value;
+        const use_saved = document.getElementById('use-saved').checked;
         console.log('getting profile dump ', path);
 
         let url = new URL(window.location);
         url.searchParams.set('profile', path);
         window.history.pushState({}, '', url);
-        fetch('/api/profile-dump/' + path)
+
+        let query = new URL('/api/profile-dump/' + path, window.location.origin);
+        query.searchParams.set('saved', use_saved);
+        fetch(query.href)
           .then((res) => res.text())
           .then((data) => {
              document.getElementById('profile-requested').innerHTML = 'loaded ' + path;
