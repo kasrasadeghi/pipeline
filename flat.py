@@ -115,16 +115,16 @@ class FLAT:
       f.write(util.get_current_time())
       f.write(f"Title: {title}\n")
 
-  @classmethod
-  def make_new(cls, title):
+  @staticmethod
+  def make_new(title):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
-    if cls.exists(cls.to_path(note)):
+    if FLAT.exists(FLAT.to_path(note)):
       return "/try-again"
     else:
-      with open(cls.to_path(note), "w+") as new_note:
+      with open(FLAT.to_path(note), "w+") as new_note:
         new_note.write("")
-      cls.init_note(note, title)
+      FLAT.init_note(note, title)
       return note
 
   @classmethod
