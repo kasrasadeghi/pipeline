@@ -137,10 +137,6 @@ class RENDER:
     if section['section'] == 'DISCUSSION':
       return DISCUSSION_RENDER.section(section, **kwargs)
 
-    acc = list()
-    if section['section'] != 'entry':
-      acc.append(f'<pre>--- {section["section"]} --- </pre>')
-
     if section['section'] == 'HTML':
       LOG({'html section': section})
       acc = []
@@ -152,6 +148,10 @@ class RENDER:
     if section['section'] == 'METADATA':
       if JOURNAL.is_journal(section):
         return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
+
+    acc = list()
+    if section['section'] != 'entry':
+      acc.append(f'<pre>--- {section["section"]} --- </pre>')
 
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):
