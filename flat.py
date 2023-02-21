@@ -130,27 +130,18 @@ class FLAT:
   @classmethod
   def metadata(cls, note):
     if note.startswith(cls.path):
+      path = note
       note = FLAT.from_path(note)
+    else:
+      path = FLAT.to_path(note)
+      note = note
     if not FLAT.exists(note):
       raise FileNotFoundError(f"cannot parse metadata for note '{note}'")
 
-    with open(cls.to_path(note)) as f:
-      reading = False
-      acc = list()
-      for l in f:
-        if l == "--- METADATA ---\n":
-          reading = True
-          continue
-        if reading == True:
-          if l.startswith("---") and l.endswith("---\n"):
-            reading = False
-            continue
-          if l.strip() != "":
-            acc.append(l.rstrip())
-      if 0 == len(acc):
-        ABORT(f"did not find metadata for note '{note}'")
+    sections = PARSER.parse_file(path)
+    assert sections[-1]['section'] == 'METADATA'
 
-    result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in acc]}
+    result = {p[0]: p[1].strip() for p in [x.split(":", 1) for x in sections[-1]['lines'] if x != '']}
     return result
 
   @staticmethod

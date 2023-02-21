@@ -28,7 +28,7 @@ class PARSER:
     # - a node can be either a line of type 'str', or a parsed tree
     R = LineReader(content)
 
-    make_section = lambda title: {"section": title, "content": list()}
+    make_section = lambda title: {"section": title, "lines": list()}
 
     sections = list()
     curr_section = make_section("entry")
@@ -44,12 +44,11 @@ class PARSER:
           LOG(f"WARNING: invalid section title '{title}'")
         curr_section = make_section(title)
       else:
-        curr_section['content'].append(L)
+        curr_section['lines'].append(L)
     sections.append(curr_section)
 
     for S in sections:
-      S['blocks'] = PARSER.parse_section("\n".join(S['content']), **kwargs)
-      del S['content']
+      S['blocks'] = PARSER.parse_section("\n".join(S['lines']), **kwargs)
 
     return sections
 
