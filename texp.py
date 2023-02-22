@@ -12,7 +12,10 @@ class Texp:
   def __getitem__(self, i):
     if isinstance(i, str):
       key = i
-      return next(c for c in self.children if c.value == key)
+      try:
+        return next(c for c in self.children if c.value == key)
+      except StopIteration:
+        raise StopIteration(f"couldn't find '{i}' in {self}")
     return self.children[i]
 
   def push(self, o):
