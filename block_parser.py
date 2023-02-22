@@ -86,3 +86,9 @@ class PARSER:
 def test_parse(note):
   page = PARSER.parse_file(FLAT.to_path(note))
   return DEBUG.TEXT('test_parse', TREE.dump_tree(page))
+
+@app.route('/api/parse/<note>')
+def api_parse(note):
+  page = PARSER.parse_file(FLAT.to_path(note))
+  dump = page.format('page', 'section', 'blocks', 'block', 'line')
+  return '<pre>' + str(len(dump)) + dump + "</pre>"
