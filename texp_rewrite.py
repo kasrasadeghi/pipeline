@@ -43,7 +43,7 @@ class TEXP_REWRITE:
       return Texp('msg',
                   Texp('content', *TEXP_REWRITE.line(DISCUSSION.msg_content(block[0]))),
                   Texp('date', DISCUSSION.date(block[0])))
-    return Texp('block', *map(lambda l: Texp('line', l), block))
+    return Texp('block', *block)
 
   @staticmethod
   def section(section):
@@ -56,7 +56,7 @@ class TEXP_REWRITE:
         continue
       prev_is_msg = TEXP_REWRITE.block_is_msg(block)
       acc_blocks.append(block)
-    return Texp('section', Texp('title', section['section']), Texp('blocks', *acc_blocks))
+    return Texp('section', section['title'], Texp('blocks', *acc_blocks))
 
   @staticmethod
   def page(page):

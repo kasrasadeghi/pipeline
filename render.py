@@ -125,19 +125,19 @@ class RENDER:
 
   @staticmethod
   def section(section, **kwargs):
-    # LOG({'kwargs': kwargs, 'section': section['section']})
+    LOG({'kwargs': kwargs, 'section title': section['title']})
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
-    if section['section'] == 'entry' and \
+    if section['title'] == 'entry' and \
        'origin_note' in kwargs and 'Tags' in FLAT.metadata(kwargs['origin_note']) and \
        'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
       return DISCUSSION_RENDER.section(section, **kwargs)
 
-    if section['section'] == 'DISCUSSION':
+    if section['title'] == 'DISCUSSION':
       return DISCUSSION_RENDER.section(section, **kwargs)
 
-    if section['section'] == 'HTML':
+    if section['title'] == 'HTML':
       LOG({'html section': section})
       acc = []
       for block in section['blocks']:
@@ -145,13 +145,13 @@ class RENDER:
           acc.append(l)
       return "\n".join(acc)
 
-    if section['section'] == 'METADATA':
+    if section['title'] == 'METADATA':
       if JOURNAL.is_journal(section):
         return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
 
     acc = list()
-    if section['section'] != 'entry':
-      acc.append(f'<pre>--- {section["section"]} --- </pre>')
+    if section['title'] != 'entry':
+      acc.append(f"<pre>--- {section['title']} --- </pre>")
 
     # don't print two empty blocks consecutively
     for block in TREE.blocks_from_section(section):
@@ -160,9 +160,14 @@ class RENDER:
     return '\n'.join(acc)
 
   @staticmethod
-  def page(note, sections, **kwargs):
+  def page(note, page, **kwargs):
     kwargs['origin_note'] = note
-    return '\n'.join(map(lambda x: RENDER.section(x, **kwargs), sections)) + TREE.filesize(note)
+    LOG({'note': note, 'page': page, 'iter': list(page), 'map': list(map(lambda x: x, page))})
+    acc = list()
+    for section in page:
+      RENDER.section(section)
+    return '\n'.join(acc) + TREE.filesize(note)
+    # return '\n'.join(map(lambda x: RENDER.section(x, **kwargs), page))
 
   @staticmethod
   def content(note, **kwargs):

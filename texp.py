@@ -25,6 +25,9 @@ class Texp:
   def __len__(self):
     return len(self.children)
 
+  def __iter__(self):
+    return iter(self.children)
+
   @staticmethod
   def parse(S):
     done = lambda: len(S) == 0
