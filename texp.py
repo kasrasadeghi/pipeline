@@ -18,6 +18,13 @@ class Texp:
         raise StopIteration(f"couldn't find '{i}' in {self}")
     return self.children[i]
 
+  def get(self):
+    return self.children[0]
+
+  def at(self, i):
+    assert len(self[i]) == 1
+    return self[i].get()
+
   def push(self, o):
     assert Texp.typecheck(o), f"child '{o}' in Texp.push is neither Texp nor str"
     return self.children.append(o)
@@ -67,14 +74,16 @@ class Texp:
     if isinstance(T, (str, int)):
       return repr(T)
     if T.value in toplevels:
-      result = '\n(' + T.value + ' ' + ' '.join(map(lambda x: Texp.format(x, *toplevels), T.children))
+      result = '\n(' + T.value
+      if T.children:
+        result += ' ' + ' '.join(map(lambda x: Texp.format(x, *toplevels), T.children))
       if any(map(lambda x: isinstance(x, Texp) and x.value in toplevels, T.children)):
         result += "\n) #" + T.value
       else:
         result += ")"
       return result
     elif T.children:
-      return '(' + T.value + ' ' + ' '.join(map(lambda x: Texp.format(x, *toplevels), T.children)) + ')'
+      return '(' + T.value + ' ' + ' '.join(map(lambda x: Texp.format(x), T.children)) + ')'
     else:
       return T.value
 

@@ -48,38 +48,36 @@ class PARSER:
     sections.append(curr_section)
 
     for S in sections:
-      S.push(PARSER.parse_section("\n".join(map(lambda x: x[0], S['lines'])), **kwargs))
+      blocks, tree_blocks = PARSER.parse_section(S, **kwargs)
+      S.push(blocks)
+      S.push(tree_blocks)
 
     return Texp('page', *sections)
 
   @staticmethod
   def parse_section(section, **kwargs):
-    R = LineReader(section)
     blocks = Texp('blocks')
     curr_block = Texp('block')
-    while R.hasNext():
-      i, l = R.get()
-
-      if "" == l:
+    for line in section['lines']:
+      if "" == line.get():
         if len(curr_block):
           blocks.push(curr_block)
-        blocks.push(Texp('line', ''))  # TODO CONSIDER making a 'newline' special type
+        blocks.push(Texp('newline'))
         curr_block = Texp('block')
       else:
-        curr_block.push(l)
+        curr_block.push(line)
 
     # avoids empty blocks at the end of sections
     if len(curr_block):
       blocks.push(curr_block)
 
-    new_blocks = Texp('blocks')
+    tree_blocks = Texp('trees')
     for B in blocks:
       if 'tree_parser' in kwargs:
-        new_blocks.push(kwargs['tree_parser'](B, **kwargs))
+        tree_blocks.push(kwargs['tree_parser'](B, **kwargs))
       else:
-        for new_block in TREE_PARSER.process_block(B, **kwargs):
-          new_blocks.push(Texp('block', new_block))
-    return new_blocks
+        tree_blocks.push(TREE_PARSER.process_block(B, **kwargs))
+    return blocks, tree_blocks
 
 @app.route('/parse/<note>')
 @app.route('/test/parse/<note>')
@@ -87,8 +85,20 @@ def test_parse(note):
   page = PARSER.parse_file(FLAT.to_path(note))
   return DEBUG.TEXT('test_parse', TREE.dump_tree(page))
 
+def dump_parse(page):
+  new_page = Texp('page')
+  for sec in page:
+    LOG({'sec', sec})
+    new_page.push(Texp('section', sec['title'], sec['trees']))
+  dump = new_page.format('page', 'section', 'blocks', 'block', 'lines', 'acc', 'newline', 'trees')
+  return '<pre>' + str(len(dump)) + dump + "</pre>"
+
 @app.route('/api/parse/<note>')
 def api_parse(note):
   page = PARSER.parse_file(FLAT.to_path(note))
-  dump = page.format('page', 'section', 'blocks', 'block', 'lines', 'line', 'acc')
-  return '<pre>' + str(len(dump)) + dump + "</pre>"
+  return dump_parse(page)
+
+@app.route('/api/block_parse/<note>')
+def api_block_parse(note):
+  page = PARSER.parse_file(FLAT.to_path(note), tree_parser=lambda x, **kw: x)
+  return dump_parse(page)
