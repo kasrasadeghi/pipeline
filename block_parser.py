@@ -28,7 +28,7 @@ class PARSER:
     # - a node can be either a line of type 'str', or a parsed tree
     R = LineReader(content)
 
-    make_section = lambda title: {"section": title, "lines": list()}
+    make_section = lambda title: Texp("section", Texp('title', title), Texp("lines"))
 
     sections = list()
     curr_section = make_section("entry")
@@ -44,41 +44,41 @@ class PARSER:
           LOG(f"WARNING: invalid section title '{title}'")
         curr_section = make_section(title)
       else:
-        curr_section['lines'].append(L)
+        curr_section['lines'].push(Texp('line', L))
     sections.append(curr_section)
 
     for S in sections:
-      S['blocks'] = PARSER.parse_section("\n".join(S['lines']), **kwargs)
+      S.push(PARSER.parse_section("\n".join(map(lambda x: x[0], S['lines'])), **kwargs))
 
-    return sections
+    return Texp('page', *sections)
 
   @staticmethod
   def parse_section(section, **kwargs):
     R = LineReader(section)
-    # EXPL: a section is a list of blocks, which are each a list of lines
-    blocks = []
-    curr_block = []
+    blocks = Texp('blocks')
+    curr_block = Texp('block')
     while R.hasNext():
       i, l = R.get()
 
       if "" == l:
         if len(curr_block):
-          blocks.append(curr_block)
-        blocks.append([''])
-        curr_block = []
+          blocks.push(curr_block)
+        blocks.push(Texp('line', ''))  # TODO CONSIDER making a 'newline' special type
+        curr_block = Texp('block')
       else:
-        curr_block.append(l)
+        curr_block.push(l)
 
     # avoids empty blocks at the end of sections
     if len(curr_block):
-      blocks.append(curr_block)
+      blocks.push(curr_block)
 
-    new_blocks = []
+    new_blocks = Texp('blocks')
     for B in blocks:
       if 'tree_parser' in kwargs:
-        new_blocks.append(kwargs['tree_parser'](B, **kwargs))
+        new_blocks.push(kwargs['tree_parser'](B, **kwargs))
       else:
-        new_blocks.append(TREE_PARSER.process_block(B, **kwargs))
+        for new_block in TREE_PARSER.process_block(B, **kwargs):
+          new_blocks.push(Texp('block', new_block))
     return new_blocks
 
 @app.route('/parse/<note>')
@@ -90,5 +90,5 @@ def test_parse(note):
 @app.route('/api/parse/<note>')
 def api_parse(note):
   page = PARSER.parse_file(FLAT.to_path(note))
-  dump = page.format('page', 'section', 'blocks', 'block', 'line')
+  dump = page.format('page', 'section', 'blocks', 'block', 'lines', 'line', 'acc')
   return '<pre>' + str(len(dump)) + dump + "</pre>"

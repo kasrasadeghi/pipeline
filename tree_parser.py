@@ -56,14 +56,14 @@ class TREE_PARSER:
     indent_counts = []
     for L in block:
       if L[0] != ' ' and L[0] != "-":
-        indent_counts.append({"indent": -1, "content": L})
+        indent_counts.append(Texp('indent-count', Texp("indent", -1), Texp("content", L)))
       else:
         indent, rest = L.split("-", 1)
         assert all(' ' == c for c in indent),  "error with line: " + L
-        indent_counts.append({"indent": len(indent) // 2, "content": rest.lstrip()})
+        indent_counts.append(Texp('indent-count', Texp("indent", len(indent) // 2), Texp("content", rest.lstrip())))
 
     def make_node(content, children, indent):
-      return {"indent": indent, 'value': content, 'children': children}
+      return Texp('node', Texp("indent", indent), Texp('value', content), Texp('children', *children))
 
     # from: https://github.com/kasrasadeghi/cornerstone-haskell/blob/master/src/Parse.hs#L50-L59
     def make_children(B):
@@ -71,23 +71,22 @@ class TREE_PARSER:
       rest = B
 
       while 0 != len(rest):
-        level, content = rest[0]['indent'], rest[0]['content']
+        level, content = rest[0]['indent'][0], rest[0]['content'][0]
         rest = rest[1:]
         # collect children of this node,
         #   which are the prefix of _rest_ that have a level that is greater than this node
-        acc = []
+        acc = Texp('children')
         while True:
           if 0 == len(rest):
             break
-          if rest[0]['indent'] <= level:
+          if rest[0]['indent'][0] <= level:
             break
-          acc.append(rest[0])
+          acc.push(rest[0])
           rest = rest[1:]
 
         children = make_children(acc)
         result.append(make_node(content, children, level))
 
-      #   return acc
       return result
 
     return make_children(indent_counts)
