@@ -38,12 +38,14 @@ class REWRITE:
 
   @staticmethod
   def block(block, **kwargs):
+    """ rewrite: block -> (| message block)"""
     if DISCUSSION.block_is_msg(block):
       return {'date': DISCUSSION.date(block[0]), 'msg': REWRITE.line(DISCUSSION.msg_content(block[0]), **kwargs)}
     return block
 
   @staticmethod
   def section(section, **kwargs):
+    """ transform: section -> block """
     acc = {'blocks': list()}
     prev_is_msg = False
     for block in section['blocks']:
@@ -56,6 +58,7 @@ class REWRITE:
 
   @staticmethod
   def page(page, **kwargs):
+    """ traverse: page -> section """
     acc = list()
     for section in page:
       acc.append(REWRITE.section(section, **kwargs))
