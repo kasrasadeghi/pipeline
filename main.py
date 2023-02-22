@@ -34,6 +34,9 @@ kaz_import('tag.py')
 kaz_import('js.py')
 kaz_import('pattern.py')
 
+kaz_import('texp.py')
+kaz_import('texp_rewrite.py')
+
 kaz_import('flat.py')
 kaz_import('search.py')
 kaz_import('journal.py')
