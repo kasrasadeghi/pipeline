@@ -39,6 +39,7 @@ class Texp:
   def parse(S):
     done = lambda: len(S) == 0
     peek = lambda: S[0]
+    more = lambda: len(S) > 0
     def expect(c):
       assert c == peek()
       chomp()
@@ -46,15 +47,30 @@ class Texp:
       nonlocal S
       x, S = S[0], S[1:]
       return x
-    def gulp(check):
+    def gulp(kind, check):
       acc = ''
-      while check(): acc += chomp()
+      prev = None
+      # print('-', S)
+      while check(prev):
+        if not more():
+          raise Exception(f"ERROR, no more to parse while gulping '{kind}'")
+        # print('=', S)
+        prev = peek()
+        acc += chomp()
       return acc
 
-    pWord = lambda: gulp(lambda: peek() not in '() \t\n\r')
-    pAtom = lambda: pWord()
-    cWS = lambda: gulp(lambda: peek() in ' \t\n\r')
-    pTexp = lambda: pList() if peek() == '(' else pAtom()
+    pWord = lambda: gulp('word', lambda _: peek() not in '() \t\n\r')
+    pStr  = lambda: chomp() + gulp('str', lambda prev: not (S.startswith('"') and prev != '\\')) + chomp()
+    pChar = lambda: chomp() + gulp('char', lambda prev: not (S.startswith('\'') and prev != '\\')) + chomp()
+    def pAtom():
+      match peek():
+        case "'": return pChar()
+        case '"': return pStr()
+      return pWord()
+    def cWS():
+      return gulp('whitespace', lambda _: peek() in ' \t\n\r')
+    def pTexp():
+      return pList() if peek() == '(' else pAtom()
     def pList():
       expect('(')
       root = pWord()
@@ -64,7 +80,7 @@ class Texp:
         children.append(pTexp())
         cWS()
       expect(')')
-      return Texp(root, children)
+      return Texp(root, *children)
 
     return pTexp()
 
