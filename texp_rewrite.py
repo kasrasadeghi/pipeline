@@ -1,11 +1,8 @@
 class TEXP_REWRITE:
-  @staticmethod
-  def block_is_msg(T):
-    return T.value == 'msg' and T[0].value == 'content' and T[1].value == 'date'
 
   @staticmethod
   def is_newline(T):
-    return T.value == 'block' and len(T) == 1 and T[0].value == 'line' and len(T[0]) == 1 and T[0][0] == ''
+    return T.match('(newline)')
 
   @staticmethod
   def line(line):
@@ -39,24 +36,40 @@ class TEXP_REWRITE:
   @staticmethod
   def block(block):
     """ rewrite: block -> (| message block)"""
-    if DISCUSSION.block_is_msg(block):
-      return Texp('msg',
-                  Texp('content', *TEXP_REWRITE.line(DISCUSSION.msg_content(block[0]))),
-                  Texp('date', DISCUSSION.date(block[0])))
-    return Texp('block', *block)
+    match block:
+      case Texp(value='block', children=[
+        Texp(value='node', children=[
+          Texp(value='indent', children=[0]),
+          Texp(value='value', children=[msg_content]),
+          Texp(value='children', children=[
+            Texp(value='node', children=[
+              Texp(value='indent', children=[1]),
+              Texp(value='value', children=[date]),
+              Texp(value='children', children=[])
+            ])
+          ])
+        ])
+      ]):
+        if msg_content.startswith('msg: ') and date.startswith('Date: '):
+          return Texp('msg', Texp('content', msg_content), Texp('date', date))
+      case Texp(value='block', children=[
+        Texp(value='node', children=children) as node
+      ]):
+        return node
+    return block
 
   @staticmethod
   def section(section):
     """ transform: section -> block """
-    acc_blocks = list()
+    acc = Texp('trees')
     prev_is_msg = False
-    for block in section['blocks']:
+    for block in section['trees']:
       block = TEXP_REWRITE.block(block)
       if prev_is_msg and TEXP_REWRITE.is_newline(block):
         continue
-      prev_is_msg = TEXP_REWRITE.block_is_msg(block)
-      acc_blocks.append(block)
-    return Texp('section', section['title'], Texp('blocks', *acc_blocks))
+      prev_is_msg = DISCUSSION.is_msg(block)
+      acc.push(block)
+    return Texp('section', section['title'], acc)
 
   @staticmethod
   def page(page):
@@ -70,7 +83,7 @@ class TEXP_REWRITE:
 def get_texp(note):
   page = PARSER.parse_file(FLAT.to_path(note))
   result = TEXP_REWRITE.page(page)
-  dump = result.format('page', 'section', 'blocks', 'block', 'msg')
-  # dump = result.dump()
+  # dump = page.format('page', 'section', 'blocks', 'trees', 'msg', 'block', 'tree')
+  dump = result.format('page', 'section', 'blocks', 'trees', 'msg', 'block', 'tree')
   # dump = FLASK_UTIL.ESCAPE(dump)
   return '<pre>' + str(len(dump)) + dump + "</pre>"
