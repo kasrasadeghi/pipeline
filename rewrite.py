@@ -74,5 +74,4 @@ def api_parse(note):
 def get_rewrite(note):
   page = PARSER.parse_file(FLAT.to_path(note))
   result = REWRITE.page(page)
-  return {'result': result}
-  # return json.dumps(result, indent=2)
+  return {'size': len(json.dumps(result)), 'result': result}
