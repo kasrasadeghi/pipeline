@@ -18,6 +18,8 @@ class LineReader:
 class PARSER:
   @staticmethod
   def parse_file(filepath, **kwargs):
+    if 'tree_parser' not in kwargs:
+      kwargs['tree_parser'] = TREE_PARSER.process_block
     with open(filepath) as f:
       return PARSER.parse_content(f.read(), **kwargs)
 
@@ -73,10 +75,7 @@ class PARSER:
 
     tree_blocks = Texp('trees')
     for B in blocks:
-      if 'tree_parser' in kwargs:
-        tree_blocks.push(kwargs['tree_parser'](B, **kwargs))
-      else:
-        tree_blocks.push(TREE_PARSER.process_block(B, **kwargs))
+      tree_blocks.push(kwargs['tree_parser'](B, **kwargs))
     return blocks, tree_blocks
 
 @app.route('/parse/<note>')
