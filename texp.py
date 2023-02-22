@@ -1,9 +1,13 @@
 class Texp:
   def __init__(self, value, *children):
     self.value = value
-    for child in children:
-      assert isinstance(child, Texp) or isinstance(child, str), f"child '{child}' in Texp constructor is neither Texp nor str"
+    for i, child in enumerate(children):
+      assert Texp.typecheck(child), f"child #{i} '{child}' in Texp constructor is neither Texp nor str"
     self.children = list(children)
+
+  @staticmethod
+  def typecheck(o):  # children must be Texp, str, or int
+    return isinstance(o, (Texp, str, int))
 
   def __getitem__(self, i):
     return self.children[i]
@@ -45,13 +49,13 @@ class Texp:
     return pTexp()
 
   def format(T, *toplevels):
-    if not isinstance(T, Texp) and not isinstance(T, str):
-      raise Exception(f"'{T}' is not a Texp nor str")
-    if isinstance(T, str):
+    if not Texp.typecheck(T):
+      raise Exception(f"'{T}' is not a Texp nor str nor int")
+    if isinstance(T, (str, int)):
       return repr(T)
     if T.value in toplevels:
       result = '\n(' + T.value + ' ' + ' '.join(map(lambda x: Texp.format(x, *toplevels), T.children))
-      if any(map(lambda x: x.value in toplevels, T.children)):
+      if any(map(lambda x: isinstance(x, Texp) and x.value in toplevels, T.children)):
         result += "\n) #" + T.value
       else:
         result += ")"
