@@ -10,7 +10,14 @@ class Texp:
     return isinstance(o, (Texp, str, int))
 
   def __getitem__(self, i):
+    if isinstance(i, str):
+      key = i
+      return next(c for c in self.children if c.value == key)
     return self.children[i]
+
+  def push(self, o):
+    assert Texp.typecheck(o), f"child '{o}' in Texp.push is neither Texp nor str"
+    return self.children.append(o)
 
   def __len__(self):
     return len(self.children)
