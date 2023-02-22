@@ -16,18 +16,18 @@ class REWRITE:
         url = url.strip()
 
         if url.startswith('https://'):
-          return cont(prefix, base) + [": ", {'link': potentially_url}]
+          return cont(prefix, base) + [": ", {'link': url}]
 
         if url.endswith(".note") and \
-           FLAT.note_id_len() == len(potentially_url.strip()):
-          return cont(prefix, base) + [": ", {'note': potentially_url}]
+           FLAT.note_id_len() == len(url.strip()):
+          return cont(prefix, base) + [": ", {'note': url}]
 
         if url.startswith('/'):
-          return cont(prefix, base) + [": ", {'internal-link': potentially_url}]
+          return cont(prefix, base) + [": ", {'internal-link': url}]
 
         if url.startswith(FLASK_UTIL.URL_ROOT()):
           from urllib.parse import unquote_plus
-          return cont(prefix, base) + [": ", {'url-internal-link': unquote_plus(potentially_url)}]
+          return cont(prefix, base) + [": ", {'url-internal-link': unquote_plus(url)}]
 
       return cont(S, base)
 
