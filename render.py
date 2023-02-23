@@ -97,19 +97,20 @@ class RENDER:
     first = True
 
     tags = list()
-    for msg in root:
-      tags + TAG.parse(msg.get('content'))
+    for item in root:
+      if item.value == 'msg':
+        tags += TAG.parse(item.get('content'))
 
     for i, item in enumerate(root):
-      if item.value == 'msg' and first:
+      if item.value == 'msg' and i == 0:
         acc.append('<summary>')
         acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
         if tags:
           acc.append("<div class='tags-summary'>" + str(tags) + "</div>")
         acc.append('</summary>')
-        first = False
       elif item.value == 'msg':
-        acc.append(DISCUSSION_RENDER.msg(item, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
+        msg = item.update(content=item.get('content').removeprefix('- '))
+        acc.append(DISCUSSION_RENDER.msg(msg, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
       else:
         acc.append(RENDER.tree(item, **kwargs))
 
