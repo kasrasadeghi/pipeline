@@ -89,7 +89,7 @@ def dump_parse(page):
   for sec in page:
     LOG({'sec': sec})
     new_page.push(Texp('section', sec['title'], sec['trees']))
-  dump = new_page.format('page', 'section', 'blocks', 'block', 'lines', 'acc', 'newline', 'trees')
+  dump = new_page.format('page', 'section', 'blocks', 'block', 'lines', 'acc', 'newline', 'trees', 'tree')
   return '<pre>' + str(len(dump)) + dump + "</pre>"
 
 @app.route('/api/parse/<note>')

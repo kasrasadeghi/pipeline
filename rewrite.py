@@ -1,71 +1,122 @@
-class REWRITE_RESULT:
-  @staticmethod
-  def block_is_msg(block):
-    return isinstance(block, dict) and 'date' in block and 'msg' in block
+class TEXP_REWRITE:
+  context = dict()
 
-class REWRITE:
   @staticmethod
-  def line(line, **kwargs):
-    # cont is continuation
-    # base is the escape function for when we have no more rendering left to do
-    def parse_url(S, cont, base):
-      nonlocal kwargs
+  def line(line):
+    def parse_url(S):
 
-      if ': ' in S:
+      if ': ' not in S:
+        return [S]
+      else:
         prefix, url = S.rsplit(': ', 1)
+        prefix = prefix + ': '
         url = url.strip()
 
         if url.startswith('https://'):
-          return cont(prefix, base) + [": ", {'link': url}]
+          url = Texp('link', url)
 
-        if url.endswith(".note") and \
-           FLAT.note_id_len() == len(url.strip()):
-          return cont(prefix, base) + [": ", {'note': url}]
+        elif url.endswith(".note") and \
+           FLAT.note_id_len() == len(url):
+          url = Texp('note', url)
 
-        if url.startswith('/'):
-          return cont(prefix, base) + [": ", {'internal-link': url}]
+        elif url.startswith('/'):
+          url = Texp('internal-link', url)
 
-        if url.startswith(FLASK_UTIL.URL_ROOT()):
+        elif url.startswith(FLASK_UTIL.URL_ROOT()):
           from urllib.parse import unquote_plus
-          return cont(prefix, base) + [": ", {'url-internal-link': unquote_plus(url)}]
+          url = Texp('url-internal-link', unquote_plus(url))
 
-      return cont(S, base)
+        return [prefix, url]
 
-    def highlight_tags(S, base):
-      return base(S)
-
-    return parse_url(line, cont=highlight_tags, base=lambda x: [x])
+    return parse_url(line)
 
   @staticmethod
-  def block(block, **kwargs):
+  def tree(tree):
     """ rewrite: block -> (| message block)"""
-    if DISCUSSION.block_is_msg(block):
-      return {'date': DISCUSSION.date(block[0]), 'msg': REWRITE.line(DISCUSSION.msg_content(block[0]), **kwargs)}
-    return block
+    if (x := tree.match("(tree (node (indent 0) (value {content}) (children (node (indent 1) (value {date}) children)))))"))[0]:
+      msg = Texp('msg')
+      msg.value = 'msg'
+      msg.push(Texp('content', x[1].get('content').removeprefix('msg: ')))
+      msg.push(Texp('Date', x[1].get('date').removeprefix('Date: ')))
+      return msg
+    return tree
 
   @staticmethod
-  def section(section, **kwargs):
-    """ transform: section -> block """
-    acc = {'blocks': list()}
-    prev_is_msg = False
-    for block in section['blocks']:
-      block = REWRITE.block(block, **kwargs)
-      if prev_is_msg and TREE.is_newline(block):
+  def discussion_section(section):
+    disc_section = section.get('title') == 'DISCUSSION'
+    journal_disc_section = (
+      section.get('title') == 'entry' and
+      'note' in TEXP_REWRITE.context and
+      'Tags' in FLAT.metadata(TEXP_REWRITE.context['note']) and
+      'Journal' in FLAT.metadata(TEXP_REWRITE.context['note'])['Tags']
+    )
+
+    if not (disc_section or journal_disc_section):
+      return section
+
+    # handle discussion sections
+    roots = Texp('roots', Texp('pre_roots'))
+
+    for tree in section['trees']:
+      match tree:
+        case Texp(value='msg') as msg:
+          if msg.get('content').startswith("- "):
+            roots[-1].push(msg)
+          else:  # new root
+            roots.push(Texp('root', msg))
+
+        case _:
+          roots[-1].push(tree)
+
+    if roots:
+      roots[-1].value = 'root_final'
+
+    return Texp('section', section['title'], roots)
+
+
+  @staticmethod
+  def section(section):
+    """ transform (traverse & rewrite): section -> section """
+
+    # do the traverse
+    acc = Texp('trees')
+    for tree in section['trees']:
+      acc.push(TEXP_REWRITE.tree(tree))
+
+    # remove newlines if they're after msgs
+    prev_is_msg = None
+    new_acc = Texp('trees')
+    for tree in acc:
+      if tree.match('(newline)')[0] and prev_is_msg:
+        prev_is_msg = tree.value == 'msg'
         continue
-      acc['blocks'].append(block)
-      prev_is_msg = REWRITE_RESULT.block_is_msg(block)
-    return acc
+      prev_is_msg = tree.value == 'msg'
+      new_acc.push(tree)
+
+    result = TEXP_REWRITE.discussion_section(Texp('section', section['title'], new_acc))
+
+    return result
 
   @staticmethod
-  def page(page, **kwargs):
+  def page(page):
     """ traverse: page -> section """
     acc = list()
     for section in page:
-      acc.append(REWRITE.section(section, **kwargs))
-    return acc
+      acc.append(TEXP_REWRITE.section(section))
+    return Texp('page', *acc)
 
-@app.route('/api/rewrite/<note>')
-def get_rewrite(note):
-  page = PARSER.parse_file(FLAT.to_path(note))
-  result = REWRITE.page(page)
-  return {'size': len(json.dumps(result)), 'result': result}
+  @staticmethod
+  def note(note):
+    page = PARSER.parse_file(FLAT.to_path(note))
+    TEXP_REWRITE.context['note'] = note
+    result = TEXP_REWRITE.page(page)
+    TEXP_REWRITE.context = dict()
+    return result
+
+@app.route('/api/texp/<note>')
+def get_texp(note):
+  result = TEXP_REWRITE.note(note)
+  # dump = page.format('page', 'section', 'blocks', 'trees', 'msg', 'block', 'tree')
+  dump = result.format('page', 'section', 'blocks', 'trees', 'block', 'tree', 'root', 'roots', 'msg')
+  # dump = FLASK_UTIL.ESCAPE(dump)
+  return '<pre>' + str(len(dump)) + dump + "</pre>"

@@ -25,7 +25,7 @@ kaz_import('advanced_tree_parser.py')
 kaz_import('block_parser.py')
 kaz_import('tree.py')
 kaz_import('node.py')
-kaz_import('rewrite.py')
+
 kaz_import('render.py')
 kaz_import('render_util.py')
 kaz_import('sidebar.py')
@@ -35,7 +35,7 @@ kaz_import('js.py')
 kaz_import('pattern.py')
 
 kaz_import('texp.py')
-kaz_import('texp_rewrite.py')
+kaz_import('rewrite.py')
 
 kaz_import('flat.py')
 kaz_import('search.py')

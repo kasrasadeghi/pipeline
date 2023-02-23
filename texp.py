@@ -18,12 +18,22 @@ class Texp:
         raise ValueError(f"couldn't find '{i}' in {self}")
     return self.children[i]
 
-  def get(self):
-    return self.children[0]
+  def __contains__(self, key):
+    assert isinstance(key, str)
+    try:
+      next(c for c in self.children if c.value == key)
+      return True
+    except StopIteration:
+      return False
 
-  def at(self, i):
-    assert len(self[i]) == 1
-    return self[i].get()
+  def get(self, *args):
+    if len(args) == 1:     # TODO allow a default value if len(args) == 2
+      assert len(self[args[0]]) == 1
+      return self[args[0]][0]
+    elif len(args) > 1:
+      raise ValueError(f"'{self}'.get({args})")
+    assert len(self.children) == 1
+    return self.children[0]
 
   def push(self, o):
     assert Texp.typecheck(o), f"child '{o}' in Texp.push is neither Texp nor str"

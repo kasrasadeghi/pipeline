@@ -36,11 +36,16 @@ class DISCUSSION_RENDER:
 
   @staticmethod
   def msg(msg, **kwargs):
+    try:
+      isinstance(msg, Texp) and 'Date' in msg and 'content' in msg
+    except:
+      assert False, f'{msg}'
+
     timerender = kwargs.get('timerender', None)
     msg_indent = kwargs.get('msg_indent', '')
 
-    msg_date = msg.at('Date')
-    msg_content = RENDER.line(msg.at('content'), **kwargs)
+    msg_date = msg.get('Date')
+    msg_content = RENDER.line(msg.get('content'), **kwargs)
     msg_origin = ''
     # if 'origin' in msg:
     #   msg_origin = '/disc/' + msg['origin']

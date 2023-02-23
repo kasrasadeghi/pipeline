@@ -54,7 +54,7 @@ class RENDER:
 
   @staticmethod
   def node(item, **kwargs):
-    level = item.at('indent')
+    level = item.get('indent')
     if level == -1:  # toplevel
       indent = ""
     elif level == 0:
@@ -73,19 +73,74 @@ class RENDER:
 
     return item.format()
 
+
+  @staticmethod
+  def tree(tree, **kwargs):
+    if tree.value == 'msg':
+      return DISCUSSION_RENDER.msg(tree, **kwargs)
+    elif tree.value == 'block':
+      return RENDER.block(tree, **kwargs)
+    elif tree.value == 'newline':
+      return RENDER.block('<br>')
+    else:
+      return tree.format()
+
+  @staticmethod
+  def root(root, **kwargs):
+    assert root[0].value == 'msg'
+
+    if len(root) == 1:
+      return [RENDER.tree(root[0], **kwargs)]
+
+    acc = list()
+    acc.append("<details open>" if root.value == 'root_final' else "<details>")
+    first = True
+
+    tags = list()
+    for msg in root:
+      tags + TAG.parse(msg.get('content'))
+
+    for i, item in enumerate(root):
+      if item.value == 'msg' and first:
+        acc.append('<summary>')
+        acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
+        if tags:
+          acc.append("<div class='tags-summary'>" + str(tags) + "</div>")
+        acc.append('</summary>')
+        first = False
+      elif item.value == 'msg':
+        acc.append(DISCUSSION_RENDER.msg(item, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
+      else:
+        acc.append(RENDER.tree(item, **kwargs))
+
+    acc.append('</details>')
+    return acc
+
+  @staticmethod
+  def roots(roots, **kwargs):
+    acc = list()
+    assert roots[0].value == 'pre_roots', f"{roots}"
+
+    # handle pre_roots
+    for tree in roots[0]:
+      if tree.value == 'block':
+        acc.append(RENDER.block(tree, **kwargs))
+      elif tree.value == 'newline':
+        acc.append('<br>')
+      else:
+        acc.append(repr(tree))
+
+    # handle roots
+    for root in roots.children[1:]:
+      acc += RENDER.root(root)
+
+    return '\n'.join(acc)
+
   @staticmethod
   def section(section, **kwargs):
     # LOG({'kwargs': kwargs, 'section title': section['title']})
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
-
-    if section['title'] == 'entry' and \
-       'origin_note' in kwargs and 'Tags' in FLAT.metadata(kwargs['origin_note']) and \
-       'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
-      return DISCUSSION_RENDER.section(section, **kwargs)
-
-    # if section['title'] == 'DISCUSSION':
-    #   return DISCUSSION_RENDER.section(section, **kwargs)
 
     # if section['title'] == 'HTML':
     #   LOG({'html section': section})
@@ -102,15 +157,19 @@ class RENDER:
     acc = list()
     acc.append(f"<pre>--- {section['title']} --- </pre>")
 
-    for tree in section['trees']:
-      if tree.value == 'msg':
-        acc.append(DISCUSSION_RENDER.msg(tree, **kwargs))
-      elif tree.value == 'block':
-        acc.append(RENDER.block(tree, **kwargs))
-      elif tree.value == 'newline':
-        acc.append('<br>')
-      else:
-        acc.append(repr(tree))
+    if 'trees' in section:
+      for tree in section['trees']:
+        if tree.value == 'msg':
+          acc.append(DISCUSSION_RENDER.msg(tree, **kwargs))
+        elif tree.value == 'block':
+          acc.append(RENDER.block(tree, **kwargs))
+        elif tree.value == 'newline':
+          acc.append('<br>')
+        else:
+          acc.append(repr(tree))
+
+    if 'roots' in section:
+      acc.append(RENDER.roots(section['roots']))
 
     return "\n".join(acc)
 
@@ -121,8 +180,7 @@ class RENDER:
 
   @staticmethod
   def content(note, **kwargs):
-    page = PARSER.parse_file(FLAT.to_path(note))
-    page = TEXP_REWRITE.page(page)
+    page = TEXP_REWRITE.note(note)
     return RENDER.page(note, page, **kwargs)
 
   @staticmethod

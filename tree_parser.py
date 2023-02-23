@@ -73,7 +73,7 @@ class TREE_PARSER:
       rest = B
 
       while 0 != len(rest):
-        level, content = rest[0].at('indent'), rest[0].at('content')
+        level, content = rest[0].get('indent'), rest[0].get('content')
         rest = rest[1:]
         # collect children of this node,
         #   which are the prefix of _rest_ that have a level that is greater than this node
@@ -81,7 +81,7 @@ class TREE_PARSER:
         while True:
           if 0 == len(rest):
             break
-          if rest[0].at('indent') <= level:
+          if rest[0].get('indent') <= level:
             break
           acc.push(rest[0])
           rest = rest[1:]
