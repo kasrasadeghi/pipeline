@@ -15,7 +15,7 @@ class Texp:
       try:
         return next(c for c in self.children if c.value == key)
       except StopIteration:
-        raise StopIteration(f"couldn't find '{i}' in {self}")
+        raise ValueError(f"couldn't find '{i}' in {self}")
     return self.children[i]
 
   def get(self):
