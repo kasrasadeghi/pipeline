@@ -87,7 +87,7 @@ def test_parse(note):
 def dump_parse(page):
   new_page = Texp('page')
   for sec in page:
-    LOG({'sec', sec})
+    LOG({'sec': sec})
     new_page.push(Texp('section', sec['title'], sec['trees']))
   dump = new_page.format('page', 'section', 'blocks', 'block', 'lines', 'acc', 'newline', 'trees')
   return '<pre>' + str(len(dump)) + dump + "</pre>"
