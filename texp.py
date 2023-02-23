@@ -36,8 +36,10 @@ class Texp:
     return iter(self.children)
 
   def __eq__(self, o):
-    if isinstance(o, str):
-      o = Texp.parse(o)
+    # if isinstance(o, str):   # CONSIDER maybe have string coalescing, hmmm
+    #   o = Texp.parse(o)
+    if not isinstance(o, Texp):  # no coalescing, for now...
+      return False
     return self.value == o.value and self.children == o.children
 
   @staticmethod
@@ -46,47 +48,43 @@ class Texp:
     peek = lambda: S[0]
     more = lambda: len(S) > 0
     def expect(c):
+      assert more()
       assert c == peek()
-      chomp()
+      return chomp()
     def chomp():
       nonlocal S
       x, S = S[0], S[1:]
       return x
+
     def gulp(kind, check):
       acc = ''
       prev = None
-      # print('-', S)
+      # print(kind + '-', S)
       while check(prev):
         if not more():
           raise Exception(f"ERROR, no more to parse while gulping '{kind}'")
-        # print('=', S)
+        # print(kind + '=', S)
         prev = peek()
         acc += chomp()
+        assert more(), f"should be more while parsing '{kind}'"
       return acc
-
+    cWS   = lambda: gulp('whitespace', lambda _: peek() in ' \t\n\r')
     pWord = lambda: gulp('word', lambda _: peek() not in '() \t\n\r')
     pStr  = lambda: gulp('str', lambda prev: not (S.startswith('"') and prev != '\\'))
     pChar = lambda: gulp('char', lambda prev: not (S.startswith('\'') and prev != '\\'))
     pInt  = lambda: gulp('int', lambda _: peek() not in '() \t\n\r')
+
     def pAtom():
       match peek():
         case "'":
-          expect("'")
-          char = pChar()
-          expect("'")
-          return char
+          return Texp(expect('\'') + pChar() + expect('\''))
         case '"':
-          expect('"')
-          str = pStr()
-          expect('"')
-          return str
+          return Texp(expect('"') + pStr() + expect('"'))
       word = pWord()
       if all(c in '0123456879' for c in word):
         return int(word)
       else:
-        return word
-    def cWS():
-      return gulp('whitespace', lambda _: peek() in ' \t\n\r')
+        return Texp(word)
     def pTexp():
       return pList() if peek() == '(' else pAtom()
     def pList():
@@ -121,8 +119,19 @@ class Texp:
     else:
       return T.value
 
+  @staticmethod
+  def dump_(T):
+    if isinstance(T, str):
+      return 'str=' + repr(T)
+    if isinstance(T, int):
+      return 'int=' + repr(T)
+    if T.children:
+      return 'texp=(' + T.value + ' ' + ' '.join(map(lambda x: Texp.dump_(x), T.children)) + ')'
+    else:
+      return 'texp='+T.value
+
   def dump(T):
-    return T.format()
+    return Texp.dump_(T)
 
   def __repr__(T):
     return T.dump()
@@ -137,6 +146,7 @@ class Texp:
 
   def match_(T, o, acc):
     def is_capture(S):
+      assert isinstance(S, str)
       return len(S) > 2 and S[0] == '{' and S[-1] == '}'
 
     def submatch(A, B):
@@ -145,19 +155,25 @@ class Texp:
           return A.match_(B, acc)
         case (int(), int()):
           return A == B, acc
-        case (int(), str()):
-          if is_capture(B):
-            key = B[1:-1]
+        case (int(), Texp()):
+          if is_capture(B.value):
+            key = B.value[1:-1]
             acc.push(Texp(key, A))
             return True, acc
           return False, acc
+        case (str(), Texp()):
+          if is_capture(B.value):
+            key = B.value[1:-1]
+            acc.push(Texp(key, A))
+            return True, acc
+          return A == B.value, acc
         case (str(), str()):
           if is_capture(B):
             key = B[1:-1]
             acc.push(Texp(key, A))
             return True, acc
           return A == B, acc
-      raise Exception('unhandled case')
+      raise Exception(f"unhandled case: '{A}'/{type(A)} '{B}'/{type(B)}")
 
     if is_capture(o.value):
       # use the value of the pattern as the key in the accumulator
