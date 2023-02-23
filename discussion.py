@@ -1,24 +1,5 @@
 class DISCUSSION:
   @staticmethod
-  def is_msg(item):
-    """ checks whether an item in a block is a msg """
-    if not isinstance(item, dict):
-      LOG({"ERROR: cannot check a non-dictionary:", item})
-      return False
-    return item['value'].startswith('msg: ') and len(item['children']) == 1 and item['children'][0]['value'].startswith('Date: ')
-
-  @staticmethod
-  def block_is_msg(block):
-    """
-    checks whether the block is just one msg
-    - this is the most common case
-    """
-    # TODO consider choosing between:
-    # - only singleton message blocks, where we'd only use block_is_msg
-    # - multimessage blocks, where we could have multiple messages in a block, possible useful for quotes and includes
-    return TREE.is_singleton(block) and DISCUSSION.is_msg(block[0])
-
-  @staticmethod
   def date(msg):
     if not 'children' in msg:
       LOG({'ERROR': msg})
@@ -58,16 +39,18 @@ class DISCUSSION_RENDER:
     timerender = kwargs.get('timerender', None)
     msg_indent = kwargs.get('msg_indent', '')
 
-    msg_date = DISCUSSION.date(msg)
-    msg_content = RENDER.line(DISCUSSION.msg_content(msg), **kwargs)
+    msg_date = msg.at('Date')
+    msg_content = RENDER.line(msg.at('content'), **kwargs)
     msg_origin = ''
-    if 'origin' in msg:
-      msg_origin = '/disc/' + msg['origin']
+    # if 'origin' in msg:
+    #   msg_origin = '/disc/' + msg['origin']
 
     if timerender:
       date = timerender(msg_date)
     else:
       date = util.date_cmd("-d", msg_date, "+%T")
+
+    # return msg.format() + "<br>"
 
     return (
       f'<div id="{msg_date}" class="msg">'

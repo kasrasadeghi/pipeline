@@ -36,54 +36,25 @@ class RENDER:
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
+  def block(block, **kwargs):
+    acc = []
+    for item in block:
+      if item.value == 'line':
+      # if isinstance(item, str):
+        line_rendered = RENDER.line(item.get(), **kwargs)
+        acc.append(f"<pre>{line_rendered}</pre>")
+      else:
+        acc.append(repr(item))
+
+    return '\n'.join(acc)
+
+  @staticmethod
   def line(L, **kwargs):
-    LOG(L)
-
-    # cont is continuation
-    # base is the escape function for when we have no more rendering left to do
-    def parse_url(S, cont, base):
-      nonlocal kwargs
-
-      if ': ' in S:
-        prefix, potentially_url = S.rsplit(': ', 1)
-
-        if potentially_url.strip().startswith('https://'):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
-
-        if potentially_url.strip().endswith(".note") and \
-           FLAT.note_id_len() == len(potentially_url.strip()):
-          return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
-
-        if potentially_url.strip().startswith('/'):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
-
-        if potentially_url.strip().startswith(FLASK_UTIL.URL_ROOT()):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, view='ref', **kwargs)
-
-      return cont(S, base)
-
-    def highlight_tags(S, base):
-      # replace DAILY with linked DAILY and run base() on everything between
-      return "<a href='/daily'><b>DAILY</b></a>".join(map(base, S.split("DAILY")))
-
-    return parse_url(L, cont=highlight_tags, base=FLASK_UTIL.ESCAPE)
-
+    return L
 
   @staticmethod
   def node(item, **kwargs):
-    # LOG({'kwargs': kwargs})
-    render_msg = kwargs.get('render_msg', None)
-    result = None
-
-    LOG({'item': item, 'render_msg': render_msg})
-
-    if DISCUSSION.is_msg(item):
-      if render_msg:
-        return render_msg(item, **kwargs)
-      else:
-        return DISCUSSION_RENDER.msg(item, **kwargs)
-
-    level = item['indent']
+    level = item.at('indent')
     if level == -1:  # toplevel
       indent = ""
     elif level == 0:
@@ -91,41 +62,20 @@ class RENDER:
     else:
       indent = (level * "  ") + "- "
 
-    result = RENDER.line(item['value'], indent=indent, **kwargs)
-    result = "<pre>" + indent + result + "</pre>"
-
     acc = list()
-    acc.append(result)
+    acc.append("<pre>" + RENDER.line(item.value, **kwargs) + "</pre>")
 
-    for child in item['children']:
-      acc.append(RENDER.node(child, **kwargs))
+    for child in item:
+      if isinstance(child, str):
+        acc.append(RENDER.line(child))
+      else:
+        acc.append(RENDER.node(child, **kwargs))
 
-    return "".join(acc)
-
-  @staticmethod
-  def block(block, **kwargs):
-    if block == ['']:
-      return '<br/>'
-
-    acc = []
-    for item in block:
-      # if item is a tree/node
-      if isinstance(item, dict):
-        acc.append(RENDER.node(item, **kwargs))
-        continue
-
-      if isinstance(item, str):
-        line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
-        acc.append(f"<pre>{line_rendered}</pre>")
-        continue
-
-      acc.append(repr(item))
-
-    return '\n'.join(acc)
+    return item.format()
 
   @staticmethod
   def section(section, **kwargs):
-    LOG({'kwargs': kwargs, 'section title': section['title']})
+    # LOG({'kwargs': kwargs, 'section title': section['title']})
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
@@ -134,44 +84,46 @@ class RENDER:
        'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
       return DISCUSSION_RENDER.section(section, **kwargs)
 
-    if section['title'] == 'DISCUSSION':
-      return DISCUSSION_RENDER.section(section, **kwargs)
+    # if section['title'] == 'DISCUSSION':
+    #   return DISCUSSION_RENDER.section(section, **kwargs)
 
-    if section['title'] == 'HTML':
-      LOG({'html section': section})
-      acc = []
-      for block in section['blocks']:
-        for l in block:
-          acc.append(l)
-      return "\n".join(acc)
+    # if section['title'] == 'HTML':
+    #   LOG({'html section': section})
+    #   acc = []
+    #   for block in section['blocks']:
+    #     for l in block:
+    #       acc.append(l)
+    #   return "\n".join(acc)
 
-    if section['title'] == 'METADATA':
-      if JOURNAL.is_journal(section):
-        return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
+    # if section['title'] == 'METADATA':
+    #   if JOURNAL.is_journal(section):
+    #     return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
 
     acc = list()
-    if section['title'] != 'entry':
-      acc.append(f"<pre>--- {section['title']} --- </pre>")
+    acc.append(f"<pre>--- {section['title']} --- </pre>")
 
-    # don't print two empty blocks consecutively
-    for block in TREE.blocks_from_section(section):
-      acc.append(RENDER.block(block, **kwargs))
+    for tree in section['trees']:
+      if tree.value == 'msg':
+        acc.append(DISCUSSION_RENDER.msg(tree, **kwargs))
+      elif tree.value == 'block':
+        acc.append(RENDER.block(tree, **kwargs))
+      elif tree.value == 'newline':
+        acc.append('<br>')
+      else:
+        acc.append(repr(tree))
 
-    return '\n'.join(acc)
+    return "\n".join(acc)
 
   @staticmethod
   def page(note, page, **kwargs):
     kwargs['origin_note'] = note
-    LOG({'note': note, 'page': page, 'iter': list(page), 'map': list(map(lambda x: x, page))})
-    acc = list()
-    for section in page:
-      RENDER.section(section)
-    return '\n'.join(acc) + TREE.filesize(note)
-    # return '\n'.join(map(lambda x: RENDER.section(x, **kwargs), page))
+    return '\n'.join(map(lambda x: RENDER.section(x, **kwargs), page)) + TREE.filesize(note)
 
   @staticmethod
   def content(note, **kwargs):
-    return RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)), **kwargs)
+    page = PARSER.parse_file(FLAT.to_path(note))
+    page = TEXP_REWRITE.page(page)
+    return RENDER.page(note, page, **kwargs)
 
   @staticmethod
   def base_page(D):
