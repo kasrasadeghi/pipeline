@@ -1,9 +1,4 @@
 class TEXP_REWRITE:
-
-  @staticmethod
-  def is_newline(T):
-    return T.match('(newline)')
-
   @staticmethod
   def line(line):
     def parse_url(S):
@@ -34,42 +29,34 @@ class TEXP_REWRITE:
     return parse_url(line)
 
   @staticmethod
-  def block(block):
+  def tree(tree):
     """ rewrite: block -> (| message block)"""
-    match block:
-      case Texp(value='block', children=[
-        Texp(value='node', children=[
-          Texp(value='indent', children=[0]),
-          Texp(value='value', children=[msg_content]),
-          Texp(value='children', children=[
-            Texp(value='node', children=[
-              Texp(value='indent', children=[1]),
-              Texp(value='value', children=[date]),
-              Texp(value='children', children=[])
-            ])
-          ])
-        ])
-      ]):
-        if msg_content.startswith('msg: ') and date.startswith('Date: '):
-          return Texp('msg', Texp('content', msg_content), Texp('date', date))
-      case Texp(value='block', children=[
-        Texp(value='node', children=children) as node
-      ]):
-        return node
-    return block
+    if (x := tree.match("(tree (node (indent 0) (value {content}) (children (node (indent 1) (value {date}) children)))))"))[0]:
+      msg = x[1]
+      msg.value = 'msg'
+      return msg
+    return tree
 
   @staticmethod
   def section(section):
-    """ transform: section -> block """
+    """ transform (traverse & rewrite): section -> section """
+
+    # do the traverse
     acc = Texp('trees')
-    prev_is_msg = False
-    for block in section['trees']:
-      block = TEXP_REWRITE.block(block)
-      if prev_is_msg and TEXP_REWRITE.is_newline(block):
+    for tree in section['trees']:
+      acc.push(TEXP_REWRITE.tree(tree))
+
+    # remove newlines if they're after msgs
+    prev_is_msg = None
+    new_acc = Texp('trees')
+    for tree in acc:
+      if tree.match('(newline)')[0] and prev_is_msg:
+        prev_is_msg = tree.value == 'msg'
         continue
-      prev_is_msg = DISCUSSION.is_msg(block)
-      acc.push(block)
-    return Texp('section', section['title'], acc)
+      prev_is_msg = tree.value == 'msg'
+      new_acc.push(tree)
+
+    return Texp('section', section['title'], new_acc)
 
   @staticmethod
   def page(page):
