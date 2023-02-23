@@ -24,7 +24,6 @@ def test_date_cmd():
     util.date_cmd("-d", 'Tue Feb 14 11:13:50 PST 2023', "+%T")
   return 'DONE'
 
-
 @app.route('/test/unit/render_every_note')
 def test_render_every_note():
   for note in FLAT.list():
@@ -37,3 +36,19 @@ def test_pagesize_every_note():
   for note in FLAT.list():
     size += len(DISCUSSION_RENDER.MAIN(note))
   return 'rendered size: ' + str(size)
+
+@app.route('/test/unit/texp_eq')
+def test_texp_eq():
+  assert Texp('indent') == Texp('indent')
+  assert Texp('indent', Texp('a')) == Texp('indent', Texp('a'))
+  assert Texp('indent', 0) == Texp('indent', 0)
+  assert Texp('indent', 0) == Texp.parse('(indent 0)'), 'nonquoted numbers are ints'
+  assert Texp('indent', '0') == Texp.parse('(indent "0")'), 'quotes are strings'
+  assert Texp('indent', '0') == Texp.parse("(indent '0')"), 'single quotes are still strings'
+  return 'PASS'
+
+@app.route('/test/unit/texp_pattern_match')
+def test_texp_pattern_match():
+  assert Texp('indent', 0).match('(indent {a})') == (True, '(match (a 0))')
+  assert Texp('indent', '0').match('(indent {a})') == (True, '(match (a "0"))')
+  return 'PASS'
