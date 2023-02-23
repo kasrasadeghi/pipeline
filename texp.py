@@ -18,6 +18,19 @@ class Texp:
         raise ValueError(f"couldn't find '{i}' in {self}")
     return self.children[i]
 
+  def update(self, **kwargs):
+    kw = kwargs.copy()
+    result = Texp(self.value)
+    for c in self:
+      if c.value in kw:
+        result.push(Texp(c.value, kw[c.value]))
+        del kw[c.value]
+      else:
+        result.push(c)
+
+    assert len(kw) == 0
+    return result
+
   def __contains__(self, key):
     assert isinstance(key, str)
     try:

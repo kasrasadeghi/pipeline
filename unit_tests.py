@@ -93,7 +93,6 @@ def test_texp_parse():
 
 @app.route('/test/unit/texp_pattern_match')
 def test_texp_pattern_match():
-  print(Texp('indent', 0).match('(indent {a})'))
   return eqch(
     [Texp('indent', 0).match('(indent {a})'),
      (True, '(match (a 0))')],
@@ -103,4 +102,15 @@ def test_texp_pattern_match():
 
     [Texp('indent', '"0"').match('(indent {a})'),
      (True, Texp.parse('(match (a "0"))'))]
+  )
+
+
+@app.route('/test/unit/test_unit_texp_clone')
+def test_texp_clone():
+  x = Texp('e', Texp('a', 5), Texp('b', 6))
+  y = x.update(a=1)
+
+  return eqch(
+    [x, Texp('e', Texp('a', 5), Texp('b', 6)), 'x stays the same'],
+    [y, Texp('e', Texp('a', 1), Texp('b', 6)), 'y changes']
   )
