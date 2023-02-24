@@ -3,10 +3,10 @@
 class PLAN_RENDER:
   @staticmethod
   def section(section, **kwargs):
-    if section['section'] == 'METADATA':
+    if section['title'] == 'METADATA':
       return RENDER.section(section, **CONTEXT.DEFAULT(kwargs, 'render_section'))
 
-    if section['section'] != 'entry':
+    if section['title'] != 'entry':
       return ''
 
     msg_blocks = list()

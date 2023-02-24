@@ -37,7 +37,7 @@ class BLOG:
 
     node = PARSER.parse_content("\n".join(lines[1:]))
 
-    if node[0]['section'] != "entry":
+    if node[0]['title'] != "entry":
       ABORT(f"ERROR: parsing entry section from node: {TREE.dump_tree(node)}")
 
     blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
@@ -58,7 +58,7 @@ class BLOG:
 
     node = PARSER.parse_content("".join(lines))
 
-    if node[0]['section'] != "entry":
+    if node[0]['title'] != "entry":
       ABORT(f"ERROR: parsing entry section from node: {TREE.dump_tree(node)}")
 
     blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
@@ -315,7 +315,7 @@ class BLOG_TREE:
 
   @staticmethod
   def section(section):
-    if section['section'] != 'entry':
+    if section['title'] != 'entry':
       return ''
 
     acc = list()

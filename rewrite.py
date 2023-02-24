@@ -49,7 +49,7 @@ class REWRITE:
   @staticmethod
   def section(section):
     """ transform: section -> block """
-    result = {'title': section['section'], 'blocks': list()}
+    result = {'title': section['title'], 'lines': section['lines'], 'blocks': list()}
     prev_is_msg = False
     for block in section['blocks']:
       block = REWRITE.block(block)

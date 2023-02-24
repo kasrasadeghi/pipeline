@@ -76,7 +76,7 @@ class TREE:
   def dump_tree(page):
     acc = list()
     for S in page:
-      acc.append(S['section'])
+      acc.append(S['title'])
       for B in S['blocks']:
         if len(B) == 1:
           acc.append(FLASK_UTIL.ESCAPE(B))
@@ -96,7 +96,7 @@ def test_render_trim_newline(note):
   new_page = list()
   for S in page:
     new_S = dict()
-    new_S['section'] = S['section']
+    new_S['title'] = S['title']
     new_S['blocks'] = TREE.trim_newlines(S['blocks'])
     new_page.append(new_S)
 
@@ -110,7 +110,7 @@ def test_render_trim_and_squash(note):
   new_page = list()
   for S in page:
     new_S = dict()
-    new_S['section'] = S['section']
+    new_S['title'] = S['title']
     new_S['blocks'] = TREE.squash_messages(TREE.trim_newlines(S['blocks']))
     new_page.append(new_S)
 

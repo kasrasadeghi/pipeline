@@ -28,7 +28,7 @@ class PARSER:
     # - a node can be either a line of type 'str', or a parsed tree
     R = LineReader(content)
 
-    make_section = lambda title: {"section": title, "lines": list()}
+    make_section = lambda title: {"title": title, "lines": list()}
 
     sections = list()
     curr_section = make_section("entry")

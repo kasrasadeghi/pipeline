@@ -3,7 +3,7 @@ def test_fbconv(note):
 
   speakers = None
   def section(s, **kwargs):
-    if s['section'] != 'FBCONV':
+    if s['title'] != 'FBCONV':
       return RENDER.section(s, **CONTEXT.DEFAULT(kwargs, 'render_section'))
 
     acc = list()
