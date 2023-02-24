@@ -64,10 +64,12 @@ def get_profile_data_viewer():
   # ideas:
   content = (
     """<script>
-      document.addEventListener('load', () => {
+      window.addEventListener('load', () => {
         let url = new URL(window.location);
-        url.searchParams.set('profile');
-        document.getElementById('select-profile').value = url.href;
+        console.trace();
+        document.getElementById('select-profile').value = url.searchParams.get('profile');
+        document.getElementById('use-saved').checked = (url.searchParams.get('saved') === 'true');
+        document.getElementById('prefix').value = url.searchParams.get('prefix');
       });
       function get_profile() {
         const path = document.getElementById('select-profile').value;
