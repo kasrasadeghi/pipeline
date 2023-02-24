@@ -43,7 +43,8 @@ class REWRITE:
       case [{ "value": content, "indent": 0, "children": [
               { "value": date, "indent": 1, "children": []}
            ]}]:
-        return {'msg': REWRITE.line(content), 'date': date}
+        if content.startswith('msg: ') and date.startswith('Date: '):
+          return {'msg': REWRITE.line(content.removeprefix('msg: ')), 'date': date.removeprefix('Date: ')}
     return block
 
   @staticmethod

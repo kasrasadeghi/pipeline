@@ -77,12 +77,6 @@ class RENDER:
 
     LOG({'item': item, 'render_msg': render_msg})
 
-    if DISCUSSION.is_msg(item):
-      if render_msg:
-        return render_msg(item, **kwargs)
-      else:
-        return DISCUSSION_RENDER.msg(item, **kwargs)
-
     level = item['indent']
     if level == -1:  # toplevel
       indent = ""
@@ -104,15 +98,19 @@ class RENDER:
 
   @staticmethod
   def block(block, **kwargs):
+    match block:
+      case {'msg': _} as msg:
+        return kwargs.get('render_msg', DISCUSSION_RENDER.msg)(msg)
+
     if block == ['']:
       return '<br/>'
 
     acc = []
     for item in block:
       # if item is a tree/node
-      if isinstance(item, dict):
-        acc.append(RENDER.node(item, **kwargs))
-        continue
+      # if isinstance(item, dict):
+        # acc.append(RENDER.node(item, **kwargs))
+        # continue
 
       if isinstance(item, str):
         line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
@@ -125,36 +123,36 @@ class RENDER:
 
   @staticmethod
   def section(section, **kwargs):
-    # LOG({'kwargs': kwargs, 'section': section['section']})
+    # LOG({'kwargs': kwargs, 'section': section['title']})
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
-    if section['section'] == 'entry' and \
-       'origin_note' in kwargs and 'Tags' in FLAT.metadata(kwargs['origin_note']) and \
-       'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
-      return DISCUSSION_RENDER.section(section, **kwargs)
+    # if section['title'] == 'entry' and \
+    #    'origin_note' in kwargs and 'Tags' in FLAT.metadata(kwargs['origin_note']) and \
+    #    'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
+    #   return DISCUSSION_RENDER.section(section, **kwargs)
 
-    if section['section'] == 'DISCUSSION':
-      return DISCUSSION_RENDER.section(section, **kwargs)
+    # if section['title'] == 'DISCUSSION':
+    #   return DISCUSSION_RENDER.section(section, **kwargs)
 
-    if section['section'] == 'HTML':
-      LOG({'html section': section})
-      acc = []
-      for block in section['blocks']:
-        for l in block:
-          acc.append(l)
-      return "\n".join(acc)
+    # if section['title'] == 'HTML':
+    #   LOG({'html section': section})
+    #   acc = []
+    #   for block in section['blocks']:
+    #     for l in block:
+    #       acc.append(l)
+    #   return "\n".join(acc)
 
-    if section['section'] == 'METADATA':
-      if JOURNAL.is_journal(section):
-        return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
+    # if section['title'] == 'METADATA':
+    #   if JOURNAL.is_journal(section):
+    #     return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
 
     acc = list()
-    if section['section'] != 'entry':
-      acc.append(f'<pre>--- {section["section"]} --- </pre>')
+    # if section['title'] != 'entry':
+    #   acc.append(f"<pre>--- {section['title']} --- </pre>")
 
     # don't print two empty blocks consecutively
-    for block in TREE.blocks_from_section(section):
+    for block in section['blocks']:
       acc.append(RENDER.block(block, **kwargs))
 
     return '\n'.join(acc)
@@ -166,7 +164,7 @@ class RENDER:
 
   @staticmethod
   def content(note, **kwargs):
-    return RENDER.page(note, PARSER.parse_file(FLAT.to_path(note)), **kwargs)
+    return RENDER.page(note, REWRITE.note(note), **kwargs)
 
   @staticmethod
   def base_page(D):
