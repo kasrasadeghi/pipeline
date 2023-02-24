@@ -34,11 +34,12 @@ class TEXP_REWRITE:
   def tree(tree):
     """ rewrite: block -> (| message block)"""
     if (x := tree.match("(tree (node (indent 0) (value {content}) (children (node (indent 1) (value {date}) children)))))"))[0]:
-      msg = Texp('msg')
-      msg.value = 'msg'
-      msg.push(Texp('content', x[1].get('content').removeprefix('msg: ')))
-      msg.push(Texp('Date', x[1].get('date').removeprefix('Date: ')))
-      return msg
+      if x[1].get('content').startswith('msg: ') and x[1].get('date').startswith('Date: '):
+        msg = Texp('msg')
+        msg.value = 'msg'
+        msg.push(Texp('content', x[1].get('content').removeprefix('msg: ')))
+        msg.push(Texp('Date', x[1].get('date').removeprefix('Date: ')))
+        return msg
     return tree
 
   @staticmethod

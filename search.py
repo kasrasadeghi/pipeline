@@ -7,12 +7,17 @@ def msg_generator():
 
   for f in files:
     LOG({'search file': f})
-    for S in filter(lambda x: x.get('title') != 'METADATA', TEXP_REWRITE.note(f)):
+    for S in TEXP_REWRITE.note(f):
       assert S.value == 'section'
       if 'trees' in S:
         for tree in S['trees']:
           if tree.value == 'msg':
             yield f, tree
+      if 'roots' in S:
+        for root in S['roots']:
+          for item in root:
+            if item.value == 'msg':
+              yield f, item
 
 class SEARCH:
   @classmethod
