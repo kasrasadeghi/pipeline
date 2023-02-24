@@ -4,13 +4,13 @@ class REWRITE_RESULT:
     return isinstance(block, dict) and 'date' in block and 'msg' in block
 
 class REWRITE:
+  context = dict()
+
   @staticmethod
-  def line(line, **kwargs):
+  def line(line):
     # cont is continuation
     # base is the escape function for when we have no more rendering left to do
     def parse_url(S, cont, base):
-      nonlocal kwargs
-
       if ': ' in S:
         prefix, url = S.rsplit(': ', 1)
         url = url.strip()
@@ -37,42 +37,48 @@ class REWRITE:
     return parse_url(line, cont=highlight_tags, base=lambda x: [x])
 
   @staticmethod
-  def block(block, **kwargs):
+  def block(block):
     """ rewrite: block -> (| message block)"""
-    if DISCUSSION.block_is_msg(block):
-      return {'date': DISCUSSION.date(block[0]), 'msg': REWRITE.line(DISCUSSION.msg_content(block[0]), **kwargs)}
+    match block:
+      case [{ "value": content, "indent": 0, "children": [
+              { "value": date, "indent": 1, "children": []}
+           ]}]:
+        return {'msg': REWRITE.line(content), 'date': date}
     return block
 
   @staticmethod
-  def section(section, **kwargs):
+  def section(section):
     """ transform: section -> block """
-    acc = {'blocks': list()}
+    result = {'title': section['section'], 'blocks': list()}
     prev_is_msg = False
     for block in section['blocks']:
-      block = REWRITE.block(block, **kwargs)
+      block = REWRITE.block(block)
       if prev_is_msg and TREE.is_newline(block):
         continue
-      acc['blocks'].append(block)
+      result['blocks'].append(block)
       prev_is_msg = REWRITE_RESULT.block_is_msg(block)
-    return acc
+
+    return result
 
   @staticmethod
-  def page(page, **kwargs):
+  def page(page):
     """ traverse: page -> section """
-    acc = list()
-    for section in page:
-      acc.append(REWRITE.section(section, **kwargs))
-    return acc
+    return [REWRITE.section(section) for section in page]
+
+  @staticmethod
+  def note(note):
+    page = PARSER.parse_file(FLAT.to_path(note))
+    REWRITE.context['note'] = note
+    result = REWRITE.page(page)
+    REWRITE.context = dict()
+    return result
 
 @app.route('/api/parse/<note>')
 def api_parse(note):
   page = PARSER.parse_file(FLAT.to_path(note))
-  result = {'note': note, 'page': page}
-  return json.dumps(result)
+  return {'note': note, 'page': page}
 
 @app.route('/api/rewrite/<note>')
 def get_rewrite(note):
-  page = PARSER.parse_file(FLAT.to_path(note))
-  result = REWRITE.page(page)
+  result = REWRITE.note(note)
   return {'result': result}
-  # return json.dumps(result, indent=2)
