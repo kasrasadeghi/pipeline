@@ -1,22 +1,18 @@
-def block_generator():
-  files = list(reversed(FLAT.list_by_create_date()))
-  DEBUG.set_state("file count", len(files))
-
-  for f in files:
-    LOG("searching through file: " + f)
-    non_metadata_sections = list(filter(lambda x: x['section'] != 'METADATA',
-                                        PARSER.parse_file(FLAT.to_path(f))))
-    for S in reversed(non_metadata_sections):
-      for B in S['blocks']:
-        yield f, B
-
 def msg_generator():
-  for f, B in block_generator():
-    for L in B:
-      if isinstance(L, dict) and L['value'].startswith("msg:"):
-        assert 'origin' not in L
-        L |= {'origin': f, 'date': DISCUSSION.date(L)}
-        yield L
+  files = list(reversed(list(map(lambda p: p[0],
+                                 util.sort_mtime(map(lambda n: (n, FLAT.to_path(n)), FLAT.list()),
+                                                 key=lambda p: p[1])))))
+  # files = list(reversed(FLAT.list_by_create_date()))  # CONSIDER list by modify date
+  LOG({"file count": len(files)})
+
+  for f in files[:100]:
+    LOG({'search file': f})
+    for S in filter(lambda x: x.get('title') != 'METADATA', TEXP_REWRITE.note(f)):
+      assert S.value == 'section'
+      if 'trees' in S:
+        for tree in S['trees']:
+          if tree.value == 'msg':
+            yield f, tree
 
 class SEARCH:
   @classmethod
@@ -51,13 +47,13 @@ def get_search_with_query(query):
   acc = list()
   current_note = None
   msg_count = 0
-  for msg in msg_generator():
-    if query.lower() in msg['value'].lower():
-      if current_note != msg['origin']:
-        acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
-        current_note = msg['origin']
+  for f, msg in msg_generator():
+    if query.lower() in msg.get('content').lower():
+      if current_note != f:
+        acc.append(RENDER_UTIL.banner(FLAT.title(f)))
+        current_note = f
       msg_count += 1
-      acc.append(DISCUSSION_RENDER.msg(msg))
+      acc.append(DISCUSSION_RENDER.msg(msg, origin=f))
   content = "".join(acc)
 
   DEBUG.set_state("content size", len(content))

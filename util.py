@@ -6,7 +6,7 @@ class util:
 
   @staticmethod
   def sort_mtime(files, key=lambda x: x):
-    return [p[0] for p in sorted([(f, os.stat(f).st_mtime) for f in files], key=lambda p: p[1])]
+    return [p[0] for p in sorted([(f, os.stat(key(f)).st_mtime) for f in files], key=lambda p: p[1])]
 
   @staticmethod
   def basename(filename):

@@ -1,8 +1,10 @@
 class Texp:
+  __match_cache__ = dict()
+
   def __init__(self, value, *children):
     self.value = value
     for i, child in enumerate(children):
-      assert Texp.typecheck(child), f"child #{i} '{child}' in Texp constructor is neither Texp nor str"
+      assert Texp.typecheck(child), f"child #{i} '{child}' in Texp constructor is Texp"
     self.children = list(children)
 
   @staticmethod
@@ -161,7 +163,9 @@ class Texp:
 
   def match(T, pattern):
     if isinstance(pattern, str):
-      pattern = Texp.parse(pattern)
+      if pattern not in Texp.__match_cache__:
+        Texp.__match_cache__[pattern] = Texp.parse(pattern)
+      pattern = Texp.__match_cache__[pattern]
     elif not isinstance(pattern, Texp):
       raise Exception(f"'{pattern}' is neither Texp nor str")
     # LOG({'pattern': pattern})
