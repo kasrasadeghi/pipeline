@@ -1,5 +1,8 @@
 def block_generator():
-  files = list(reversed(FLAT.list_by_create_date()))
+  files = list(reversed(list(map(lambda p: p[0],
+                                 util.sort_mtime(map(lambda n: (n, FLAT.to_path(n)), FLAT.list()),
+                                                 key=lambda p: p[1])))))
+
   DEBUG.set_state("file count", len(files))
 
   for f in files:
