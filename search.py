@@ -5,7 +5,7 @@ def msg_generator():
   # files = list(reversed(FLAT.list_by_create_date()))  # CONSIDER list by modify date
   LOG({"file count": len(files)})
 
-  for f in files[:100]:
+  for f in files:
     LOG({'search file': f})
     for S in filter(lambda x: x.get('title') != 'METADATA', TEXP_REWRITE.note(f)):
       assert S.value == 'section'

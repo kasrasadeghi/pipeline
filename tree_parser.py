@@ -56,7 +56,7 @@ class TREE_PARSER:
   @staticmethod
   def parse_tree(block, **kwargs):
     indent_counts = []
-    for L in block:
+    for i, L in enumerate(block):
       if L.get()[0] != ' ' and L.get()[0] != "-":
         indent_counts.append(Texp('indent-count', Texp("indent", -1), Texp("content", L)))
       else:
