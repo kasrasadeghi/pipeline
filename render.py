@@ -64,13 +64,7 @@ class RENDER:
     else:
       indent = (level * "  ") + "- "
 
-    result = None
-    result = RENDER.line(REWRITE.line(item['value']), indent=indent, **kwargs)
-    result = "<pre>" + indent + result + "</pre>"
-
-    acc = list()
-    acc.append(result)
-
+    acc = ["<pre>" + indent + RENDER.line(REWRITE.line(item['value']), indent=indent, **kwargs) + "</pre>"]
     for child in item['children']:
       acc.append(RENDER.node(child, **kwargs))
 
