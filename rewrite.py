@@ -44,6 +44,39 @@ class REWRITE:
     return block
 
   @staticmethod
+  def discussion_section(section):
+    disc_section = section['title'] == 'DISCUSSION'
+    journal_disc_section = (
+      section['title'] == 'entry' and
+      'note' in REWRITE.context and
+      'Tags' in FLAT.metadata(REWRITE.context['note']) and
+      'Journal' in FLAT.metadata(REWRITE.context['note'])['Tags']
+    )
+
+    if not (disc_section or journal_disc_section):
+      return section
+
+    # handle discussion sections
+    roots = [{'root': 'pre_roots', 'children': list()}]
+
+    for block in section['blocks']:
+      match block:
+        case {'msg': _} as msg:
+          if msg['msg'][0].startswith("- "):
+            msg['msg'][0] = msg['msg'][0].removeprefix('- ')
+            roots[-1]['children'].append(msg)
+          else:  # new root
+            roots.append({'root': 'nonfinal', 'children': [msg]})
+
+        case _:
+          roots[-1]['children'].append(block)
+
+    if roots:
+      roots[-1]['root'] = 'final'
+
+    return section | {'roots': roots}
+
+  @staticmethod
   def section(section):
     """ transform: section -> block """
     result = {'title': section['title'], 'lines': section['lines'], 'blocks': list()}
@@ -55,6 +88,7 @@ class REWRITE:
       result['blocks'].append(block)
       prev_is_msg = REWRITE_RESULT.block_is_msg(block)
 
+    result = REWRITE.discussion_section(result)
     return result
 
   @staticmethod

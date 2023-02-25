@@ -105,6 +105,42 @@ class RENDER:
     return '\n'.join(acc)
 
   @staticmethod
+  def root(root, **kwargs):
+    match root:
+      case {'root': 'pre_roots', 'children': children}:
+        return ''.join(map(lambda x: RENDER.block(x, **kwargs), children))
+      case {'root': _, 'children': [child]}:
+        return RENDER.block(child, **kwargs)
+      case {'root': 'nonfinal', 'children': children}:
+        details = "<details>"
+      case {'root': 'final', 'children': children}:
+        details = "<details open>"
+
+    acc = list()
+    acc.append(details)
+
+    tags = list()
+    for item in root:
+      if 'msg' in item:
+        tags += TAG.parse(item['msg'])
+
+    for i, item in enumerate(children):
+      match item:
+        case {'msg': _} as msg if i == 0:
+          acc.append('<summary>')
+          acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
+          if tags:
+            acc.append("<div class='tags-summary'>" + str(tags) + "</div>")
+          acc.append('</summary>')
+        case {'msg': _}:
+          acc.append(DISCUSSION_RENDER.msg(msg, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
+        case _:
+          acc.append(repr(item))  # TODO probably RENDER.block instead
+
+    acc.append('</details>')
+    return ''.join(acc)
+
+  @staticmethod
   def section(section, **kwargs):
     # LOG({'kwargs': kwargs, 'section': section['title']})
     if 'render_section' in kwargs:
@@ -134,8 +170,12 @@ class RENDER:
     if section['title'] != 'entry':
       acc.append(f"<pre>--- {section['title']} --- </pre>")
 
-    for block in section['blocks']:
-      acc.append(RENDER.block(block, **kwargs))
+    if 'roots' in section:
+      for root in section['roots']:
+        acc.append(RENDER.root(root, **kwargs))
+    else:
+      for block in section['blocks']:
+        acc.append(RENDER.block(block, **kwargs))
 
     return '\n'.join(acc)
 
