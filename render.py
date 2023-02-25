@@ -89,17 +89,13 @@ class RENDER:
 
     acc = []
     for item in block:
-      if isinstance(item, dict):
-        acc.append(RENDER.node(item, **kwargs))
-        continue
-
-        # str():
-      if isinstance(item, str):
-        line_rendered = "\n".join(map(lambda x: RENDER.line(REWRITE.line(x), **kwargs), item.split('\n')))
-        acc.append(f"<pre>{line_rendered}</pre>")
-        continue
-
-      acc.append(repr(item))
+      match item:
+        case dict():
+          acc.append(RENDER.node(item, **kwargs))
+        case str():
+          acc.append("<pre>" + "\n".join(map(lambda x: RENDER.line(REWRITE.line(x), **kwargs), item.split('\n'))) + "</pre>")
+        case _:
+          acc.append(repr(item))
 
     return '\n'.join(acc)
 
