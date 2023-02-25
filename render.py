@@ -54,9 +54,7 @@ class RENDER:
 
   @staticmethod
   def node(item, **kwargs):
-    # LOG({'kwargs': kwargs})
-    render_msg = kwargs.get('render_msg', None)
-    LOG({'item': item, 'render_msg': render_msg})
+    LOG({'item': item})
 
     level = item['indent']
     if level == -1:  # toplevel
