@@ -19,20 +19,17 @@ def kaz_import(filepath):
 
 kaz_import('util.py')
 kaz_import('flask_util.py')
-
 kaz_import('tree_parser.py')
-kaz_import('advanced_tree_parser.py')
 kaz_import('block_parser.py')
 kaz_import('tree.py')
-kaz_import('node.py')
 kaz_import('rewrite.py')
 kaz_import('render.py')
 kaz_import('render_util.py')
 kaz_import('sidebar.py')
-kaz_import('git.py')
+
 kaz_import('tag.py')
-kaz_import('js.py')
 kaz_import('pattern.py')
+kaz_import('ref.py')
 
 kaz_import('flat.py')
 kaz_import('search.py')
@@ -40,15 +37,19 @@ kaz_import('journal.py')
 kaz_import('edit.py')
 kaz_import('discussion.py')
 
+kaz_import('git.py')
+kaz_import('js.py')
+
 kaz_import('command.py')
 kaz_import('commands/new_note.py')
+kaz_import('node.py')
+kaz_import('advanced_tree_parser.py')
+kaz_import('blog.py')
+
 kaz_import('commands/twitch_clip.py')
 kaz_import('commands/full_sync.py')
 
 kaz_import('plan.py')
-kaz_import('ref.py')
-
-kaz_import('blog.py')
 kaz_import('graph.py')
 
 kaz_import('debug.py')
