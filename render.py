@@ -82,7 +82,7 @@ class RENDER:
     acc = []
     for item in block:
       match item:
-        case dict():
+        case {'value': _, 'indent': _, 'children': _}:
           acc.append(RENDER.node(item, **kwargs))
         case str():
           acc.append("<pre>" + RENDER.line(REWRITE.line(item)) + "</pre>")
