@@ -32,6 +32,11 @@ class REWRITE:
     return parse_url(line)
 
   @staticmethod
+  def node(node):
+    return node | {'line': REWRITE.line(node['value']),
+                   'children': [REWRITE.node(child) for child in node['children']]}
+
+  @staticmethod
   def block(block):
     """ rewrite: block -> (| message block)"""
     match block:
@@ -39,7 +44,19 @@ class REWRITE:
               { "value": date, "indent": 1, "children": []}
            ]}] if content.startswith('msg: ') and date.startswith('Date: '):
         return {'msg': REWRITE.line(content.removeprefix('msg: ')), 'content': content, 'date': date.removeprefix('Date: ')}
-    return block
+      case ['']:
+        return block
+
+    acc = list()
+    for item in block:
+      match item:
+        case {'value': _, 'indent': _, 'children': _}:
+          acc.append(REWRITE.node(item))
+        case str():
+          acc.append({'line': REWRITE.line(item)})
+        case _:
+          assert False
+    return acc
 
   @staticmethod
   def discussion_section(section):

@@ -64,7 +64,7 @@ class RENDER:
     else:
       indent = (level * "  ") + "- "
 
-    acc = ["<pre>" + indent + RENDER.line(REWRITE.line(item['value']), indent=indent, **kwargs) + "</pre>"]
+    acc = ["<pre>" + indent + RENDER.line(item['line'], indent=indent, **kwargs) + "</pre>"]
     for child in item['children']:
       acc.append(RENDER.node(child, **kwargs))
 
@@ -75,19 +75,20 @@ class RENDER:
     match block:
       case {'msg': _} as msg:
         return kwargs.get('render_msg', DISCUSSION_RENDER.msg)(msg)
-
+      case {'line': line}:
+        return RENDER.line(line, **kwargs)
     if block == ['']:
       return '<br/>'
 
     acc = []
     for item in block:
       match item:
-        case {'value': _, 'indent': _, 'children': _}:
+        case {'value': _, 'indent': _, 'children': _, 'line': _}:
           acc.append(RENDER.node(item, **kwargs))
-        case str():
-          acc.append("<pre>" + RENDER.line(REWRITE.line(item)) + "</pre>")
+        case {'line': line}:
+          acc.append('<pre>' + RENDER.line(line, **kwargs) + '</pre>')
         case _:
-          acc.append(repr(item))
+          assert False
 
     return '\n'.join(acc)
 
