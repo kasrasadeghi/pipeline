@@ -23,32 +23,30 @@ def LOG(s):
   DEBUG.LOG(s)
 
 class DEBUG:
-  # TODO should make state request specific so that it can be multithreaded or multi-processed
-  _STATE = None
   _GLOBAL_LOG = []
   _GLOBAL_LOG_ENABLED = False
 
   @staticmethod
   def clear_state():
-    DEBUG._STATE = None
+    g.DEBUG_STATE = None
 
   @staticmethod
   def init_state():
-    DEBUG._STATE = dict()
-    DEBUG._STATE['start time'] = time.time()  # get current time
-    DEBUG._STATE['LOG'] = list()
+    g.DEBUG_STATE = dict()
+    g.DEBUG_STATE['LOG'] = list()
+    g.request_start = time.time()  # get current time
 
   @staticmethod
   def set_state(k, v):
-    if DEBUG._STATE:
+    if g.DEBUG_STATE:
       LOG(f"set '{k}' to '{v}'")
-      DEBUG._STATE[k] = v
+      g.DEBUG_STATE[k] = v
     else:
       LOG(f"stateless map {k} -> {v}")
 
   @staticmethod
   def get_state(k):
-    return DEBUG._STATE[k]
+    return g.DEBUG_STATE[k]
 
   @staticmethod
   def clear_log():
@@ -80,8 +78,8 @@ class DEBUG:
 
   @staticmethod
   def LOG(s):
-    if DEBUG._STATE:
-      DEBUG._STATE['LOG'].append(s)
+    if 'DEBUG_STATE' in g:
+      g.DEBUG_STATE['LOG'].append(s)
     if DEBUG._GLOBAL_LOG_ENABLED:
       parent_frame = DEBUG.first_nondebug_frame(lambda f: f.f_code.co_name == 'LOG')
       DEBUG._GLOBAL_LOG.append({"i": len(DEBUG._GLOBAL_LOG), "frame": DEBUG.frameinfo(parent_frame), "content": s})
@@ -118,18 +116,18 @@ class DEBUG:
   @staticmethod
   def CONTENT():
     debug = ""
-    if DEBUG._STATE is not None:
-      if 'LOG' in DEBUG._STATE:
+    if 'DEBUG_STATE' in g:
+      if 'LOG' in g.DEBUG_STATE:
         # if log is empty, don't print anything
-        if 0 == len(DEBUG._STATE['LOG']):
+        if 0 == len(g.DEBUG_STATE['LOG']):
           return ''
 
         # rearrange to put the log at the end
-        log = DEBUG._STATE['LOG']
-        del DEBUG._STATE['LOG']
-        DEBUG._STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{PRETTY.DUMP(DEBUG._STATE)}\n"
-      debug += DEBUG._STATE.get("stacktrace", "")
+        log = g.DEBUG_STATE['LOG']
+        del g.DEBUG_STATE['LOG']
+        g.DEBUG_STATE['LOG'] = log
+      debug = f"<pre>DEBUG STATE: \n" + f"{PRETTY.DUMP(g.DEBUG_STATE)}\n"
+      debug += g.DEBUG_STATE.get("stacktrace", "")
       debug += "</pre>"
     DEBUG.clear_state()
     return debug
