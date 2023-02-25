@@ -122,7 +122,7 @@ class RENDER:
     tags = list()
     for item in root:
       if 'msg' in item:
-        tags += TAG.parse(item['msg'])
+        tags += TAG.parse(item['content'])
 
     for i, item in enumerate(children):
       match item:

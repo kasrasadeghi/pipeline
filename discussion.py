@@ -14,9 +14,6 @@ class DISCUSSION:
       LOG({'ERROR': 'msg cannot be list, you\'re probably passing in a block', 'msg': msg})
     return msg['children'][0]['value'].removeprefix('Date: ')
 
-  @staticmethod
-  def msg_content(msg):
-    return msg["value"].removeprefix("msg: ")
 # end DISCUSSION
 
 

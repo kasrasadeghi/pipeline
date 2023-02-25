@@ -54,12 +54,12 @@ def get_search_with_query(query):
   current_note = None
   msg_count = 0
   for msg in msg_generator():
-    if query.lower() in msg['value'].lower():
+    if query.lower() in msg['content'].lower():
       if current_note != msg['origin']:
         acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
         current_note = msg['origin']
       msg_count += 1
-      acc.append(DISCUSSION_RENDER.msg(msg))
+      acc.append(DISCUSSION_RENDER.msg(REWRITE.block(msg)))
   content = "".join(acc)
 
   DEBUG.set_state("content size", len(content))
