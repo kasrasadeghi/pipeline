@@ -28,7 +28,7 @@ class REWRITE:
           url = {'url-internal-link': unquote_plus(url)}
         return [prefix, ': ', url]
 
-      return S
+      return [S]
 
     return parse_url(line)
 
