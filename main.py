@@ -49,7 +49,6 @@ kaz_import('blog.py')
 kaz_import('commands/twitch_clip.py')
 kaz_import('commands/full_sync.py')
 
-kaz_import('plan.py')
 kaz_import('graph.py')
 
 kaz_import('debug.py')
