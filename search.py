@@ -7,7 +7,7 @@ def block_generator():
 
   for note in notes:
     LOG({"searching through note": note})
-    non_metadata_sections = list(filter(lambda x: x['title'] != 'METADATA', REWRITE.note(note)))
+    non_metadata_sections = list(filter(lambda x: x['title'] != 'METADATA', PARSER.parse_file(FLAT.to_path(note))))
     for S in reversed(non_metadata_sections):
       for B in S['blocks']:
         yield note, B
@@ -15,9 +15,14 @@ def block_generator():
 def msg_generator():
   for f, B in block_generator():
     match B:
-      case {'msg': _} as msg:
-        msg |= {'origin': f}
-        yield msg
+      case [{ "value": content, "indent": 0, "children": [
+              { "value": date, "indent": 1, "children": []}
+           ]}]:
+        if content.startswith('msg: ') and date.startswith('Date: '):
+          yield {'content': content, 'block': B, 'origin': f}
+
+def render_msg_from_generator(msg_gen_result):
+  return DISCUSSION_RENDER.msg(REWRITE.block(msg_gen_result['block']))
 
 class SEARCH:
   @classmethod
@@ -35,7 +40,7 @@ def get_search():
   DEBUG.init_state()
 
   msgs = list(msg_generator())
-  content = "".join(map(DISCUSSION_RENDER.msg, msgs))
+  content = "".join(map(render_msg_from_generator, msgs))
 
   DEBUG.set_state("content size", len(content))
 
@@ -58,7 +63,7 @@ def get_search_with_query(query):
         acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
         current_note = msg['origin']
       msg_count += 1
-      acc.append(DISCUSSION_RENDER.msg(REWRITE.block(msg)))
+      acc.append(render_msg_from_generator(msg))
   content = "".join(acc)
 
   DEBUG.set_state("content size", len(content))
