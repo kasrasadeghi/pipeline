@@ -1,14 +1,13 @@
 def block_generator():
-  files = list(reversed(list(map(lambda p: p[0],
+  notes = list(reversed(list(map(lambda p: p[0],
                                  util.sort_mtime(map(lambda n: (n, FLAT.to_path(n)), FLAT.list()),
                                                  key=lambda p: p[1])))))
 
-  DEBUG.set_state("file count", len(files))
+  LOG({"file count": len(notes)})
 
-  for f in files:
-    LOG("searching through file: " + f)
-    non_metadata_sections = list(filter(lambda x: x['title'] != 'METADATA',
-                                        PARSER.parse_file(FLAT.to_path(f))))
+  for note in notes:
+    LOG({"searching through note": note})
+    non_metadata_sections = list(filter(lambda x: x['title'] != 'METADATA', REWRITE.note(note)))
     for S in reversed(non_metadata_sections):
       for B in S['blocks']:
         yield f, B
