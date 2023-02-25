@@ -8,33 +8,29 @@ class REWRITE:
 
   @staticmethod
   def line(line):
-    # cont is continuation
-    # base is the escape function for when we have no more rendering left to do
-    def parse_url(S, cont, base):
+    def parse_url(S):
       if ': ' in S:
         prefix, url = S.rsplit(': ', 1)
         url = url.strip()
 
         if url.startswith('https://'):
-          return cont(prefix, base) + [": ", {'link': url}]
+          url = {'link': url}
 
-        if url.endswith(".note") and \
+        elif url.endswith(".note") and \
            FLAT.note_id_len() == len(url.strip()):
-          return cont(prefix, base) + [": ", {'note': url}]
+          url = {'note': url}
 
-        if url.startswith('/'):
-          return cont(prefix, base) + [": ", {'internal-link': url}]
+        elif url.startswith('/'):
+          url = {'internal-link': url}
 
-        if url.startswith(FLASK_UTIL.URL_ROOT()):
+        elif url.startswith(FLASK_UTIL.URL_ROOT()):
           from urllib.parse import unquote_plus
-          return cont(prefix, base) + [": ", {'url-internal-link': unquote_plus(url)}]
+          url = {'url-internal-link': unquote_plus(url)}
+        return [prefix, ': ', url]
 
-      return cont(S, base)
+      return S
 
-    def highlight_tags(S, base):
-      return base(S)
-
-    return parse_url(line, cont=highlight_tags, base=lambda x: [x])
+    return parse_url(line)
 
   @staticmethod
   def block(block):
