@@ -48,6 +48,10 @@ class FLAT:
   def list(cls):
     return [x for x in os.listdir(cls.path) if cls.exists(x) and not (x[0] == '#' and x[-1] == '#')]
 
+  @staticmethod
+  def list_by_mtime():
+    return util.sort_mtime(FLAT.list(), cwd=FLAT.path)[::-1]
+
   @classmethod
   def listabs(cls):
     return list(map(lambda x: cls.path + "/" + x, cls.list()))
@@ -333,7 +337,7 @@ def get_all():
 
 @app.route("/recents")
 def recents():
-  return FLAT_RENDER.LIST(reversed(util.sort_mtime(map(FLAT.to_path, FLAT.list()))),
+  return FLAT_RENDER.LIST(FLAT.list_by_mtime(),
                           title="Recently Edited Notes")
 
 @app.route("/creation")

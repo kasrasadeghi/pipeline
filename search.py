@@ -1,7 +1,5 @@
 def block_generator():
-  notes = list(reversed(list(map(lambda p: p[0],
-                                 util.sort_mtime(map(lambda n: (n, FLAT.to_path(n)), FLAT.list()),
-                                                 key=lambda p: p[1])))))
+  notes = FLAT.list_by_mtime()
 
   LOG({"file count": len(notes)})
 
