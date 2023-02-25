@@ -1,21 +1,9 @@
 @app.route('/test/unit/render_msg')
 def test_render_msg():
-  msg = {
-    'indent': 0,
-    'value': 'msg: AWAKEN a bit ago, RECAP PLAY GAME vampire survivors',
-    'children': [
-      {
-        'indent': 1,
-        'value': 'Date: Tue Feb 14 11:13:50 PST 2023',
-        'children': []
-      }
-    ]
-  }
-  kwargs = {
-    'origin_note': 'd8362739-4333-4fef-8ddd-fddb1a7ca8e9.note'
-  }
+  msg = {'msg': 'AWAKEN a bit ago, RECAP PLAY GAME vampire survivors',
+         'Date': 'Tue Feb 14 11:13:50 PST 2023'}
   for i in range(1000):
-    DISCUSSION_RENDER.msg(msg, **kwargs)
+    DISCUSSION_RENDER.msg(msg)
   return 'DONE'
 
 @app.route('/test/unit/date_cmd')

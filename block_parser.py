@@ -33,8 +33,7 @@ class PARSER:
 
     for line in content.split('\n'):
       if line.startswith("--- ") and line.endswith(" ---"):
-        # end previous section
-        sections.append(curr_section)
+        sections.append(curr_section)  # end previous section
 
         title = line[len("--- "):-len(" ---")]
         is_capital = lambda c: 0 <= ord(c) - ord('A') < 26
