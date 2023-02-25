@@ -135,7 +135,7 @@ class RENDER:
         case {'msg': _}:
           acc.append(DISCUSSION_RENDER.msg(msg, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
         case _:
-          acc.append(repr(item))  # TODO probably RENDER.block instead
+          acc.append(RENDER.block(item, **kwargs))
 
     acc.append('</details>')
     return ''.join(acc)

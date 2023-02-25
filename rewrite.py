@@ -71,7 +71,7 @@ class REWRITE:
         case _:
           roots[-1]['children'].append(block)
 
-    if roots:
+    if roots[-1]['root'] == 'nonfinal':
       roots[-1]['root'] = 'final'
 
     return section | {'roots': roots}
