@@ -20,13 +20,12 @@ class BLOG:
   def title():
     lines = FLAT.note_read_lines(BLOG.root)
 
-    if len(lines) == 0:
-      ABORT(f"ERROR: blog root file is empty {BLOG.root}")
+    assert len(lines) != 0, (f"ERROR: blog root file is empty {BLOG.root}")
 
     # parse title
     first_line = lines[0]
     if not first_line.startswith("# "):
-      ABORT(f"ERROR: parsing title on first line: '{lines[0]}'")
+      assert (f"ERROR: parsing title on first line: '{lines[0]}'")
     title = first_line.removeprefix("# ")
 
     return title
@@ -64,13 +63,16 @@ class BLOG:
     blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
 
     for b in blocks:
-      if not TREE.is_singleton(b):
-        ABORT(f"ERROR while parsing blog post: block '{b}' is not a singleton")
-      blog_post = b[0]
-      post = NODE.splay(blog_post, ['title', 'filename', 'note'])
-      post['internal_name'] = blog_post['value']
-
-      yield post
+      match b:
+        case [{'indent': 0, 'value': blog_slug, 'children': [
+                {'indent': 1, 'value': title, 'children': []},
+                {'indent': 1, 'value': filename, 'children': []},
+                {'indent': 1, 'value': note, 'children': []}
+             ]}] if title.startswith('title: ') and filename.startswith('filename: ') and note.startswith('note: '):
+          yield {'internal_name': blog_slug, 'title': title.removeprefix('title: '),
+                 'filename': filename.removeprefix('filename: '), 'note': note.removeprefix('note: ')}
+        case _:
+          assert False, f"{b}"
 
   @staticmethod
   def try_note_to_post(note):
@@ -107,12 +109,8 @@ class BLOG_RENDER:
   def ROOT():
     bar = BLOG_RENDER.bar()
 
-    try:
-      content = BLOG_RENDER.ROOT_CONTENT("internal")
-      title = BLOG.title()
-    except Boundary as e:
-      LOG(e)
-      return FLAT_RENDER.NOTE(BLOG.root)
+    content = BLOG_RENDER.ROOT_CONTENT("internal")
+    title = BLOG.title()
 
     return BLOG_COMPILE.base_page(title, content)
 
@@ -334,22 +332,17 @@ class BLOG_TREE:
 class BLOG_COMPILE:
   @staticmethod
   def ROOT():
-    try:
-      content = BLOG_RENDER.ROOT_CONTENT("blog")
-      title = BLOG.title()
-    except Boundary as e:
-      LOG(e)
-      return ('internal server error', 404)
-
+    content = BLOG_RENDER.ROOT_CONTENT("blog")
+    title = BLOG.title()
     return BLOG_COMPILE.base_page(title, content)
 
   @staticmethod
   def POST(post):
-    note_content = PARSER.parse_file(FLAT.to_path(post.note))
-    content = (BLOG_TREE.content(post.note) + \
+    note_content = PARSER.parse_file(FLAT.to_path(post['note']))
+    content = (BLOG_TREE.content(post['note']) + \
                # "<pre>\n" + PRETTY.DUMP(note_content[0], no_symbol=True) + "</pre>"
                "")
-    return BLOG_COMPILE.base_page(title=FLAT.title(post.note), content=content)
+    return BLOG_COMPILE.base_page(title=FLAT.title(post['note']), content=content)
 
   @staticmethod
   def base_page(title, content):
@@ -477,14 +470,14 @@ def get_internal_blog():
 def get_internal_blog_post(filename, blog_type=None):
   def filename_to_post(url):
     for post in BLOG.parse_postlist():
-      if post.filename == filename:
+      if post['filename'] == filename:
         return post
     ABORT(f"ERROR: post for url 'posts/{filename}' not found")
 
   post = filename_to_post(filename)
 
   if blog_type == "internal":
-    return FLAT_RENDER.NOTE(post.note)
+    return FLAT_RENDER.NOTE(post['note'])
   else:
     return Response(BLOG_COMPILE.POST(post), 200, mimetype="text/html")
 

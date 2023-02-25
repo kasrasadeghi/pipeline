@@ -22,14 +22,6 @@ import traceback # format_exc (for printing stacktraces)
 def LOG(s):
   DEBUG.LOG(s)
 
-class Boundary(Exception):
-  pass
-
-def ABORT(msg):
-  import inspect
-  LOG({"ABORT": msg, "frame": DEBUG.first_nondebug_frame()})
-  raise Boundary(msg)
-
 class DEBUG:
   # TODO should make state request specific so that it can be multithreaded or multi-processed
   _STATE = None

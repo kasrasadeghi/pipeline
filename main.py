@@ -42,7 +42,6 @@ kaz_import('js.py')
 
 kaz_import('command.py')
 kaz_import('commands/new_note.py')
-kaz_import('node.py')
 kaz_import('advanced_tree_parser.py')
 kaz_import('blog.py')
 
