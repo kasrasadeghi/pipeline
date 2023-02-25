@@ -85,7 +85,7 @@ class RENDER:
         case dict():
           acc.append(RENDER.node(item, **kwargs))
         case str():
-          acc.append("<pre>" + "\n".join(map(lambda x: RENDER.line(REWRITE.line(x), **kwargs), item.split('\n'))) + "</pre>")
+          acc.append("<pre>" + RENDER.line(REWRITE.line(item)) + "</pre>")
         case _:
           acc.append(repr(item))
 
