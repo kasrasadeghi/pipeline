@@ -37,9 +37,8 @@ class REWRITE:
     match block:
       case [{ "value": content, "indent": 0, "children": [
               { "value": date, "indent": 1, "children": []}
-           ]}]:
-        if content.startswith('msg: ') and date.startswith('Date: '):  # i should actually have this be 'line':, not 'msg':.  maybe 'type' should be 'msg' or something.  maybe the id?
-          return {'msg': REWRITE.line(content.removeprefix('msg: ')), 'content': content, 'date': date.removeprefix('Date: ')}
+           ]}] if content.startswith('msg: ') and date.startswith('Date: '):
+        return {'msg': REWRITE.line(content.removeprefix('msg: ')), 'content': content, 'date': date.removeprefix('Date: ')}
     return block
 
   @staticmethod
