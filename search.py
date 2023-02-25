@@ -35,26 +35,22 @@ def get_search():
   if 'content' in request.args:
     return redirect("/search/" + request.args['content'], code=302)
 
-  DEBUG.init_state()
-
+  g.request_start = time.time()
   msgs = list(msg_generator())
   content = "".join(map(render_msg_from_generator, msgs))
-
-  DEBUG.set_state("content size", len(content))
 
   return SEARCH.RENDER(
     content,
     msg_count=(len(msgs)),
-    elapsed_time=(time.time() - DEBUG.get_state("start time"))
+    elapsed_time=(time.time() - g.request_start)
   )
 
 @app.route('/search/<query>')
 def get_search_with_query(query):
-  DEBUG.init_state()
-
   acc = list()
   current_note = None
   msg_count = 0
+  g.request_start = time.time()
   for msg in msg_generator():
     if query.lower() in msg['content'].lower():
       if current_note != msg['origin']:
@@ -64,10 +60,8 @@ def get_search_with_query(query):
       acc.append(render_msg_from_generator(msg))
   content = "".join(acc)
 
-  DEBUG.set_state("content size", len(content))
-
   return SEARCH.RENDER(
     content,
     msg_count=msg_count,
-    elapsed_time=(time.time() - DEBUG.get_state("start time"))
+    elapsed_time=(time.time() - g.request_start)
   )

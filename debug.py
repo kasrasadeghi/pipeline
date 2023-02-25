@@ -1,20 +1,3 @@
-"""
-USAGE:
-def helper():
-  LOG("huh")
-
-@app.route("/example")
-def get_example():
-  DEBUG.init_state()
-
-  helper()  # calls LOG('huh'), "huh" will show up in the output
-  ....
-  # choose one of:
-  return DEBUG.DUMP(content)
-  return DEBUG.TEXT(title, content)
-  return Response(custom() + DEBUG.CONTENT(), 200)
-"""
-
 import time
 import traceback # format_exc (for printing stacktraces)
 
@@ -25,32 +8,6 @@ def LOG(s):
 class DEBUG:
   _GLOBAL_LOG = []
   _GLOBAL_LOG_ENABLED = False
-
-  @staticmethod
-  def clear_state():
-    g.DEBUG_STATE = None
-
-  @staticmethod
-  def init_state():
-    g.DEBUG_STATE = dict()
-    g.DEBUG_STATE['LOG'] = list()
-    g.request_start = time.time()  # get current time
-
-  @staticmethod
-  def set_state(k, v):
-    if g.DEBUG_STATE:
-      LOG(f"set '{k}' to '{v}'")
-      g.DEBUG_STATE[k] = v
-    else:
-      LOG(f"stateless map {k} -> {v}")
-
-  @staticmethod
-  def get_state(k):
-    return g.DEBUG_STATE[k]
-
-  @staticmethod
-  def clear_log():
-    DEBUG._GLOBAL_LOG = list()
 
   @staticmethod
   def frameinfo(frame):
@@ -114,62 +71,12 @@ class DEBUG:
     return RENDER.base_page({'content': content, 'title': "DEBUG LOG"})
 
   @staticmethod
-  def CONTENT():
-    debug = ""
-    if 'DEBUG_STATE' in g:
-      if 'LOG' in g.DEBUG_STATE:
-        # if log is empty, don't print anything
-        if 0 == len(g.DEBUG_STATE['LOG']):
-          return ''
-
-        # rearrange to put the log at the end
-        log = g.DEBUG_STATE['LOG']
-        del g.DEBUG_STATE['LOG']
-        g.DEBUG_STATE['LOG'] = log
-      debug = f"<pre>DEBUG STATE: \n" + f"{PRETTY.DUMP(g.DEBUG_STATE)}\n"
-      debug += g.DEBUG_STATE.get("stacktrace", "")
-      debug += "</pre>"
-    DEBUG.clear_state()
-    return debug
-
-  @staticmethod
   def TEXT(title, content):
-    debug = DEBUG.CONTENT()
-
     r = Response(f"<!DOCTYPE hmtl><html><head>{RENDER_UTIL.STYLE()}<title>{title}</title></head>"
                  f"<body><div class=\"content\">"
                  f"<pre>{content}</pre>" +
-                 debug +
                  "</div></body></html>", mimetype="text/html")
     return r
-
-  @staticmethod
-  def DUMP(content=''):
-    return DEBUG.TEXT("Debug DUMP", content)
-
-  @staticmethod
-  def SELECTED(debugmode):
-    return debugmode and set(debugmode.split()) in ['RENDER']  # set to debug nothing right now
-
-
-# TODO maybe don't even use debug print, maybe add something like this to the logging system instead.
-# debug print
-# TODO have a config for debugging module by module by inspecting the stacktrace
-def debug(*l, **kw):
-  is_debug = 'FLASK_ENV' in os.environ and os.getenv('FLASK_ENV') == 'development'
-
-  if 'debugmode' in kw:
-    debugmode = kw['debugmode']
-    del kw['debugmode']
-  else:
-    debugmode = None
-
-  if not DEBUG.SELECTED(debugmode):
-    return
-
-  if is_debug:
-    print(*l, **kw)
-
 
 @app.route("/debuginfo")
 def route_debuginfo():

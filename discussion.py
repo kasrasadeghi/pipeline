@@ -62,8 +62,6 @@ class DISCUSSION_RENDER:
 
 @app.route("/disc/<note>", methods=["GET", "POST"])
 def get_disc(note):
-  DEBUG.init_state()
-
   # handle messages
   if request.method == 'POST':
     unhandled, result_url = COMMAND.PARSE(note, request.form['msg'])
