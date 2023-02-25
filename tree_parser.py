@@ -72,17 +72,17 @@ class TREE_PARSER:
 
       while 0 != len(rest):
         level, content = rest[0]['indent'], rest[0]['content']
+        rest = rest[1:]
         # collect children of this node,
         #   which are the prefix of _rest_ that have a level that is greater than this node
         acc = []
-        sibling_i = 1
-        while sibling_i < len(rest):
-          if rest[sibling_i]['indent'] <= level:
+        while True:
+          if 0 == len(rest):
             break
-          sibling_i += 1
-
-        acc = rest[1:sibling_i+1]
-        rest = rest[sibling_i+1:]
+          if rest[0]['indent'] <= level:
+            break
+          acc.append(rest[0])
+          rest = rest[1:]
 
         children = make_children(acc)
         result.append(make_node(content, children, level))
