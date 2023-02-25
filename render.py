@@ -91,9 +91,9 @@ class RENDER:
     acc = []
     for item in block:
       # if item is a tree/node
-      # if isinstance(item, dict):
-        # acc.append(RENDER.node(item, **kwargs))
-        # continue
+      if isinstance(item, dict):
+        acc.append(RENDER.node(item, **kwargs))
+        continue
 
       if isinstance(item, str):
         line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
@@ -131,10 +131,9 @@ class RENDER:
     #     return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
 
     acc = list()
-    # if section['title'] != 'entry':
-    #   acc.append(f"<pre>--- {section['title']} --- </pre>")
+    if section['title'] != 'entry':
+      acc.append(f"<pre>--- {section['title']} --- </pre>")
 
-    # don't print two empty blocks consecutively
     for block in section['blocks']:
       acc.append(RENDER.block(block, **kwargs))
 
