@@ -4,7 +4,7 @@ import sys  # argv
 import json  # load, dump, dumps
 from subprocess import check_output
 
-from flask import Flask, Response, render_template, escape, request, redirect
+from flask import Flask, Response, render_template, escape, request, redirect, g
 
 app = Flask(__name__)
 from werkzeug.middleware.profiler import ProfilerMiddleware

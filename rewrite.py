@@ -4,7 +4,6 @@ class REWRITE_RESULT:
     return isinstance(block, dict) and 'date' in block and 'msg' in block
 
 class REWRITE:
-  context = dict()
 
   @staticmethod
   def line(line):
@@ -48,9 +47,9 @@ class REWRITE:
     disc_section = section['title'] == 'DISCUSSION'
     journal_disc_section = (
       section['title'] == 'entry' and
-      'note' in REWRITE.context and
-      'Tags' in FLAT.metadata(REWRITE.context['note']) and
-      'Journal' in FLAT.metadata(REWRITE.context['note'])['Tags']
+      'note' in g.rewrite_note and
+      'Tags' in FLAT.metadata(g.rewrite_note) and
+      'Journal' in FLAT.metadata(g.rewrite_note)['Tags']
     )
 
     if not (disc_section or journal_disc_section):
@@ -100,9 +99,9 @@ class REWRITE:
   @staticmethod
   def note(note):
     page = PARSER.parse_file(FLAT.to_path(note))
-    REWRITE.context['note'] = note
+    g.rewrite_note = note
     result = REWRITE.page(page)
-    REWRITE.context = dict()
+    g.rewrite_note = dict()
     return result
 
 @app.route('/api/parse/<note>')
