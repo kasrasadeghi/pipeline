@@ -47,7 +47,7 @@ class DISCUSSION_RENDER:
     msg_indent = kwargs.get('msg_indent', '')
 
     msg_date = msg['date']
-    msg_content = msg['msg']  # TODO RENDER.line
+    msg_content = RENDER.line(msg['msg'])
     msg_origin = ''
     if 'origin' in msg:
       msg_origin = '/disc/' + msg['origin']

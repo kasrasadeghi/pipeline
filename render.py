@@ -37,37 +37,20 @@ class RENDER:
 
   @staticmethod
   def line(L, **kwargs):
-    LOG(L)
-
-    # cont is continuation
-    # base is the escape function for when we have no more rendering left to do
-    def parse_url(S, cont, base):
-      nonlocal kwargs
-
-      if ': ' in S:
-        prefix, potentially_url = S.rsplit(': ', 1)
-
-        if potentially_url.strip().startswith('https://'):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
-
-        if potentially_url.strip().endswith(".note") and \
-           FLAT.note_id_len() == len(potentially_url.strip()):
-          return cont(prefix, base) + ": " + RENDER.note(potentially_url, **kwargs)
-
-        if potentially_url.strip().startswith('/'):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, **kwargs)
-
-        if potentially_url.strip().startswith(FLASK_UTIL.URL_ROOT()):
-          return cont(prefix, base) + ": " + RENDER.link(potentially_url, view='ref', **kwargs)
-
-      return cont(S, base)
-
-    def highlight_tags(S, base):
-      # replace DAILY with linked DAILY and run base() on everything between
-      return "<a href='/daily'><b>DAILY</b></a>".join(map(base, S.split("DAILY")))
-
-    return parse_url(L, cont=highlight_tags, base=FLASK_UTIL.ESCAPE)
-
+    acc = list()
+    for el in L:
+      match el:
+        case {'link': link}:
+          acc.append(RENDER.link(link))
+        case {'note': note}:
+          acc.append(RENDER.note(note))
+        case {'internal-link': internal_link}:
+          acc.append(RENDER.link(internal_link))
+        case {'url-internal-link': internal_url}:
+          acc.append(RENDER.link(internal_url))
+        case _:
+          acc.append(str(el))
+    return ''.join(acc)
 
   @staticmethod
   def node(item, **kwargs):
