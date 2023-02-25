@@ -22,7 +22,7 @@ def msg_generator():
           yield {'content': content, 'block': B, 'origin': f}
 
 def render_msg_from_generator(msg_gen_result):
-  return DISCUSSION_RENDER.msg(REWRITE.block(msg_gen_result['block']))
+  return DISCUSSION_RENDER.msg(REWRITE.block(msg_gen_result['block']) | {'origin': msg_gen_result['origin']})
 
 class SEARCH:
   @classmethod
