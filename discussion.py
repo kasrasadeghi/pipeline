@@ -40,19 +40,14 @@ class DISCUSSION_RENDER:
 
   @staticmethod
   def msg(msg, **kwargs):
-    timerender = kwargs.get('timerender', None)
+    msg_date = msg['date']
+    date = kwargs.get('timerender', lambda msg_date: util.date_cmd("-d", msg_date, "+%T"))(msg_date)
     msg_indent = kwargs.get('msg_indent', '')
 
-    msg_date = msg['date']
     msg_content = RENDER.line(msg['msg'])
     msg_origin = ''
     if 'origin' in msg:
       msg_origin = '/disc/' + msg['origin']
-
-    if timerender:
-      date = timerender(msg_date)
-    else:
-      date = util.date_cmd("-d", msg_date, "+%T")
 
     return (
       f'<div id="{msg_date}" class="msg">'
