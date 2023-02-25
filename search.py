@@ -10,15 +10,14 @@ def block_generator():
     non_metadata_sections = list(filter(lambda x: x['title'] != 'METADATA', REWRITE.note(note)))
     for S in reversed(non_metadata_sections):
       for B in S['blocks']:
-        yield f, B
+        yield note, B
 
 def msg_generator():
   for f, B in block_generator():
-    for L in B:
-      if isinstance(L, dict) and L['value'].startswith("msg:"):
-        assert 'origin' not in L
-        L |= {'origin': f, 'date': DISCUSSION.date(L)}
-        yield L
+    match B:
+      case {'msg': _} as msg:
+        msg |= {'origin': f}
+        yield msg
 
 class SEARCH:
   @classmethod
