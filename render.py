@@ -141,14 +141,6 @@ class RENDER:
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
-    # if section['title'] == 'entry' and \
-    #    'origin_note' in kwargs and 'Tags' in FLAT.metadata(kwargs['origin_note']) and \
-    #    'Journal' in FLAT.metadata(kwargs['origin_note'])['Tags']:
-    #   return DISCUSSION_RENDER.section(section, **kwargs)
-
-    # if section['title'] == 'DISCUSSION':
-    #   return DISCUSSION_RENDER.section(section, **kwargs)
-
     # if section['title'] == 'HTML':
     #   LOG({'html section': section})
     #   acc = []
