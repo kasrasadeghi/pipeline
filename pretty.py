@@ -19,38 +19,38 @@ class PRETTY:
       else:
         return s
 
-    if isinstance(o, dict):
-      acc = list()
-      for k, v in o.items():
-        acc.append(f"{k}: {PRETTY.DUMP(v, no_symbol)}")
-      if len(o.items()) == 0:
-        result = '{}'
-      else:
-        result = symbol("{\n") + indent("\n".join(acc), color="#833") + symbol("}")
-
-    if isinstance(o, list):
-      if len(o) == 0:
-        result = "[]"
-      else:
+    match o:
+      case dict():
         acc = list()
-        for el in o:
-          acc.append(PRETTY.DUMP(el, no_symbol))
-        result = symbol("[\n") + indent("\n".join(acc), color='#388') + symbol("]")
+        for k, v in o.items():
+          acc.append(f"{k}: {PRETTY.DUMP(v, no_symbol)}")
+        if len(o.items()) == 0:
+          result = '{}'
+        else:
+          result = symbol("{\n") + indent("\n".join(acc), color="#833") + symbol("}")
 
-    if isinstance(o, Exception):
-      import traceback
-      obj = {"msg": str(o), "traceback": "\n".join(traceback.format_exception(o))}
-      result = PRETTY.DUMP(obj, no_symbol)
+      case list():
+        if len(o) == 0:
+          result = "[]"
+        else:
+          result = symbol("[\n") \
+            + indent("\n".join(PRETTY.DUMP(el, no_symbol) for el in o), color='#388') \
+            + symbol("]")
 
-    if isinstance(o, str):
-      if o == "\n":
-        result = "\\n"
-      elif o == '':
-        result = '""'
-      elif len(o.splitlines()) == 1:
-        result = FLASK_UTIL.ESCAPE(o)
-      else:
-        result = '\n' + indent('"""\n' + FLASK_UTIL.ESCAPE(o) + '"""')
+      case Exception():
+        import traceback
+        obj = {"msg": str(o), "traceback": "\n".join(traceback.format_exception(o))}
+        result = PRETTY.DUMP(obj, no_symbol)
+
+      case str():
+        if o == "\n":
+          result = "\\n"
+        elif o == '':
+          result = '""'
+        elif len(o.splitlines()) == 1:
+          result = FLASK_UTIL.ESCAPE(o)
+        else:
+          result = '\n' + indent('"""\n' + FLASK_UTIL.ESCAPE(o) + '"""')
 
     if result is None:
       result = repr(o)
