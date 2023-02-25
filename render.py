@@ -56,8 +56,6 @@ class RENDER:
   def node(item, **kwargs):
     # LOG({'kwargs': kwargs})
     render_msg = kwargs.get('render_msg', None)
-    result = None
-
     LOG({'item': item, 'render_msg': render_msg})
 
     level = item['indent']
@@ -68,7 +66,8 @@ class RENDER:
     else:
       indent = (level * "  ") + "- "
 
-    result = RENDER.line(item['value'], indent=indent, **kwargs)
+    result = None
+    result = RENDER.line(REWRITE.line(item['value']), indent=indent, **kwargs)
     result = "<pre>" + indent + result + "</pre>"
 
     acc = list()
@@ -90,13 +89,13 @@ class RENDER:
 
     acc = []
     for item in block:
-      # if item is a tree/node
       if isinstance(item, dict):
         acc.append(RENDER.node(item, **kwargs))
         continue
 
+        # str():
       if isinstance(item, str):
-        line_rendered = "\n".join(map(lambda x: RENDER.line(x, **kwargs), item.split('\n')))
+        line_rendered = "\n".join(map(lambda x: RENDER.line(REWRITE.line(x), **kwargs), item.split('\n')))
         acc.append(f"<pre>{line_rendered}</pre>")
         continue
 
