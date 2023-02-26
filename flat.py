@@ -138,13 +138,12 @@ class FLAT:
 
   @staticmethod
   def try_from_url(url):
-    host = FLASK_UTIL.HOST()
-    if url.startswith(f"http://{host}"):
-      url = url.removeprefix(f"http://{host}")
+    if url.startswith(FLASK_UTIL.URL_ROOT()):
+      url = url.removeprefix(FLASK_UTIL.URL_ROOT())
 
     for view in ["note", "disc", "plan", "daily", "edit"]:
-      if url.startswith(f'/{view}/'):
-        return view, url.removeprefix(f"/{view}/")
+      if url.startswith(f'{view}/'):
+        return view, url.removeprefix(f"{view}/")
 
     return None, url
 

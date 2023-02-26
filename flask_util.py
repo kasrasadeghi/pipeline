@@ -19,7 +19,7 @@ class FLASK_UTIL:
   @staticmethod
   def TELEMETRY():
     return f"""<script>
-       fetch("http://{request.headers['Host']}/receive_info",
+       fetch("https://{request.headers['Host']}/receive_info",
          {{ method: "POST",
             headers: {{ 'Content-Type': 'application/json'}},
             body: JSON.stringify({{width: window.screen.width, height: window.screen.height, dpr: window.devicePixelRatio }})
@@ -29,7 +29,7 @@ class FLASK_UTIL:
 
   @staticmethod
   def URL_ROOT():
-    return request.url_root # like http://192.37.37.3:5000/
+    return request.url_root # like http://192.37.37.3:5000/ or https://10.50.50.2:5000
 
   @staticmethod
   def HOST():
