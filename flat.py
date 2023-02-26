@@ -1,5 +1,5 @@
 class FLAT:
-  path = "/home/kasra/notes"
+  path = os.path.join(os.path.expanduser('~'), "notes")
 
   @staticmethod
   def check_is_note(maybe_note):
