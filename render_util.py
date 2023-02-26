@@ -52,6 +52,8 @@ class RENDER_UTIL:
          overflow-wrap: anywhere;
        }
 
+       emph { color: black; }
+
        .msg_container {
          display: flex;
          flex-direction: row;
