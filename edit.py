@@ -1,18 +1,12 @@
 class EDIT_RENDER:
-  @classmethod
-  def EDIT(R, note):
-    content = util.read_file(FLAT.to_path(note))
-
-    bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
-                          f'<a href="/disc/{note}">disc</a>')
-
+  @staticmethod
+  def EDIT(**kwargs):
+    title = kwargs['title']
+    content = kwargs['content']
+    bar = kwargs['bar']
     # compose html
-    try:
-      title = FLAT.title(note)
-    except:
-      title = "ERROR, NOTE DOESN'T HAVE METADATA"
-      pass
     result = (
+      """<script>window.addEventListener("load", () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });</script>"""
       f'<form method="post">'
         f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/><br/>'
         f'<input class="link-button" type="submit" value="Submit"/>'
@@ -27,4 +21,23 @@ def route_edit(note):
     FLAT.handle_edit(note, request.form)
     return redirect(f"/edit/{note}", code=302)
 
-  return EDIT_RENDER.EDIT(note)
+  try:
+    title = FLAT.title(note)
+  except:
+    title = "ERROR, NOTE DOESN'T HAVE METADATA"
+  content = util.read_file(FLAT.to_path(note))
+  bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
+                        f'<a href="/disc/{note}">disc</a>')
+  return EDIT_RENDER.EDIT(title=title, content=content, bar=bar)
+
+
+@app.route('/config', methods=['GET', 'POST'])
+def config_edit():
+  if request.method == 'POST':
+    FLAT.set_config(request.form)
+    return redirect(f"/config", code=302)
+
+  with open(FLAT.config_path()) as f:
+    content = f.read()
+
+  return EDIT_RENDER.EDIT(title='Edit Configuration', content=content, bar=None)

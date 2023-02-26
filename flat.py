@@ -34,6 +34,51 @@ class FLAT:
 
     return True
 
+  # NOTE: configuration stuff is in this folder because it's in the ~/notes/ folder
+
+  @staticmethod
+  def default_config():
+    return {
+      "navbar_size": "40px",
+      "header_color": "#bb6",
+      "link_button_color": {"main": "orange", "hover": "red"},
+      "msg_color": "#a52a2a",
+      "nav_button_color": "#611",
+      "base_text_color": "#ddd",
+      "input_background_color": "#333",
+      "body_background_color": "#222",
+      "banner_color": "#aaa",
+      "sidebar_animation_time": "0.1s",
+      "desktopview_device_width_threshold": "1034px",
+      "tag_style": "color: #000",
+      "cmd_color": "#111",
+      "msg_timestamp_color": "rgb(230, 50, 120)"
+    }
+
+  def config_path():
+    return FLAT.to_path('notes_config.json')
+
+  @staticmethod
+  def set_config(form):
+    with open(FLAT.config_path(), "w") as f:
+      f.write(form['text'])
+
+  @staticmethod
+  def config():
+    if not FLAT.exists('notes_config.json'):
+      LOG("config doesn't exist")
+      return FLAT.default_config()
+
+    LOG("config exists")
+    with open(os.path.join(FLAT.path, 'notes_config.json')) as f:
+      # comment with '#'
+      content = "\n".join(filter(lambda x: not x.strip().startswith('#'), f.read().split('\n')))
+      try:
+        return json.loads(content)
+      except Exception as e:
+        LOG('failed to read file, maybe invalid json?\n' + str(e) + "\n" + content)
+        return FLAT.default_config()
+
   @staticmethod
   def note_id_len():
     return len("4e0ce4ff-1663-49f9-8ced-30f91202ae08.note")
@@ -202,8 +247,6 @@ class FLAT:
 
   @classmethod
   def handle_edit(_, note, form):
-
-    # read note
     with open(FLAT.to_path(note), "w") as f:
       f.write(form['text'])
 # END FLAT
