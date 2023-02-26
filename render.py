@@ -39,13 +39,16 @@ class RENDER:
   def tag(s):
     match s:
       case {'tag': tag}:
-        return '<emph>' + tag + '</emph>'
-      case _:
+        return '<emph class="tag">' + tag + '</emph>'
+      case {'cmd': cmd}:
+        return '<emph class="cmd">' + cmd + '</emph>'
+      case str():
         return s
+      case _:
+        NotImplementedError()
 
   @staticmethod
   def line_content(content):
-    # return str(TAG.parse(content))
     return ''.join(map(RENDER.tag, TAG.parse(content)))
 
   @staticmethod

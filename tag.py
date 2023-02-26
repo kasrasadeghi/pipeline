@@ -10,6 +10,13 @@ class TAG:
 
   def parse(content):
     acc = list()
+
+    if content[:1] == '\\':
+      if (cmdlen := content.find(' ')) == -1:
+        cmdlen = len(content)
+      acc.append({'cmd': content[:cmdlen]})
+      content = content[cmdlen:]
+
     word = None
     rest = None
     for c in content:
@@ -28,8 +35,12 @@ class TAG:
         print('  ' + c, word, rest)
 
         if word:
-          acc.append({'tag': word})
-          word = None
+          if len(word) == 1:
+            acc.append(word)
+            word = None
+          else:
+            acc.append({'tag': word})
+            word = None
         if rest:
           rest += c
         else:

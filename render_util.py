@@ -52,7 +52,8 @@ class RENDER_UTIL:
          overflow-wrap: anywhere;
        }
 
-       emph { color: black; }
+       emph.tag { color: black; }
+       emph.cmd { color: yellow; }
 
        .msg_container {
          display: flex;
