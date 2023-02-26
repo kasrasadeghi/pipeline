@@ -42,6 +42,7 @@ class RENDER_UTIL:
          overflow-wrap: anywhere;
        }
 
+       .selected { width: 100%; background: #330; border-radius: 18px }
 
        emph.tag { """ + C['tag_style'] + """; }
        emph.cmd { color: """ + C['cmd_color'] + """; }

@@ -196,7 +196,12 @@ class RENDER:
       bar = D['bar']
 
     result = (
-      f"<!DOCTYPE hmtl><html><head>{RENDER_UTIL.STYLE()}<title>{D['title']}</title></head>"
+      f"<!DOCTYPE hmtl>"
+      f"<html><head>"
+        f"<title>{D['title']}</title>"
+        f"{RENDER_UTIL.STYLE()}"
+        "<script src='/js/highlight-selected.js'></script>"
+      "</head>"
       f"<body>"
         f"{bar}"
         f"<div class=\"content\">"
