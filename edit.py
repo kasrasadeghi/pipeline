@@ -3,19 +3,6 @@ class EDIT_RENDER:
   def EDIT(R, note):
     content = util.read_file(FLAT.to_path(note))
 
-    line_height = 23;
-
-    textarea_resize_script = """
-    function textarea_resize(el) {
-
-      // https://stackoverflow.com/questions/15195209/how-to-get-font-size-in-html
-      // https://stackoverflow.com/a/15195345
-      linecount = el.innerHTML.split(/\\n/).length;
-      el.style.height = (""" + str(line_height * 1.065) + """ * linecount)+"px";
-    }
-    window.addEventListener('load', () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });
-    """
-
     bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
                           f'<a href="/disc/{note}">disc</a>')
 
@@ -26,9 +13,7 @@ class EDIT_RENDER:
       title = "ERROR, NOTE DOESN'T HAVE METADATA"
       pass
     result = (
-      f'<script>{textarea_resize_script}</script>'
       f'<form method="post">'
-      #f'<textarea name="text" oninput="textarea_resize(this)" style="line-height: 23px; resize:none; overflow: auto; width: -webkit-fill-available" rows="100">{content}</textarea><br/><br/>',
         f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/><br/>'
         f'<input class="link-button" type="submit" value="Submit"/>'
       f'</form>'
