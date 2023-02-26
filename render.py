@@ -36,6 +36,19 @@ class RENDER:
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
+  def tag(s):
+    match s:
+      case {'tag': tag}:
+        return '<emph>' + tag + '</emph>'
+      case _:
+        return s
+
+  @staticmethod
+  def line_content(content):
+    # return str(TAG.parse(content))
+    return ''.join(map(RENDER.tag, TAG.parse(content)))
+
+  @staticmethod
   def line(L, **kwargs):
     acc = list()
     for el in L:
@@ -49,7 +62,7 @@ class RENDER:
         case {'url-internal-link': internal_url}:
           acc.append(RENDER.link(internal_url))
         case _:
-          acc.append(str(el))
+          acc.append(RENDER.line_content(el))
     return ''.join(acc)
 
   @staticmethod
@@ -108,9 +121,12 @@ class RENDER:
     acc.append(details)
 
     tags = list()
-    for item in root:
-      if 'msg' in item:
-        tags += TAG.parse(item['content'])
+    for item in children[1:]:
+      match item:
+        case {'msg': _}:
+          tags += TAG.gather(item['content'])
+        case _:
+          assert False
 
     for i, item in enumerate(children):
       match item:
@@ -118,7 +134,7 @@ class RENDER:
           acc.append('<summary>')
           acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
           if tags:
-            acc.append("<div class='tags-summary'>" + str(tags) + "</div>")
+            acc.append("<div class='tags-summary'>" + ' '.join(map(RENDER.tag,tags)) + "</div>")
           acc.append('</summary>')
         case {'msg': _}:
           acc.append(DISCUSSION_RENDER.msg(msg, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
