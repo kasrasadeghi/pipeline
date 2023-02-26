@@ -46,7 +46,7 @@ class FLAT:
 
   @classmethod
   def list(cls):
-    return [x for x in os.listdir(cls.path) if cls.exists(x) and not (x[0] == '#' and x[-1] == '#')]
+    return [x for x in os.listdir(cls.path) if cls.exists(x) and x.endswith('.note') and not (x[0] == '#' and x[-1] == '#')]
 
   @staticmethod
   def list_by_mtime():
