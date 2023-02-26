@@ -1,20 +1,3 @@
-class LineReader:
-  def __init__(R, content):
-    R.lines = content.split('\n')
-    R.i = 0
-
-  def peek(R):
-    return R.lines[R.i]
-
-  def get(R):
-    R.i += 1
-    return R.i - 1, R.lines[R.i - 1]
-
-  def hasNext(R):
-    return R.i < len(R.lines)
-
-# ---------------------------------------------------------------------------- #
-
 class PARSER:
   @staticmethod
   def parse_file(filepath, **kwargs):
