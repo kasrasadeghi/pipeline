@@ -21,7 +21,7 @@ class TAG:
     rest = None
     for c in content:
       if c.isupper():
-        print('u ' + c, word, rest)
+        # print('u ' + c, word, rest)
 
         if rest:
           acc.append(rest)
@@ -32,7 +32,7 @@ class TAG:
         else:
           word = c
       else:
-        print('  ' + c, word, rest)
+        # print('  ' + c, word, rest)
 
         if word:
           if len(word) == 1:
@@ -48,7 +48,7 @@ class TAG:
 
     assert not (word and rest)
 
-    print('end', word, rest)
+    # print('end', word, rest)
 
     if word:
       acc.append({'tag': word})
@@ -57,6 +57,6 @@ class TAG:
       acc.append(rest)
       rest = None
 
-    print('end', word, rest)
+    # print('end', word, rest)
 
     return acc
