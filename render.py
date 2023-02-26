@@ -153,13 +153,13 @@ class RENDER:
     if 'render_section' in kwargs:
       return kwargs['render_section'](section, **kwargs)
 
-    # if section['title'] == 'HTML':
-    #   LOG({'html section': section})
-    #   acc = []
-    #   for block in section['blocks']:
-    #     for l in block:
-    #       acc.append(l)
-    #   return "\n".join(acc)
+    if section['title'] == 'HTML':
+      LOG({'html section': section})
+      acc = []
+      for block in section['blocks']:
+        for l in block:
+          acc.append(l)
+      return "\n".join(acc)
 
     if section['title'] == 'METADATA':
       if JOURNAL.is_journal(section):
