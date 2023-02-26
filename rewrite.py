@@ -25,7 +25,11 @@ class REWRITE:
         elif url.startswith(FLASK_UTIL.URL_ROOT()):
           from urllib.parse import unquote_plus
           url = {'url-internal-link': unquote_plus(url)}
-        return [prefix, ': ', url]
+
+        if isinstance(url, dict):
+          return [prefix, ': ', url]
+        else:
+          return [S]
 
       return [S]
 
