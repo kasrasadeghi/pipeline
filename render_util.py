@@ -58,7 +58,7 @@ class RENDER_UTIL:
        }
 
        * { font-size: 18px; color: """ + C["base_text_color"] + """; }
-       select, option, input[type=button], input[type=button], input[type=text] { color: black }
+       select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
        header {
          display: flex; align-items: center;
          position: fixed; top: 0px; width: 100%; height: """ + C["navbar_size"] + """;

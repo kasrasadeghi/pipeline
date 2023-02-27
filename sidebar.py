@@ -21,6 +21,8 @@ class SIDEBAR:
             <label for="prevent-default">prevent default</label>
           </a>
           <br/>
+          <p id='updated-at'> error getting geolocation data </p>
+          <button onclick="getLocation()">refresh</button>
           <ul>""" + "<br/>".join(map(render_forward, forward_link_list)) + """</ul>
         </div>
       </aside>

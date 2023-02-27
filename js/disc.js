@@ -1,4 +1,28 @@
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    let x = document.getElementById("updated-at");
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+  console.log('what');
+  let x = document.getElementById("updated-at");
+  console.log(position);
+  const {latitude, longitude} = position.coords;
+  x.innerHTML = (
+    `(Latitude, Longitude): (<a href="https://google.com/maps/?q=${latitude},${longitude}">${latitude}, ${longitude}</a>)`
+    + `<br>at ${new Date(position.timestamp).toLocaleString()}<br>accuracy (in meters): ${position.coords.accuracy}`);
+}
+
+
 window.addEventListener('load', () => { load_preventing(); });
+window.addEventListener('load', () => {
+  console.log('hi');
+  getLocation();
+});
 
 function load_preventing() {
   console.log('load_preventing');
