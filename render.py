@@ -128,8 +128,6 @@ class RENDER:
       match item:
         case {'msg': _}:
           tags += TAG.gather(item['content'])
-        case _:
-          assert False
 
     for i, item in enumerate(children):
       match item:
