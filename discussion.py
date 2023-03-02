@@ -18,25 +18,26 @@ class DISCUSSION:
 
 
 class DISCUSSION_RENDER:
-  @staticmethod
-  def MAIN(note, **kwargs):
-    content = RENDER.content(note, **kwargs)
 
-    bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
-                          f'<a href="/edit/{note}">edit</a>')
-
-    # compose html
-    title = FLAT.title(note)
-    result = (
+  def content(note):
+    return (
       f"<div class='msgbox'>"
-      f"{content}</div>"
+      f"{RENDER.content(note)}</div>"
       f"<div class='msgbox' id='message-queue'></div>"
       f"<script src='/js/disc.js'></script>"
       f'<form onsubmit="handle_msg(event, \'{note}\')" method="post">'
         f'<input class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
       f'</form>'
     )
-    return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
+
+  @staticmethod
+  def MAIN(note, **kwargs):
+    title = FLAT.title(note)
+    bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
+                          f'<a href="/edit/{note}">edit</a>')
+    content = DISCUSSION_RENDER.content(note, **kwargs)
+
+    return RENDER.base_page({'title': title, 'bar': bar, 'content': content})
 
   @staticmethod
   def msg(msg, **kwargs):
