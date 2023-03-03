@@ -22,8 +22,8 @@ port:
 	sudo netstat -nlp | grep 5001
 
 killports:
-	sudo fuser -k 5000/tcp
-	sudo fuser -k 5001/tcp
+	-sudo fuser -k 5000/tcp
+	-sudo fuser -k 5001/tcp
 
 cert:
 	mkdir cert/
