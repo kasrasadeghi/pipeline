@@ -35,10 +35,7 @@ def test_fbconv(note):
 
     return "\n".join(acc)
 
-  rendered_page = RENDER.content(
-    note,
-    render_section=section
-  )
+  rendered_page = RENDER.content(note, render_section=section)
 
   return RENDER.base_page(
     {'title': 'testing blog render for FBCONV ' + note,
