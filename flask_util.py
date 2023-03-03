@@ -38,3 +38,25 @@ class FLASK_UTIL:
   @staticmethod
   def ESCAPE(s):
     return str(escape(s))
+
+
+@app.route("/site-map")
+def site_map():
+  from flask import url_for
+
+  raw_endpoints = list()
+  note_views = list()
+  unmatched = list()
+  for rule in app.url_map.iter_rules():
+    # Filter out rules we can't navigate to in a browser
+    # and rules that require parameters
+    note_arg = {'note'}
+
+    if "GET" in rule.methods:
+      if len(rule.arguments) == 0:
+        raw_endpoints.append(repr(rule))
+      elif len(rule.arguments) == 1 and list(rule.arguments)[0] == 'note':
+        note_views.append(repr(rule))
+      else:
+        unmatched.append((repr(rule), repr(rule.arguments)))
+  return {'raw': list(reversed(raw_endpoints)), "note": note_views, "unmatched": unmatched}
