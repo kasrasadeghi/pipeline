@@ -27,8 +27,9 @@ kaz_import('render.py')
 kaz_import('render_util.py')
 kaz_import('sidebar.py')
 
-kaz_import('tag.py')
 kaz_import('pattern.py')
+kaz_import('date.py')
+kaz_import('tag.py')
 kaz_import('ref.py')
 
 kaz_import('flat.py')
