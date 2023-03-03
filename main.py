@@ -59,6 +59,8 @@ kaz_import('unit_tests.py')
 
 kaz_import('fbconv.py')
 
+kaz_import('quant.py')
+
 # END IMPORTS
 
 # MAIN
