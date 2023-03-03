@@ -80,7 +80,7 @@ def route_day_of(note):
 
 @app.route("/before")
 def route_before_bare(note):
-  _view_, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  unused_view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
   return route_before(note)
 
 @app.route("/before/<note>")
