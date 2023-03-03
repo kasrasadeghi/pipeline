@@ -11,14 +11,15 @@ def test_fbconv(note):
       if TREE.is_newline(b):
         continue
 
-      if len(b) == 2 and b[0].startswith('left: ') and b[1].startswith('right: '):
+      if len(b) == 2 and b[0]['line'][0].startswith('left: ') and b[1]['line'][0].startswith('right: '):
         acc.append('<span style="color:red">' + str(b) + "</span><br/>")
         speakers = dict()
-        speakers['left'] = b[0].removeprefix('left: ').split(', ')
-        speakers['right'] = b[1].removeprefix('right: ').split(', ')
+        speakers['left'] = b[0]['line'][0].removeprefix('left: ').split(', ')
+        speakers['right'] = b[1]['line'][0].removeprefix('right: ').split(', ')
         continue
 
-      for l in b:
+      for line in b:
+        l = line['line'][0]
         if speakers:
           if l in speakers['left']:
             if not speakers.get('current', None) == 'left':
@@ -30,14 +31,12 @@ def test_fbconv(note):
               speakers['current'] = 'right'
               acc.append('<span style="color:#88f">' + str(l) + "</span><br/>")
             continue
-          if isinstance(l, str): # TODO render "dict()" as well or just put this into /disc/ mode
-            acc.append("&nbsp;&nbsp;" + l + "<br/>")
+          acc.append("&nbsp;&nbsp;" + str(l) + "<br/>")
 
     return "\n".join(acc)
 
-  rendered_page = RENDER.page(
+  rendered_page = RENDER.content(
     note,
-    PARSER.parse_file(FLAT.to_path(note)),
     render_section=section
   )
 
