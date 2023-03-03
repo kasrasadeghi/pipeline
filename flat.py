@@ -55,6 +55,7 @@ class FLAT:
       "msg_timestamp_color": "rgb(230, 50, 120)"
     }
 
+  @staticmethod
   def config_path():
     return FLAT.to_path('notes_config.json')
 
