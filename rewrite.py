@@ -4,7 +4,6 @@ class REWRITE_RESULT:
     return isinstance(block, dict) and 'date' in block and 'msg' in block
 
 class REWRITE:
-
   @staticmethod
   def line(line):
     def parse_url(S):
@@ -12,19 +11,23 @@ class REWRITE:
         prefix, url = S.rsplit(': ', 1)
         url = url.strip()
 
-        if url.startswith('https://'):
-          url = {'link': url}
-
-        elif url.endswith(".note") and \
+        if url.endswith(".note") and \
            FLAT.note_id_len() == len(url.strip()):
           url = {'note': url}
 
         elif url.startswith('/'):
-          url = {'internal-link': url}
+          url = {'root-link': url}
 
-        elif url.startswith(FLASK_UTIL.URL_ROOT()):
-          from urllib.parse import unquote_plus
-          url = {'url-internal-link': unquote_plus(url)}
+        elif url.startswith('https://') or url.startswith('http://'):
+          from urllib.parse import urlparse
+
+          # treat all 192.* and 10.* links as links to somewhere within the notes system
+          parsed_url = urlparse(url)
+          origin = parsed_url.netloc
+          if origin.startswith('192.') or origin.startswith('10.'):
+            url = {'internal-link': parsed_url}
+          else:
+            url = {'link': url}
 
         if isinstance(url, dict):
           return [prefix, ': ', url]

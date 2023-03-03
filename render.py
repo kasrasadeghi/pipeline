@@ -11,22 +11,30 @@ class CONTEXT:
 # the tree renderer, with hooks
 class RENDER:
   @staticmethod
-  def link(url, **kwargs):
-    if 'view' in kwargs:
-      if kwargs['view'] == 'ref':
-        ref = REF.parse_ref(url)
-        if '#' not in ref:
-          LOG({'ref no #': ref})
-        else:
-          note, timestamp = ref.split('#')
-          if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
-            return f'<a href="{url}">{FLAT.title(note)} @ {timestamp[17:25]}</a>'
-          else:
-            from urllib.parse import unquote_plus
-            return f'<a href="{url}">{FLAT.title(note)} @ {unquote_plus(timestamp)}</a>'
-
-      LOG({'ERROR: unmatched link view': kwargs['view']})
+  def link(url):
     return f'<a href="{url}">{url}</a>'
+
+  @staticmethod
+  def internal_link(url):
+    from urllib.parse import unquote_plus
+    path = url.path
+    if path.startswith('/disc/'):
+      path = path.removeprefix('/disc/')
+
+    if FLAT.exists(path):
+      note = path
+      if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
+        title = 'Journal'
+      else:
+        title = FLAT.title(note)
+    else:
+      title = path
+    if url.fragment:
+      return f"<a href='{path}#{url.fragment}'>{title} @ {unquote_plus(url.fragment)}</a>"
+    else:
+      return f"<a href='{path}'>{title}</a>"
+    # else:
+      # return RENDER.link(url)
 
   @staticmethod
   def note(note, **kwargs):
@@ -60,10 +68,10 @@ class RENDER:
           acc.append(RENDER.link(link))
         case {'note': note}:
           acc.append(RENDER.note(note))
-        case {'internal-link': internal_link}:
+        case {'root-link': internal_link}:
           acc.append(RENDER.link(internal_link))
-        case {'url-internal-link': internal_url}:
-          acc.append(RENDER.link(internal_url))
+        case {'internal-link': internal_url}:
+          acc.append(RENDER.internal_link(internal_url))
         case _:
           acc.append(RENDER.line_content(el))
     return ''.join(acc)
@@ -104,7 +112,7 @@ class RENDER:
         case {'line': line}:
           acc.append('<pre>' + RENDER.line(line, **kwargs) + '</pre>')
         case _:
-          assert False
+          assert False, f"'{item}' is not item in block"
 
     return '\n'.join(acc)
 
