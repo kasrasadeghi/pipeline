@@ -45,10 +45,12 @@ function handle_msg(event, note) {
   const form = new FormData(event.target);
   const data = Object.fromEntries(form.entries());
   console.log('handle_msg', note, ':', data);
+  const text_input = event.target.firstChild;
 
   const preventing = window.localStorage.getItem('prevent-default');
   if (preventing === 'true') {
     event.preventDefault();
+    text_input.value = '';  // clear text input
 
     const createID = () => {
       const now = new Date();
@@ -66,10 +68,11 @@ function handle_msg(event, note) {
       const time_hour_min_sec_24h = now.toTimeString().slice(0, 8);    // 16:00:17
       const local_timezone        = now.toTimeString().slice(19, -1);  // Pacific Standard Time
       const year                  = now.getFullYear(); // 2023
+      const gmt_offset            = now.toTimeString().slice(9, 17);   // GMT-0800
 
       const IANA_timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       return [
-        `${brief_weekday}, ${brief_month} ${nozero_day_of_month} ${year}, ${time_hour_min_sec_24h} (${local_timezone})`,
+        `${brief_weekday}, ${brief_month} ${nozero_day_of_month} ${year}, ${time_hour_min_sec_24h} (${local_timezone}, ${gmt_offset}, ${IANA_timezone})`,
         {brief_weekday, brief_month, nozero_day_of_month, time_hour_min_sec_24h, local_timezone, year, IANA_timezone}
       ];
     };
@@ -95,23 +98,25 @@ function handle_msg(event, note) {
 
       const msg_container = el('div', 'msg_container', [msg_content]);
 
-      const timestamp_link = el('a');
-      timestamp_link.innerHTML = timeobj.time_hour_min_sec_24h;
-      timestamp_link.setAttribute('href', '#' + id);
-
-      const msg_timestamp = el('div', 'msg_timestamp', [timestamp_link]);
+      const msg_timestamp = el('a', 'msg_timestamp');
+      msg_timestamp.innerHTML = timeobj.time_hour_min_sec_24h;
+      msg_timestamp.setAttribute('href', '#' + id);
 
       const result = el('div', 'msg', [msg_timestamp, msg_container]);
       result.setAttribute('id', id);
       return result;
     };
 
+    const message = {content: data.msg, id};
+
     if (data.msg.length > 0) {
       document.getElementById('message-queue').appendChild(render_msg(data.msg, id));
     }
 
     // TODO put message in localStorage so it doesn't get lost on refresh
-    // scroll down
+    // window.localStorage.set(message);
+    console.log(message);
+    // TODO scroll down to
 
     // fetch('/', {
     //   method: 'POST',

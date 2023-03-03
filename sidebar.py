@@ -18,7 +18,7 @@ class SIDEBAR:
           <a class="link-button" href="/recents">recents</a>
           <a class="link-button" href='javascript:void(0)'>
             <input onclick="store_preventing()" type="checkbox" id="prevent-default" name="prevent-default" value="Boat">
-            <label for="prevent-default">prevent default</label>
+            <label for="prevent-default">offline</label>
           </a>
           <br/>
           <p id='updated-at'> error getting geolocation data </p>

@@ -311,3 +311,7 @@ class RENDER_UTIL:
               "<span class='banner'>" + title + "</span>" +
               "<div class='banner-bar'></div>" +
             "</div>")
+
+  @staticmethod
+  def pre(s):
+    return "<pre>" + str(s) + "</pre>"
