@@ -42,7 +42,8 @@ class RENDER_UTIL:
          overflow-wrap: anywhere;
        }
 
-       .selected { width: 100%; background: #330; border-radius: 18px }
+       .selected { width: 100%; background: #0cc4; border-radius: 18px }
+       .selected > .msg_timestamp { color: #ddd; }
 
        emph.tag { """ + C['tag_style'] + """; }
        emph.cmd { color: """ + C['cmd_color'] + """; }
@@ -192,7 +193,7 @@ class RENDER_UTIL:
        /* desktop */
        @media (min-width: """ + C["desktopview_device_width_threshold"] + """) {
          .msg { flex-direction: row; align-items: baseline; }
-         .msg_timestamp { margin: 0px 5px 0px 0px; }
+         .msg_timestamp { margin: 0px 5px 0px 5px; }
        }
      </style>""" + FLASK_UTIL.TELEMETRY()
 

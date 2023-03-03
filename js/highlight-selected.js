@@ -1,20 +1,23 @@
 window.addEventListener('load', () => {
-  if (window.location.hash === '') {
-    return;
-  }
-  const selected = document.getElementById(decodeURI(window.location.hash.slice(1)));
-  selected.classList.add('selected');
-  console.trace('load selected', selected);
+  console.log('enable highlight-selected');
 
-  console.log(document);
+  updateSelected = () => {
+    // clear selected
+    const currently_selected = document.getElementsByClassName('selected');
+    for (s of currently_selected) {
+      s.classList.remove('selected');
+    }
 
-  for (e of document.getElementsByClassName('msg_timestamp')) {
-    e.addEventListener('click', (event) => {
-      const currently_selected = document.getElementsByClassName('selected');
-      for (s of currently_selected) {
-        s.classList.remove('selected');
-      }
-      event.target.parentElement.classList.add('selected');
-    });
-  }
+    // select from hash
+    if (window.location.hash) {
+      const selected = document.getElementById(decodeURI(window.location.hash.slice(1)));
+      selected.classList.add('selected');
+    }
+  };
+
+  window.addEventListener('hashchange', () => {
+    updateSelected();
+  });
+
+  updateSelected();
 });
