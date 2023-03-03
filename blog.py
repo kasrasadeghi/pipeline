@@ -465,22 +465,19 @@ def get_blog():
 def get_internal_blog():
   return BLOG_RENDER.ROOT()
 
+def filename_to_post(filename):
+  for post in (postlist := BLOG.parse_postlist()):
+    if post['filename'] == filename:
+      return post
+  assert False, "can't find filename in postlist:\n" + str(postlist)
+
+@app.route("/internal/posts/<filename>")
+def get_blog_post(filename):
+  return FLAT_RENDER.NOTE(filename_to_post(filename)['note'])
+
 @app.route("/blog/posts/<filename>")
-@app.route("/internal/posts/<filename>", defaults={"blog_type": "internal"})
-def get_internal_blog_post(filename, blog_type=None):
-  def filename_to_post(url):
-    for post in BLOG.parse_postlist():
-      if post['filename'] == filename:
-        return post
-    ABORT(f"ERROR: post for url 'posts/{filename}' not found")
-
-  post = filename_to_post(filename)
-
-  if blog_type == "internal":
-    return FLAT_RENDER.NOTE(post['note'])
-  else:
-    return Response(BLOG_COMPILE.POST(post), 200, mimetype="text/html")
-
+def get_internal_blog_post(filename):
+  return Response(BLOG_COMPILE.POST(filename_to_post(filename)), 200, mimetype="text/html")
 
 @app.route("/test/blog/<note>")
 def test_blog_renderer(note):

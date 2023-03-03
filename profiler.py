@@ -1,9 +1,8 @@
 # NOTE this file cannot be called "profile.py" because python won't be able to distinguish it from the builtin 'profile' module
+# - lol
 # see: https://github.com/google/ci_edit/issues/192#issuecomment-517118503
 
-@app.route('/api/profile-dumps', defaults={'profile_dir': 'profile-dumps'})
-@app.route('/api/saved-profile-dumps', defaults={'profile_dir': 'saved-profile-dumps'})
-def get_profile_targets(profile_dir='profile-dumps'):
+def inner_get_profile_targets(profile_dir='profile-dumps'):
   dumps = os.listdir(profile_dir)
   print(profile_dir)
   get_timestamp = lambda x: x.rsplit('.', 2)[1]
@@ -22,6 +21,14 @@ def get_profile_targets(profile_dir='profile-dumps'):
     LOG({'filename': filename})
     acc.append(f"     <option value='{filename}'>{get_timestamp(filename)}: {filename}</option>")
   return {'options': "\n".join(acc), 'average': 0 if len(acc) == 0 else sum(duration_acc[:10]) / len(duration_acc[:10])}
+
+@app.route('/api/saved-profile-dumps')
+def get_saved_profiles():
+  return inner_get_profile_targets(profile_dir='saved-profile-dumps')
+
+@app.route('/api/profile-dumps')
+def get_unsaved_profiles():
+  return inner_get_profile_targets(profile_dir='profile-dumps')
 
 @app.route('/api/profile-dump/<dump>')
 def get_profile_target(dump):
@@ -145,7 +152,7 @@ def get_profile_data_viewer():
     </script>"""
     "<form>"
       "<select id='select-profile' name='profile-target'>"
-      + get_profile_targets()['options'] + \
+      + inner_get_profile_targets()['options'] + \
       "</select>"
       "<br/>"
       "<input type=button value='get profile' onclick='get_profile()'></input>"
