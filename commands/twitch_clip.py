@@ -36,6 +36,7 @@ class TWITCH_CLIP:
       f.write(url + '\n')
       f.write(filename + '\n')
       f.write(title + '\n\n')
+      f.flush()
 
     os.chdir(cwd)
     return output

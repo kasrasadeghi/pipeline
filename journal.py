@@ -25,6 +25,7 @@ class JOURNAL:
       content = f.read()
     with open(FLAT.to_path(note), "w") as f:
       f.write(f"{content}Tags: Journal\n")
+      f.flush()
     return note
 
   @staticmethod

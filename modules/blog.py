@@ -496,12 +496,14 @@ def COMMAND_BLOG(args, handle_msg, redirect_page):
           with open(BLOG.distpath + "/posts/" + post.filename, "w+") as f:
             acc.append(f"compile ~/blog/posts/{post.filename}\n")
             f.write(BLOG_COMPILE.POST(post))
+            f.flush()
         pass
 
         # render root
         acc.append('compile root\n\n')
         with open(BLOG.distpath + "/index.html", "w+") as f:
           f.write(BLOG_COMPILE.ROOT())
+          f.flush()
 
         # TODO track changed files
         handle_msg("COMPILE")

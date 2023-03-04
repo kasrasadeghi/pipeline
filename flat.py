@@ -63,6 +63,7 @@ class FLAT:
   def set_config(form):
     with open(FLAT.config_path(), "w") as f:
       f.write(form['text'])
+      f.flush()
 
   @staticmethod
   def config():
@@ -231,6 +232,7 @@ class FLAT:
       f.write("\n".join(lines[:metadata_linenum]) + "\n")
       f.write(content)
       f.write("\n".join(lines[metadata_linenum:]))
+      f.flush()
 
 
   @classmethod
@@ -249,6 +251,7 @@ class FLAT:
   def handle_edit(_, note, form):
     with open(FLAT.to_path(note), "w") as f:
       f.write(form['text'])
+      f.flush()
 # END FLAT
 
 class FLAT_PARSER:
