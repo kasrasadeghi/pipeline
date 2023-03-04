@@ -20,11 +20,11 @@ class JOURNAL:
     return DATE.abbr_month_to_full(x['m']) + ' ' + x['D'].strip() + DATE.joke_ordinal_day_of_month_suffix(x['D']) + ", " + x['Y']
 
   @staticmethod
-  def init_journal(note, D):
+  def init_journal(note):
     with open(FLAT.to_path(note)) as f:
       content = f.read()
     with open(FLAT.to_path(note), "w") as f:
-      f.write(f"# {D['month']} {D['day_of_month']}\n\n{content}Tags: Journal\n")
+      f.write(f"{content}Tags: Journal\n")
     return note
 
   @staticmethod
@@ -33,7 +33,7 @@ class JOURNAL:
 
   @staticmethod
   def create_journal_for_day(date):
-    JOURNAL.init_journal(new_note := FLAT.make_new(JOURNAL.date_to_title(date)), D)
+    JOURNAL.init_journal(new_note := FLAT.make_new(JOURNAL.date_to_title(date)))
     return new_note
 
   @staticmethod
