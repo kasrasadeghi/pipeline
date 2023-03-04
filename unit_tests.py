@@ -45,7 +45,7 @@ def eqch(*P):
     except Exception as e:
       raise Exception(v) from e
   return \
-    "<p>FAIL</p>" + "<pre>" + "<br>".join(b) + "</pre>"\
+    "<p>FAIL</p>" + "<pre>" + "<br>".join(b) + "</pre>" + \
     "<p>PASS</p>" + "<pre>" + "<br>".join(g) + "</pre>"
 
 @app.route('/test/unit/tag_parse')
