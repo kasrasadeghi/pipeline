@@ -33,8 +33,7 @@ class JOURNAL:
 
   @staticmethod
   def create_journal_for_day(date):
-    new_note = FLAT.make_new(JOURNAL.date_to_title(date))
-    JOURNAL.init_journal(new_note, D)
+    JOURNAL.init_journal(new_note := FLAT.make_new(JOURNAL.date_to_title(date)), D)
     return new_note
 
   @staticmethod
