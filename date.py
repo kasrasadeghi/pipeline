@@ -57,4 +57,7 @@ def fastparse_datetime(date, output_pattern=None):
         # %B == to_full(mmm) full month name
         return x['D'] + ' ' + x['W'] + ' ' + x['Y'] + ' ' + x['m']
 
+      case '+%T %Z':
+        return x['H'] + ':' + x['M'] + ':' + x['S'] + ' ' + x['Z']
+
   return False
