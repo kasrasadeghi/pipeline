@@ -32,22 +32,19 @@ class BLOG:
 
   @staticmethod
   def parse_root():
-    lines = FLAT.note_read_lines(BLOG.root)
+    page = REWRITE.note(BLOG.root)
 
-    node = PARSER.parse_content("\n".join(lines[1:]))
+    assert page[0]['title'] == "entry", 'blog root first section must be entry'
 
-    if node[0]['title'] != "entry":
-      ABORT(f"ERROR: parsing entry section from node: {TREE.dump_tree(node)}")
+    for b in page[0]['blocks']:
+      if b == ['']:
+        continue
+      blog_post = b[0]['line']
+      if blog_post[0].startswith('#'):
+        continue
 
-    blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
-
-    for b in blocks:
-      if not TREE.is_line(b):
-        ABORT(f"ERROR: block is not singleton '{b}'")
-      blog_post = b[0]
-      LOG(blog_post)
       post = dict()
-      post['internal_name'], post['note'] = blog_post.rsplit(': ', 2)
+      post['internal_name'], post['note'] = blog_post[0], blog_post[2]['note']
 
       yield post
 
@@ -79,7 +76,7 @@ class BLOG:
     for post in BLOG.parse_postlist():
       if post['note'] == note:
         return post
-    ABORT(f"ERROR: post for note '{note}' not found")
+    assert False, (f"ERROR: post for note '{note}' not found")
 
 # end BLOG
 
@@ -90,7 +87,6 @@ class BLOG_RENDER:
     # view is either "internal" or "blog"
     return f"""<a href="/{view}/posts/{post['filename']}">{post['title']}</a>"""
 
-  @staticmethod
   def bar():
     note = BLOG.root
     return RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
@@ -102,13 +98,16 @@ class BLOG_RENDER:
     for post_slug in BLOG.parse_root():
       blog_post = BLOG.try_note_to_post(post_slug['note'])
       acc.append("<div class='block'>" + BLOG_RENDER.link_to_post(blog_post, view) + "</div>")
+
+    for post_slug in BLOG.parse_postlist():
+      blog_post = BLOG.try_note_to_post(post_slug['note'])
+      acc.append("<div class='block'>" + BLOG_RENDER.link_to_post(blog_post, view) + "</div>")
     content = '\n'.join(acc)
     return content
 
   @staticmethod
   def ROOT():
     bar = BLOG_RENDER.bar()
-
     content = BLOG_RENDER.ROOT_CONTENT("internal")
     title = BLOG.title()
 
@@ -303,7 +302,7 @@ class BLOG_TREE:
 
       if isinstance(item, str):
         acc.append(f"<pre style='color: red'>{item}</pre>")
-        debug("string:", item)
+        LOG({item})
         continue
 
       # acc.append(repr(item))

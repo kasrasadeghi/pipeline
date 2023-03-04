@@ -11,11 +11,6 @@ class TREE:
     return len(block) == 1 and block[0] == ''
 
   @staticmethod
-  def is_singleton(block):
-    """ a singleton is a block with one item that is a dict, and thus a parsed tree """
-    return len(block) == 1 and isinstance(block[0], dict)
-
-  @staticmethod
   def is_line(block):
     """ a line is a block with one item that is a string, not a parse tree item """
     return len(block) == 1 and isinstance(block[0], str)
