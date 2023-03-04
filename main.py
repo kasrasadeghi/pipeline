@@ -43,13 +43,17 @@ kaz_import('js.py')
 
 kaz_import('command.py')
 kaz_import('commands/new_note.py')
-kaz_import('advanced_tree_parser.py')
-kaz_import('blog.py')
+
 
 kaz_import('commands/twitch_clip.py')
 kaz_import('commands/full_sync.py')
 
 kaz_import('graph.py')
+
+kaz_import('advanced_tree_parser.py')
+kaz_import('modules/blog.py')
+kaz_import('modules/fbconv.py')
+kaz_import('modules/quant.py')
 
 kaz_import('debug.py')
 kaz_import('pretty.py')
@@ -57,10 +61,6 @@ kaz_import('latency.py')
 kaz_import('pagesize.py')
 kaz_import('profiler.py')
 kaz_import('unit_tests.py')
-
-kaz_import('fbconv.py')
-
-kaz_import('quant.py')
 
 # END IMPORTS
 
