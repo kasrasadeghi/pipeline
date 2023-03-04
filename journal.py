@@ -79,13 +79,13 @@ def route_day_of(note):
   return "ERROR: could not find journal on that day"
 
 @app.route("/before")
-def route_before_bare(note):
-  unused_view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-  return route_before(note)
+def route_before_bare():
+  view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  return route_before(note, view=view)
 
 @app.route("/before/<note>")
-def route_before(note):
-  day = util.day_before(current_day := FLAT.metadata(note)['Date'])
+def route_before(note, view='disc'):
+  day = DATE.day_before(current_day := FLAT.metadata(note)['Date'])
   if n := JOURNAL.find_journal_for_day(day):
     return redirect(FLAT.to_url(n, view=view))
 
@@ -93,16 +93,13 @@ def route_before(note):
 
 
 @app.route("/after")
-def route_after_bare(note):
-  _view_, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-  return route_after(note)
+def route_after_bare():
+  view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
+  return route_after(note, view=view)
 
 @app.route("/after/<note>")
-def route_after(note):
-  if not note:
-    view, note = FLAT.try_from_url(request.environ['HTTP_REFERER'])
-
-  day = util.day_after(current_day := FLAT.metadata(note)['Date'])
+def route_after(note, view='disc'):
+  day = DATE.day_after(current_day := FLAT.metadata(note)['Date'])
   if n := JOURNAL.find_journal_for_day(day):
     return redirect(FLAT.to_url(n, view=view))
 
