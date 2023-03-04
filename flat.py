@@ -160,7 +160,7 @@ class FLAT:
   def init_note(note, title):
     with open(FLAT.to_path(note), "w+") as f:
       f.write("--- METADATA ---\n"
-              f"Date: {util.get_current_time()}\n"
+              f"Date: {DATE.now()}\n"
               f"Title: {title}\n")
       f.flush()
 
@@ -241,7 +241,7 @@ class FLAT:
     if '' == form['msg']:
       return
 
-    msg = "- msg: " + form['msg'] + "\n  - Date: " + util.get_current_time() + "\n\n"
+    msg = "- msg: " + form['msg'] + "\n  - Date: " + DATE.now() + "\n\n"
 
     FLAT.append_to_note(note, msg)
 
@@ -342,7 +342,7 @@ class FLAT_RENDER:
     note = FLAT.get_index()
 
     content = RENDER.content(note)
-    lines_of_code = util.cmd("tokei", shell=True, cwd="/home/kasra/projects/notes-website")
+    lines_of_code = util.cmd("tokei", cwd="/home/kasra/projects/notes-website")
 
     bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>',
                           f'<a href="/disc/{note}">disc</a>',

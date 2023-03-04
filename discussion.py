@@ -42,7 +42,7 @@ class DISCUSSION_RENDER:
   @staticmethod
   def msg(msg, **kwargs):
     msg_date = msg['date']
-    date = kwargs.get('timerender', lambda msg_date: util.date_cmd("-d", msg_date, "+%T"))(msg_date)
+    date = kwargs.get('timerender', lambda msg_date: DATE.cmd("-d", msg_date, "+%T"))(msg_date)
     msg_indent = kwargs.get('msg_indent', '')
 
     msg_content = RENDER.line(msg['msg'])

@@ -9,7 +9,7 @@ def test_render_msg():
 @app.route('/test/unit/date_cmd')
 def test_date_cmd():
   for i in range(10000):
-    util.date_cmd("-d", 'Tue Feb 14 11:13:50 PST 2023', "+%T")
+    DATE.cmd("-d", 'Tue Feb 14 11:13:50 PST 2023', "+%T")
   return 'DONE'
 
 

@@ -2,8 +2,8 @@ class JOURNAL_RENDER:
   @staticmethod
   def METADATA(metadata, **kwargs):
     """ @param metadata - must be parsed metadata"""
-    return (f"<pre>Journal for {JOURNAL.date_to_parts(metadata['Date'])['brief_weekday']}, {metadata['Title']}\n"
-            f"- created at {util.date_cmd('-d', metadata['Date'], '+%T %Z')}\n"
+    return (f"<pre>Journal for {DATE.cmd('-d', metadata['Date'], '+%a')}, {metadata['Title']}\n"
+            f"- created at {DATE.cmd('-d', metadata['Date'], '+%T %Z')}\n"
             f'- see the day <a href="/before">before</a> <a href="/after">after</a>'
             f"</pre>")
 
@@ -14,15 +14,10 @@ class JOURNAL:
     return 'Tags' in metadata and "Journal" in metadata['Tags']
 
   @staticmethod
-  def date_to_parts(date_str):
-    day_of_month, brief_weekday, month, year = util.date_cmd("-d", date_str, "+%e %a %B %Y").split()
-    day_of_month_suffix = {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
-    title = f"{month} {day_of_month}{day_of_month_suffix}, {year}"
-    return {'day_of_month': day_of_month, 'day_of_month_suffix': day_of_month_suffix, 'month': month, 'year': year, 'title': title, 'brief_weekday': brief_weekday}
-
-  @staticmethod
   def date_to_title(date_str):
-    return JOURNAL.date_to_parts(date_str)['title']
+    # date_str -> e.g. "March 8th, 2023", e.g. "March 13rd, 2023" (lol)
+    assert (x := pattern_scatter(date_str, 'WWW mmm DD HH:MM:SS ZZZ YYYY', 'WmDHMSZY')), f"'{date_str}' doesn't match pattern"
+    return DATE.abbr_month_to_full(x['m']) + ' ' + x['D'].strip() + DATE.joke_ordinal_day_of_month_suffix(x['D']) + ", " + x['Y']
 
   @staticmethod
   def init_journal(note, D):
@@ -38,16 +33,15 @@ class JOURNAL:
 
   @staticmethod
   def create_journal_for_day(date):
-    D = JOURNAL.date_to_parts(date)
-    new_note = FLAT.make_new(D['title'])
+    new_note = FLAT.make_new(JOURNAL.date_to_title(date))
     JOURNAL.init_journal(new_note, D)
     return new_note
 
   @staticmethod
   def today():
-    if note := JOURNAL.find_journal_for_day("today"):
+    if note := JOURNAL.find_journal_for_day(DATE.now()):
       return note
-    return JOURNAL.create_journal_for_day("today")
+    return JOURNAL.create_journal_for_day(DATE.now())
 
   @staticmethod
   def yesterday():
@@ -76,7 +70,7 @@ def route_day_of(note):
   if n := JOURNAL.find_journal_for_day(FLAT.metadata(note)['Date']):
     return redirect(FLAT.to_url(n, view="disc"))
 
-  return "ERROR: could not find journal on that day"
+  return f"ERROR: could not find journal on {JOURNAL.date_to_title(current_day)}, which is {JOURNAL.date_to_title(day)}"
 
 @app.route("/before")
 def route_before_bare():
