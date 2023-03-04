@@ -85,7 +85,7 @@ class FLAT:
     return len("4e0ce4ff-1663-49f9-8ced-30f91202ae08.note")
 
   @staticmethod
-  def cmd(*args, **kwargs):
+  def cmd(args, **kwargs):
     if 'cwd' not in kwargs:
       kwargs['cwd'] = FLAT.path
     return util.cmd(*args, **kwargs)
@@ -213,7 +213,7 @@ class FLAT:
 
   @classmethod
   def list_by_create_date(cls):
-    return sorted(cls.list(), key=lambda n: util.parse_time_to_utc(FLAT.metadata(n)['Date']))
+    return sorted(cls.list(), key=lambda n: DATE.parse_time_to_utc(FLAT.metadata(n)['Date']))
 
   @classmethod
   def append_to_note(_, note, content):

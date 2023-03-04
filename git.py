@@ -48,7 +48,7 @@ class GIT:
         acc.append((before, uuid, "uuid"))
 
     def comparable_date(p):
-      return util.parse_time_to_utc(FLAT.metadata(p[1])['Date'])
+      return DATE.parse_time_to_utc(FLAT.metadata(p[1])['Date'])
 
     acc_sorted = list(reversed(sorted(acc, key=comparable_date)))
 
