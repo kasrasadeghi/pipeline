@@ -342,7 +342,6 @@ class FLAT_RENDER:
     note = FLAT.get_index()
 
     content = RENDER.content(note)
-    lines_of_code = util.cmd("tokei", cwd="/home/kasra/projects/notes-website")
 
     bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>',
                           f'<a href="/disc/{note}">disc</a>',
@@ -351,7 +350,7 @@ class FLAT_RENDER:
     # compose html
     title = FLAT.title(note)
     result = (f"<div class='msgbox'>"
-              f"{content}\n<pre>{lines_of_code}</pre></div>")
+              f"{content}\n</div>")
     return RENDER.base_page({'title': title, 'bar': bar, 'content': result})
 
   @classmethod
