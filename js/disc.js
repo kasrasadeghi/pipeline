@@ -34,6 +34,9 @@ function load_preventing() {
   }
   document.getElementById('prevent-default').checked = (preventing === 'true');
   console.log('load_preventing becomes', window.localStorage.getItem('prevent-default'));
+
+  // TODO catch local storage change event and update the checkbox
+  // TODO CONSIDER maybe not, so that every instance of a page can have a different queue?  but the queues might interfere with each other, but it's probably easier to do a queue merge for local messages than it is to do something else.  hmmmmm.
 }
 
 function store_preventing() {
@@ -116,6 +119,15 @@ function handle_msg(event, note) {
     // TODO put message in localStorage so it doesn't get lost on refresh
     // window.localStorage.set(message);
     console.log(message);
+
+    // TODO catch local storage change event and update the message queue
+
+    // TODO CONSIDER maybe use local storage to sync tabs???  so we can send to the server but also have updated tabs???
+    // - but having non-synced tabs is nice sometimes, to recover from failure-states.  i should probably just use git for that tho
+
+    // scroll to bottom
+    window.scrollTo(0, document.body.scrollHeight);
+
     // TODO scroll down to
 
     // fetch('/', {
