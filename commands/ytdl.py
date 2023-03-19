@@ -1,5 +1,6 @@
-class TWITCH_CLIP:
-  folder = '/home/kasra/twitch-clip-cache'
+class YOUTUBE_DL:
+  folder = '/home/kasra/pipeline-ytdl-cache'
+  cmd = 'yt-dlp'
 
   @classmethod
   def DOWNLOAD(cls, url, title):
@@ -14,7 +15,7 @@ class TWITCH_CLIP:
     pre = os.listdir()
 
     # download the twitch clip
-    p = subprocess.run(['youtube-dl', url], capture_output=True, text=True)
+    p = subprocess.run([cls.cmd, url], capture_output=True, text=True)
 
     # figure out what file was downloaded, if any
     post = os.listdir()
@@ -25,25 +26,27 @@ class TWITCH_CLIP:
       output = p.stdout + p.stderr + '\n'
 
     if diff := set(post) - set(pre):
-      LOG({"twitch clip diff": diff})
+      LOG({"ytdl diff": diff})
       assert len(diff) == 1
       filename = next(iter(diff))
     else:
       return output
 
     # append to the mappings file
-    with open(cls.folder + '/mapping.txt', 'a') as f:
-      f.write(url + '\n')
-      f.write(filename + '\n')
-      f.write(title + '\n\n')
-      f.flush()
+    with open(cls.folder + '/mapping.json') as f:
+      data = json.load(f)
+
+    data['list'].append({'title': title, 'url': url, 'filename': filename})
+
+    with open(cls.folder + '/mapping.json', 'w') as f:
+      json.dump(data, f, indent=2)
 
     os.chdir(cwd)
     return output
 
 
-@COMMAND.REGISTER('TWITCH-CLIP')
-def COMMAND_TWITCH_CLIP(args, continuation, redirect_page):
+@COMMAND.REGISTER('YTDL')  # works with twitch clips
+def COMMAND_YTDL(args, continuation, redirect_page):
 
   rest = args['arg']
 
@@ -57,6 +60,6 @@ def COMMAND_TWITCH_CLIP(args, continuation, redirect_page):
 
   LOG({'downloading twitch clip': url})
 
-  output = TWITCH_CLIP.DOWNLOAD(url, title)
+  output = YOUTUBE_DL.DOWNLOAD(url, title)
   continuation(args['arg'])
   FLAT.append_to_note(args['origin'], output)

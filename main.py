@@ -43,9 +43,9 @@ kaz_import('js.py')
 
 kaz_import('command.py')
 kaz_import('commands/new_note.py')
-
-kaz_import('commands/twitch_clip.py')
 kaz_import('commands/full_sync.py')
+
+kaz_import('commands/ytdl.py')
 
 kaz_import('graph.py')
 
