@@ -1,3 +1,5 @@
+# depends on pattern.py
+
 class DATE:
 
   @staticmethod
