@@ -14,28 +14,80 @@ class RENDER:
   def link(url):
     return f'<a href="{url}">{url}</a>'
 
+  #staticmethod
+  def ref(url, **kwargs):
+    # [/disc/]<note uuid>#<timestamp fragment>
+    from urllib.parse import unquote_plus
+    note = url.path.removeprefix('/disc/')
+    title = FLAT.title(note)
+
+    if not url.fragment:
+      return f"<a href='{note}'>{title}</a>"
+
+    timestamp = unquote_plus(url.fragment)
+
+    # possibilities:
+    #
+    # same note, journal
+    # - @ 10:07:33
+    # - @ 10:07:33 on Mar 26       # ref on different day than journal title
+    # - @ 10:07:33 on Mar 26 2023  # ref on different day and year than journal title
+    # same note, not journal
+    # - @ 10:07:33 on Mar 26 2023
+    # - should we use the different day journal conciseness, maybe using creation date?
+    # not same note, ref journal
+    # - Mar 26 2023 @ 10:07:33
+    # not same note, ref not journal
+    # - whatever @ 10:07:33 on Mar 26 2023
+
+    # same note
+    x = DATE.pattern_scatter(timestamp)
+    if note == kwargs['origin_note']:
+      # journal
+      if JOURNAL.is_journal(note):
+        full_month, ordinal_day, year = title.split(' ')
+        title = ''
+        day = (ordinal_day
+               .removesuffix(',')
+               .removesuffix('st')
+               .removesuffix('nd')
+               .removesuffix('rd')
+               .removesuffix('th'))  # 1st, 2nd, 3rd, 4th
+        month = DATE.full_month_to_abbr(full_month)
+        if x['M'] == month and x['D'] == day and x['Y'] == year:
+          # NOTE: timezone changes because of daylight savings and stuff might mess this up
+          timestamp = f"{x['h']}:{x['m']}:{x['s']}"
+          # https://twitter.com/collision/status/1640035287798784006?s=46&t=Ja4Tt6RUYNcfFXA5q_Z6eA
+        elif x['Y'] == year:
+          timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']}"
+        else:
+          timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']} {x['Y']}"
+
+      # not journal
+      else:
+        title = ''
+        timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']} {x['Y']}"
+
+    # not same note
+    else:
+      if JOURNAL.is_journal(note):
+        title     = f"{x['M']} {x['D']} {x['Y']}"
+        timestamp = f"{x['h']}:{x['m']}:{x['s']}"
+      else:
+        # do nothing
+        pass
+
+    if title:
+      title += ' '
+    return f"<a href='{note}#{url.fragment}'>{title}@ {timestamp}</a>"
+
+
   @staticmethod
   def internal_link(url, **kwargs):
-    from urllib.parse import unquote_plus
+    if FLAT.exists(url.path.removeprefix('/disc/')):
+      return RENDER.ref(url, **kwargs)
 
-    # [/disc/]<note uuid>#<timestamp fragment>
-
-    path = url.path
-    if path.startswith('/disc/'):
-      path = path.removeprefix('/disc/')
-    if FLAT.exists(path):
-      note = path
-      if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
-        title = 'Journal'
-      else:
-        title = FLAT.title(note)
-    else:
-      title = path
-    if url.fragment:
-      return f"<a href='{path}#{url.fragment}'>{title} @ {unquote_plus(url.fragment)}</a>"
-    else:
-      # no timestamp should just show the raw root
-      return f"<a href='{path}'>{title}</a>"
+    return RENDER.link(url.path)
 
   @staticmethod
   def note(note, **kwargs):
@@ -171,7 +223,7 @@ class RENDER:
       return "\n".join(acc)
 
     if section['title'] == 'METADATA':
-      if JOURNAL.is_journal(section):
+      if JOURNAL.is_journal_from_section(section):
         return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
 
     acc = list()

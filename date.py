@@ -59,10 +59,31 @@ class DATE:
     }[x]
 
   @staticmethod
+  def full_month_to_abbr(x):
+    return {
+      'January'  : 'Jan',
+      'February' : 'Feb',
+      'March'    : 'Mar',
+      'April'    : 'Apr',
+      'May'      : 'May',
+      'June'     : 'Jun',
+      'July'     : 'Jul',
+      'August'   : 'Aug',
+      'September': 'Sep',
+      'October'  : 'Oct',
+      'November' : 'Nov',
+      'December' : 'Dec'
+    }[x]
+
+  @staticmethod
   def joke_ordinal_day_of_month_suffix(day_of_month):
     # this incorrectly maps 11 -> 11st, 12 -> 12nd, 13 -> 13rd
     # kaz: originally i did not notice, but then i thought it was funny
     return {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
+
+  @staticmethod
+  def pattern_scatter(date):
+    return pattern_scatter(date, 'WWW MMM DD hh:mm:ss ZZZ YYYY', 'WMDhmsZY')
 
   @staticmethod
   def fastparse_datetime(date, output_pattern):

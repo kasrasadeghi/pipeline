@@ -9,9 +9,13 @@ class JOURNAL_RENDER:
 
 class JOURNAL:
   @staticmethod
-  def is_journal(metadata_section):
+  def is_journal_from_section(metadata_section):
     metadata = FLAT.parse_metadata_from_section(metadata_section)
     return 'Tags' in metadata and "Journal" in metadata['Tags']
+
+  @staticmethod
+  def is_journal(note):
+    return 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']
 
   @staticmethod
   def date_to_title(date_str):
