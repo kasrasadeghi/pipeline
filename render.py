@@ -11,7 +11,7 @@ class CONTEXT:
 # the tree renderer, with hooks
 class RENDER:
   @staticmethod
-  def link(url):
+  def simple_link(url, **kwargs):
     return f'<a href="{url}">{url}</a>'
 
   #staticmethod
@@ -87,7 +87,7 @@ class RENDER:
     if FLAT.exists(url.path.removeprefix('/disc/')):
       return RENDER.ref(url, **kwargs)
 
-    return RENDER.link(url.path)
+    return RENDER.simple_link(url.path)
 
   @staticmethod
   def note(note, **kwargs):
@@ -97,37 +97,38 @@ class RENDER:
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'
 
   @staticmethod
-  def tag(s):
-    match s:
+  def link(line, **kwargs):
+    match line:
+      case {'link': x, 'linktype': 'link'}:
+        return RENDER.simple_link(x, **kwargs)
+      case {'link': x, 'linktype': 'note'}:
+        return RENDER.note(x, **kwargs)
+      case {'link': x, 'linktype': 'root-link'}:
+        return RENDER.simple_link(x, **kwargs)
+      case {'link': x, 'linktype': 'internal-link'}:
+        return RENDER.internal_link(x, **kwargs)
+      case _:
+        raise NotImplementedError(line)
+
+  @staticmethod
+  def line_content(content, **kwargs):
+    match content:
       case {'tag': tag}:
         return '<emph class="tag">' + tag + '</emph>'
       case {'cmd': cmd}:
         return '<emph class="cmd">' + cmd + '</emph>'
       case str():
-        return s
+        return content
+      case {'link': _, 'linktype': _} as link:
+        return ': ' + RENDER.link(link, **kwargs)
       case _:
-        NotImplementedError()
+        raise NotImplementedError(content)
 
   @staticmethod
-  def line_content(content, **kwargs):
-    return ''.join(map(RENDER.tag, content))
-
-  @staticmethod
-  def line(L, **kwargs):
-    acc = list()
-    for el in L:
-      match el:
-        case {'link': link}:
-          acc.append(RENDER.link(link))
-        case {'note': note}:
-          acc.append(RENDER.note(note))
-        case {'root-link': internal_link}:
-          acc.append(RENDER.link(internal_link))
-        case {'internal-link': internal_url}:
-          acc.append(RENDER.internal_link(internal_url, **kwargs))
-        case _:
-          acc.append(RENDER.line_content(el, **kwargs))
-    return ''.join(acc)
+  def line(line, **kwargs):
+    def mapper(x):
+      return RENDER.line_content(x, **kwargs)
+    return ''.join(map(mapper, line))
 
   @staticmethod
   def node(item, **kwargs):
@@ -198,7 +199,7 @@ class RENDER:
           acc.append('<summary>')
           acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
           if tags:
-            acc.append("<div class='tags-summary'>" + ' '.join(map(RENDER.tag,tags)) + "</div>")
+            acc.append("<div class='tags-summary'>" + ' '.join(map(RENDER.line_content,tags)) + "</div>")
           acc.append('</summary>')
         case {'msg': _}:
           acc.append(DISCUSSION_RENDER.msg(msg, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))

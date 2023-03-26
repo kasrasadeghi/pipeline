@@ -13,10 +13,10 @@ class REWRITE:
 
         if url.endswith(".note") and \
            FLAT.note_id_len() == len(url.strip()):
-          url = {'note': url}
+          url = {'linktype': 'note', 'link': url}
 
         elif url.startswith('/'):
-          url = {'root-link': url}
+          url = {'linktype': 'root-link', 'link': url}
 
         elif url.startswith('https://') or url.startswith('http://'):
           from urllib.parse import urlparse
@@ -25,16 +25,16 @@ class REWRITE:
           parsed_url = urlparse(url)
           origin = parsed_url.netloc
           if origin.startswith('192.') or origin.startswith('10.'):
-            url = {'internal-link': parsed_url}
+            url = {'linktype': 'internal-link', 'link': parsed_url}
           else:
-            url = {'link': url}
+            url = {'linktype': 'link', 'link': url}
 
         if isinstance(url, dict):
-          return [TAG.parse(prefix), ': ', url]
+          return TAG.parse(prefix) + [url]
         else:
-          return [TAG.parse(S)]
+          return TAG.parse(S)
 
-      return [TAG.parse(S)]
+      return TAG.parse(S)
 
     return parse_url(line)
 
@@ -84,9 +84,8 @@ class REWRITE:
     for block in section['blocks']:
       match block:
         case {'msg': _} as msg:
-          if msg['content'][0].startswith("- "):
+          if msg['content'].startswith("msg: - "):
             msg['msg'][0] = msg['msg'][0].removeprefix('- ')
-            msg['content'] = msg['content'].removeprefix('- ')
             roots[-1]['children'].append(msg)
           else:  # new root
             roots.append({'root': 'nonfinal', 'children': [msg]})
