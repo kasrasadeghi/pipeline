@@ -52,5 +52,11 @@ def eqch(*P):
 def test_tag_parse():
   return eqch(
     [TAG.parse('HELLO WORLD'),
-     [{'tag': 'HELLO'}, ' ', {'tag': 'WORLD'}]]
+     [{'tag': 'HELLO'}, ' ', {'tag': 'WORLD'}]],
+    [TAG.parse('INPUT generators vs stackless coroutines: QUOTE testing I am testing 1 2 3'),
+     [{"tag": "INPUT"},
+      " generators vs stackless coroutines: ",
+      {"tag": "QUOTE"},
+      " testing I am testing 1 2 3"],
+     "capital 'I' should not disrupt parsing non-tags"]
   )

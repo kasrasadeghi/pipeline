@@ -17,45 +17,48 @@ class TAG:
       acc.append({'cmd': content[:cmdlen]})
       content = content[cmdlen:]
 
-    word = None
+    tag = None
     rest = None
     for c in content:
       if c.isupper():
         # print('u ' + c, word, rest)
 
-        if rest:
-          acc.append(rest)
-          rest = None
-
-        if word:
-          word += c
+        if tag:
+          tag += c
         else:
-          word = c
+          tag = c
       else:
         # print('  ' + c, word, rest)
 
-        if word:
-          if len(word) == 1:
-            acc.append(word)
-            word = None
+        if tag:
+          if len(tag) == 1:
+            if rest:
+              rest += tag
+            else:
+              rest = tag
+            tag = None
           else:
-            acc.append({'tag': word})
-            word = None
+            # we should delay pushing 'rest' until we're sure we're parsing a tag
+            # we can delay it all the way until we're pushing the tag itself
+            if rest:
+              acc.append(rest)
+              rest = None
+            acc.append({'tag': tag})
+            tag = None
         if rest:
           rest += c
         else:
           rest = c
 
-    assert not (word and rest)
-
     # print('end', word, rest)
 
-    if word:
-      acc.append({'tag': word})
-      word = None
     if rest:
       acc.append(rest)
       rest = None
+
+    if tag:
+      acc.append({'tag': tag})
+      tag = None
 
     # print('end', word, rest)
 
