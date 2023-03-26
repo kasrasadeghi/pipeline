@@ -20,18 +20,28 @@ class RENDER_UTIL:
     return """
      <meta name="viewport" content=" """ + meta_tags + """ ">
      <style>
+
+       /* global font setting */
+       * { font-size: 18px; color: """ + C["base_text_color"] + """; }
+
+       /* forms */
+       select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
+       input[type=text].msg_input { color: """ + C["base_text_color"] + """}
+       input[type=checkbox] { width: 18px; height: 18px; margin: 1 3 1 3; padding: 0 }
+
+       /* body content */
        body { margin: 0; background: """ + C["body_background_color"] + """; }
        .content { padding: 5px; margin: """ + C["navbar_size"] + """ 1% 1% 1%; height: calc(100vh - """ + C["navbar_size"] + """ - 10px); }
-       :target { scroll-margin-top: """ + C["navbar_size"] + """; }
+
+       /* disc messages */
        .msgbox {
          margin: 0px;
          display: flex;
          flex-direction: column;
          align-content: stretch;
          align-items: flex-start;
-         font-feature-settings: "liga" 0
+         font-feature-settings: "liga" 0;
        }
-       pre { margin: 0px; color: """ + C["base_text_color"] + """; }
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: """ + C["msg_timestamp_color"] + """; }
        .msg_content {
@@ -39,27 +49,20 @@ class RENDER_UTIL:
          padding: 7px 12px 8px 12px;
          border-radius: 18px;
          background: """ + C["msg_color"] + """; color: rgb(250, 250, 250);
-         overflow-wrap: anywhere;
+         width: fit-content;
        }
+       pre { margin: 0px; color: """ + C["base_text_color"] + """; }
 
+       /* selecting specific messages */
+       :target { scroll-margin-top: """ + C["navbar_size"] + """; }
        .selected { width: 100%; background: #0cc4; border-radius: 18px }
        .selected > .msg_timestamp { color: #ddd; }
 
+       /* tags */
        emph.tag { """ + C['tag_style'] + """; }
        emph.cmd { color: """ + C['cmd_color'] + """; }
-       details { width: 100%; }
 
-       .msg_container {
-         display: flex;
-         flex-direction: row;
-         align-items: center;
-       }
-       .msg_dash {
-         margin: 0 0.5em 0 0.5em;
-       }
-
-       * { font-size: 18px; color: """ + C["base_text_color"] + """; }
-       select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
+       /* render base_page header */
        header {
          display: flex; align-items: center;
          position: fixed; top: 0px; width: 100%; height: """ + C["navbar_size"] + """;
@@ -73,16 +76,29 @@ class RENDER_UTIL:
          color: """ + C["nav_button_color"] + """;
        }
 
+       /* note title */
        h1.title {
          margin-left: 1em; padding-left: 10px; padding-bottom: 6px; padding-right: 10px;
          border-left: 2px white solid; border-bottom: 2px white solid;
        }
 
+       /* debug */
        span.mono {
          font-feature-settings: "liga" 0;
          font-family: monospace;
        }
 
+       /* disc roots */
+       .msg_container {
+         display: flex;
+         flex-direction: row;
+         align-items: center;
+       }
+       .msg_dash {
+         margin: 0 0.5em 0 0.5em;
+       }
+
+       details { width: 100%; }
        details > summary {
          display: block;
        }
@@ -99,6 +115,7 @@ class RENDER_UTIL:
          display: none;
        }
 
+       /* banner */
        .banner-box {
          display: flex;
          flex-direction: row;
@@ -122,6 +139,7 @@ class RENDER_UTIL:
          background: """ + C["banner_color"] + """;
        }
 
+       /* edit */
        .editor_textarea {
          background: """ + C["input_background_color"] + """;
          height: calc(85vh);
@@ -131,6 +149,7 @@ class RENDER_UTIL:
          width: -webkit-fill-available;
        }
 
+       /* buttons */
        .link-button {
          background: none;
          color: """ + C["link_button_color"]['main'] + """;
@@ -143,13 +162,10 @@ class RENDER_UTIL:
        .link-button:hover, .link-button:focus { border-color: """ + C["link_button_color"]['hover'] + """; outline: none; }
        .link-button:active { color: """ + C["link_button_color"]['hover'] + """; }
 
+       /* disc input */
        .msg_input { background: """ + C["input_background_color"] + """;width: -webkit-fill-available; margin: 5px}
-       input[type=text].msg_input { color: """ + C["base_text_color"] + """}
-
-       input[type=checkbox] { width: 18px; height: 18px; margin: 1 3 1 3; padding: 0 }
 
        /* sidebar */
-
        .unselectable {
          -webkit-touch-callout: none;
          -webkit-user-select: none;
@@ -181,8 +197,6 @@ class RENDER_UTIL:
        div.sidebar-content {
          margin: 5%;
        }
-
-       /* end sidebar */
 
        /* phones */
        @media (max-width: """ + C["desktopview_device_width_threshold"] + """) {
