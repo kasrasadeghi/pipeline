@@ -30,11 +30,11 @@ class REWRITE:
             url = {'link': url}
 
         if isinstance(url, dict):
-          return [prefix, ': ', url]
+          return [TAG.parse(prefix), ': ', url]
         else:
-          return [S]
+          return [TAG.parse(S)]
 
-      return [S]
+      return [TAG.parse(S)]
 
     return parse_url(line)
 
@@ -84,7 +84,7 @@ class REWRITE:
     for block in section['blocks']:
       match block:
         case {'msg': _} as msg:
-          if msg['msg'][0].startswith("- "):
+          if msg['content'][0].startswith("- "):
             msg['msg'][0] = msg['msg'][0].removeprefix('- ')
             msg['content'] = msg['content'].removeprefix('- ')
             roots[-1]['children'].append(msg)
@@ -135,4 +135,4 @@ def api_parse(note):
 @app.route('/api/rewrite/<note>')
 def get_rewrite(note):
   result = REWRITE.note(note)
-  return {'result': result}
+  return {'note': note, 'rewrite': result}

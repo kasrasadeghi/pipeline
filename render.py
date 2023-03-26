@@ -110,7 +110,7 @@ class RENDER:
 
   @staticmethod
   def line_content(content, **kwargs):
-    return ''.join(map(RENDER.tag, TAG.parse(content)))
+    return ''.join(map(RENDER.tag, content))
 
   @staticmethod
   def line(L, **kwargs):
