@@ -15,12 +15,14 @@ class RENDER:
     return f'<a href="{url}">{url}</a>'
 
   @staticmethod
-  def internal_link(url):
+  def internal_link(url, **kwargs):
     from urllib.parse import unquote_plus
+
+    # [/disc/]<note uuid>#<timestamp fragment>
+
     path = url.path
     if path.startswith('/disc/'):
       path = path.removeprefix('/disc/')
-
     if FLAT.exists(path):
       note = path
       if 'Tags' in FLAT.metadata(note) and 'Journal' in FLAT.metadata(note)['Tags']:
@@ -32,9 +34,8 @@ class RENDER:
     if url.fragment:
       return f"<a href='{path}#{url.fragment}'>{title} @ {unquote_plus(url.fragment)}</a>"
     else:
+      # no timestamp should just show the raw root
       return f"<a href='{path}'>{title}</a>"
-    # else:
-      # return RENDER.link(url)
 
   @staticmethod
   def note(note, **kwargs):
@@ -56,7 +57,7 @@ class RENDER:
         NotImplementedError()
 
   @staticmethod
-  def line_content(content):
+  def line_content(content, **kwargs):
     return ''.join(map(RENDER.tag, TAG.parse(content)))
 
   @staticmethod
@@ -71,9 +72,9 @@ class RENDER:
         case {'root-link': internal_link}:
           acc.append(RENDER.link(internal_link))
         case {'internal-link': internal_url}:
-          acc.append(RENDER.internal_link(internal_url))
+          acc.append(RENDER.internal_link(internal_url, **kwargs))
         case _:
-          acc.append(RENDER.line_content(el))
+          acc.append(RENDER.line_content(el, **kwargs))
     return ''.join(acc)
 
   @staticmethod
@@ -98,7 +99,9 @@ class RENDER:
   def block(block, **kwargs):
     match block:
       case {'msg': _} as msg:
-        return kwargs.get('render_msg', DISCUSSION_RENDER.msg)(msg)
+        def default_render_msg(msg):
+          return DISCUSSION_RENDER.msg(msg, **kwargs)
+        return kwargs.get('render_msg', default_render_msg)(msg)
       case {'line': line}:
         return RENDER.line(line, **kwargs)
     if block == ['']:

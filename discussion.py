@@ -45,7 +45,7 @@ class DISCUSSION_RENDER:
     date = kwargs.get('timerender', lambda msg_date: DATE.cmd("-d", msg_date, "+%T"))(msg_date)
     msg_indent = kwargs.get('msg_indent', '')
 
-    msg_content = RENDER.line(msg['msg'])
+    msg_content = RENDER.line(msg['msg'], **kwargs)
     msg_origin = ''
     if 'origin' in msg:
       msg_origin = '/disc/' + msg['origin']
