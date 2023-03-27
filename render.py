@@ -57,7 +57,6 @@ class RENDER:
         if x['M'] == month and x['D'] == day and x['Y'] == year:
           # NOTE: timezone changes because of daylight savings and stuff might mess this up
           timestamp = f"{x['h']}:{x['m']}:{x['s']}"
-          # https://twitter.com/collision/status/1640035287798784006?s=46&t=Ja4Tt6RUYNcfFXA5q_Z6eA
         elif x['Y'] == year:
           timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']}"
         else:
