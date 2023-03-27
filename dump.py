@@ -25,7 +25,7 @@ class DUMP:
 
   @staticmethod
   def msg(msg):
-    return '- ' + msg['content'] + "\n  - " + msg['date'] + '\n'
+    return '- ' + msg['content'] + "\n  - Date: " + msg['date'] + '\n\n'
 
   @staticmethod
   def root(root):
