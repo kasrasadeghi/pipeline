@@ -3,6 +3,19 @@ class REWRITE_RESULT:
   def block_is_msg(block):
     return isinstance(block, dict) and 'date' in block and 'msg' in block
 
+#   grammar output of REWRITE
+# note -> *page
+# page -> *section
+# section -> {title: METADATA, lines: *str} | {title,blocks: *block} | {title,roots: *root}
+# root -> {root: 'pre_roots'|'nonfinal'|'final', children: block*}
+# block -> message | newline | *node | *line
+# newline -> ['']
+# message -> {msg: *line_content,date,content: str}
+# node -> {value,indent,children:*node,line: *line_content}
+# line -> {line: *line_content}
+# line_content -> str | tag | cmd | link
+# link -> note | root-link | internal-link | simple-link
+
 class REWRITE:
   @staticmethod
   def line(line):
