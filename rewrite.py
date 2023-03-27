@@ -106,6 +106,7 @@ class REWRITE:
     for block in section['blocks']:
       block = REWRITE.block(block)
       if prev_is_msg and TREE.is_newline(block):
+        prev_is_msg = False
         continue
       new_blocks.append(block)
       prev_is_msg = REWRITE_RESULT.block_is_msg(block)
