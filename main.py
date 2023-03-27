@@ -40,7 +40,7 @@ kaz_import('discussion.py')
 kaz_import('git.py')
 kaz_import('js.py')
 
-kaz_import('command.py')
+kaz_import('command.py')  # exports @COMMAND.REGISTER
 kaz_import('commands/new_note.py')
 kaz_import('commands/full_sync.py')
 

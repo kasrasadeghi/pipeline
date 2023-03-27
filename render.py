@@ -226,6 +226,7 @@ class RENDER:
     if section['title'] == 'METADATA':
       if JOURNAL.is_journal_from_section(section):
         return JOURNAL_RENDER.METADATA(FLAT.parse_metadata_from_section(section), **kwargs)
+      return '<pre>' + "\n".join(section['lines']) + '</pre>'
 
     acc = list()
     if section['title'] != 'entry':
