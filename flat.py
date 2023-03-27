@@ -49,7 +49,7 @@ class FLAT:
       "body_background_color": "#222",
       "banner_color": "#aaa",
       "sidebar_animation_time": "0.1s",
-      "desktopview_device_width_threshold": "1034px",
+      "desktopview_device_width_threshold": "1117px",
       "tag_style": "color: #000",
       "cmd_color": "#111",
       "msg_timestamp_color": "rgb(230, 50, 120)"
