@@ -42,6 +42,8 @@ class RENDER:
 
     # same note
     x = DATE.pattern_scatter(timestamp)
+    hms = f"{x['h']}:{x['m']}:{x['s']}"
+    MDY = f"{x['M']} {x['D']} {x['Y']}"
     if note == kwargs['origin_note']:
       # journal
       if JOURNAL.is_journal(note):
@@ -56,22 +58,22 @@ class RENDER:
         month = DATE.full_month_to_abbr(full_month)
         if x['M'] == month and x['D'] == day and x['Y'] == year:
           # NOTE: timezone changes because of daylight savings and stuff might mess this up
-          timestamp = f"{x['h']}:{x['m']}:{x['s']}"
+          timestamp = hms
         elif x['Y'] == year:
-          timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']}"
+          timestamp = f"{hms} on {x['M']} {x['D']}"
         else:
-          timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']} {x['Y']}"
+          timestamp = f"{hms} on {MDY}"
 
       # not journal
       else:
         title = ''
-        timestamp = f"{x['h']}:{x['m']}:{x['s']} on {x['M']} {x['D']} {x['Y']}"
+        timestamp = f"{hms} on {MDY}"
 
     # not same note
     else:
       if JOURNAL.is_journal(note):
-        title     = f"{x['M']} {x['D']} {x['Y']}"
-        timestamp = f"{x['h']}:{x['m']}:{x['s']}"
+        title     = MDY
+        timestamp = hms
       else:
         # do nothing
         pass
