@@ -65,12 +65,7 @@ def total_size(o):
   # from: https://code.activestate.com/recipes/577504/
   from itertools import chain
   dict_handler = lambda d: chain.from_iterable(d.items())
-  handlers = {tuple: iter,
-              list: iter,
-              dict: dict_handler,
-              set: iter,
-              frozenset: iter
-              }
+  handlers = {dict: dict_handler, tuple: iter, list: iter, set: iter, frozenset: iter}
   seen = set()              # track which object id's have already been seen
 
   def sizeof(o):
@@ -90,7 +85,7 @@ def total_size(o):
 
 @app.route('/test/unit/parse_all_memory')
 def test_parse_all_memory():
-  acc = list()
+  acc = dict()
   for note in FLAT.list():
-    acc.append(REWRITE.note(note))
+    acc[note] = REWRITE.note(note)
   return str(total_size(acc))
