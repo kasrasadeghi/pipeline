@@ -7,6 +7,12 @@ class DUMP:
         return lc
       case {'tag': tag}:
         return tag
+      case {'cmd': cmd}:
+        return cmd
+      case {'link': str() as link, 'linktype': 'simple-link'}:
+        return link
+      case {'link': str() as note, 'linktype': 'note'}:
+        return note
       case {'link': ParseResult() as parsed_url, 'linktype': _}:
         return ': ' + urlunparse(parsed_url)
       case _:
