@@ -45,11 +45,9 @@ class RENDER_UTIL:
        .msg { display: flex; margin: 3px; font-family: monospace; }
        .msg_timestamp { border-radius: 18px; color: """ + C["msg_timestamp_color"] + """; }
        .msg_content {
-         display: inline-block;
          padding: 7px 12px 8px 12px;
          border-radius: 18px;
          background: """ + C["msg_color"] + """; color: rgb(250, 250, 250);
-         width: fit-content;
        }
        pre { margin: 0px; color: """ + C["base_text_color"] + """; }
 
