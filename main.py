@@ -38,6 +38,7 @@ kaz_import('edit.py')
 kaz_import('discussion.py')
 
 kaz_import('dump.py')
+kaz_import('outgoing.py')
 
 kaz_import('git.py')
 kaz_import('js.py')

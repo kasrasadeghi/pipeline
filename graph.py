@@ -30,6 +30,23 @@ class GRAPH:
 
     return acc
 
+  @staticmethod
+  def collect_outgoing(note):
+    acc = dict()
+    for note in FLAT.list():
+      acc[note] = {'note': note, 'rewrite': REWRITE.note(note)}
+
+    for note, data in acc.items():
+      outgoing = Outgoing(data['rewrite'])
+      acc[note]['outgoing'] = outgoing.result
+
+    for note, data in acc.items():
+      source_msg = data['outgoing'][0]
+      target = data['outgoing'][1]['note']
+      acc[target]['incoming'] = {'note': note, 'msg': source_msg}
+
+    return acc
+
 @app.route("/graph")
 def get_graph():
   def title(note):
