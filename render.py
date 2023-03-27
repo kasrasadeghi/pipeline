@@ -131,16 +131,20 @@ class RENDER:
     return ''.join(map(mapper, line))
 
   @staticmethod
+  def indent(node):
+    level = node['indent']
+    if level == -1:  # toplevel
+      return  ""
+    elif level == 0:
+      return  "- "
+    else:
+      return (level * "  ") + "- "
+
+  @staticmethod
   def node(item, **kwargs):
     LOG({'item': item})
 
-    level = item['indent']
-    if level == -1:  # toplevel
-      indent = ""
-    elif level == 0:
-      indent = "- "
-    else:
-      indent = (level * "  ") + "- "
+    indent = RENDER.indent(item)
 
     acc = ["<pre>" + indent + RENDER.line(item['line'], indent=indent, **kwargs) + "</pre>"]
     for child in item['children']:

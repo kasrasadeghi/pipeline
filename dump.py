@@ -1,21 +1,16 @@
 class DUMP:
   @staticmethod
-  def node(node):
-    raise NotImplementedError(node)
-
-  @staticmethod
-  def block(block):
-    raise NotImplementedError(block)
-
-  @staticmethod
   def line_content(lc):
+    from urllib.parse import urlunparse, ParseResult
     match lc:
       case str():
         return lc
       case {'tag': tag}:
         return tag
-      case {'link': link, 'linktype': _}:
+      case {'link': str(), 'linktype': _}:
         return ': ' + link
+      case {'link': ParseResult() as parsed_url, 'linktype': _}:
+        return ': ' + urlunparse(parsed_url)
       case _:
         raise NotImplementedError(lc)
 
@@ -24,24 +19,35 @@ class DUMP:
     return ''.join(map(DUMP.line_content, line['line']))
 
   @staticmethod
+  def node(node):
+    assert node.keys() == {'indent', 'value', 'children', 'line'}
+    indent = RENDER.indent(node)
+    return indent + node['value'] + '\n' + ''.join(map(DUMP.node, node['children']))
+
+  @staticmethod
+  def block(block):
+    if isinstance(block, dict) and {'msg', 'date', 'content'} == block.keys():
+      return DUMP.msg(block)
+
+    if block == ['']:
+      return '\n'
+
+    assert len(block) > 0
+    if block[0].keys() == {'line'}:
+      return '\n'.join(map(DUMP.line, block))
+    else:
+      return ''.join(map(DUMP.node, block))
+
+  @staticmethod
   def msg(msg):
     return '- ' + msg['content'] + "\n  - Date: " + msg['date'] + '\n\n'
 
   @staticmethod
   def root(root):
     acc = list()
-    # acc.append(str(root))
-    for child in root['children']:
-      if isinstance(child, dict) and {'msg', 'date', 'content'} == child.keys():
-        acc.append(DUMP.msg(child))
-      else:
-        if child == ['']:
-          acc.append('\n')
-          continue
-        for node in child:
-          elif node.keys() == {'line'}:
-            acc.append(DUMP.line(node))
-    return '\n'.join(acc)
+    for block in root['children']:
+      acc.append(DUMP.block(block))
+    return ''.join(acc)
 
   @staticmethod
   def section(section):
@@ -60,7 +66,7 @@ class DUMP:
       for root in section['roots']:
         acc.append(DUMP.root(root))
 
-    return '\n'.join(acc)
+    return ''.join(acc)
 
   @staticmethod
   def page(page):
