@@ -36,7 +36,7 @@ class REWRITE:
           if origin.startswith('192.') or origin.startswith('10.'):
             url = {'linktype': 'internal-link', 'link': parsed_url}
           else:
-            url = {'linktype': 'link', 'link': url}
+            url = {'linktype': 'simple-link', 'link': url}
 
         if isinstance(url, dict):
           return TAG.parse(prefix) + [url]

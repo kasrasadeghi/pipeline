@@ -100,7 +100,7 @@ class RENDER:
   @staticmethod
   def link(line, **kwargs):
     match line:
-      case {'link': x, 'linktype': 'link'}:
+      case {'link': x, 'linktype': 'simple-link'}:
         return RENDER.simple_link(x, **kwargs)
       case {'link': x, 'linktype': 'note'}:
         return RENDER.note(x, **kwargs)
