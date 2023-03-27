@@ -101,17 +101,17 @@ class REWRITE:
   @staticmethod
   def section(section):
     """ transform: section -> block """
-    result = {'title': section['title'], 'lines': section['lines'], 'blocks': list()}
+    new_blocks = list()
     prev_is_msg = False
     for block in section['blocks']:
       block = REWRITE.block(block)
       if prev_is_msg and TREE.is_newline(block):
         continue
-      result['blocks'].append(block)
+      new_blocks.append(block)
       prev_is_msg = REWRITE_RESULT.block_is_msg(block)
 
-    result = REWRITE.discussion_section(result)
-    return result
+    section = section | {'blocks': new_blocks}
+    return REWRITE.discussion_section(section)
 
   @staticmethod
   def page(page):
