@@ -6,6 +6,15 @@ class REWRITE_RESULT:
 class REWRITE:
   @staticmethod
   def line(line):
+    """ link recognition in lines
+          string -> [line_content...]
+          where line_content is one of:
+            str
+            {tag}
+            {cmd}
+            {link,linktype}
+          and the link comes at the end
+    """
     def parse_url(S):
       if ': ' in S:
         prefix, url = S.rsplit(': ', 1)
@@ -40,12 +49,19 @@ class REWRITE:
 
   @staticmethod
   def node(node):
+    """ node: """
     return node | {'line': REWRITE.line(node['value']),
                    'children': [REWRITE.node(child) for child in node['children']]}
 
   @staticmethod
   def block(block):
-    """ rewrite: block -> (| message block)"""
+    """ block:
+          single node i.e. [node] -> [node] | msg{msg,content,date}
+          single newline, identity
+          for [items...]
+            str -> line
+            node{value,indent,children} ->node{value,indent,children,_line_}  // added line
+    """
     match block:
       case [{ "value": content, "indent": 0, "children": [
               { "value": date, "indent": 1, "children": []}
@@ -67,6 +83,7 @@ class REWRITE:
 
   @staticmethod
   def discussion_section(section):
+    """ check discussion section.  if so: {title,blocks} -> {title,roots} """
     disc_section = section['title'] == 'DISCUSSION'
     journal_disc_section = (
       section['title'] == 'entry' and
@@ -93,14 +110,23 @@ class REWRITE:
         case _:
           roots[-1]['children'].append(block)
 
-    if roots[-1]['root'] == 'nonfinal':
+    if roots[-1]['root'] == 'nonfinal':  # final-able, i.e. not pre_roots
       roots[-1]['root'] = 'final'
 
-    return section | {'roots': roots}
+    section = section | {'roots': roots}
+    del section['blocks']
+    return section
 
   @staticmethod
   def section(section):
-    """ transform: section -> block """
+    """ section.keys
+          {title,blocks} -> {title,roots} | {title,blocks}
+          {title,lines} identity
+    """
+    if 'blocks' not in section:
+      assert section['title'] == 'METADATA'
+      return section
+
     new_blocks = list()
     prev_is_msg = False
     for block in section['blocks']:

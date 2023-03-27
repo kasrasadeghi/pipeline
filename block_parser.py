@@ -28,7 +28,10 @@ class PARSER:
     sections.append(curr_section)
 
     for S in sections:
+      if S['title'] == 'METADATA':
+        continue
       S['blocks'] = PARSER.parse_section(S['lines'], **kwargs)
+      del S['lines']
 
     return sections
 
