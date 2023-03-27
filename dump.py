@@ -8,6 +8,22 @@ class DUMP:
     raise NotImplementedError(block)
 
   @staticmethod
+  def line_content(lc):
+    match lc:
+      case str():
+        return lc
+      case {'tag': tag}:
+        return tag
+      case {'link': link, 'linktype': _}:
+        return ': ' + link
+      case _:
+        raise NotImplementedError(lc)
+
+  @staticmethod
+  def line(line):
+    return ''.join(map(DUMP.line_content, line['line']))
+
+  @staticmethod
   def msg(msg):
     return '- ' + msg['content'] + "\n  - " + msg['date'] + '\n'
 
@@ -19,7 +35,12 @@ class DUMP:
       if isinstance(child, dict) and {'msg', 'date', 'content'} == child.keys():
         acc.append(DUMP.msg(child))
       else:
-        raise NotImplementedError(child)
+        if child == ['']:
+          acc.append('\n')
+          continue
+        for node in child:
+          elif node.keys() == {'line'}:
+            acc.append(DUMP.line(node))
     return '\n'.join(acc)
 
   @staticmethod
