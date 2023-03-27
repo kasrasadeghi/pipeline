@@ -1,39 +1,6 @@
 class FLAT:
   path = os.path.join(os.path.expanduser('~'), "notes")
 
-  @staticmethod
-  def check_is_note(maybe_note):
-    """
-    returns true if maybe_note is a note
-    - valid uuid
-    - ends in .note
-    - the file actually exists
-    """
-
-    LOG('long enough?')
-    if len(maybe_note) != FLAT.note_id_len():
-      return False
-
-    LOG('end with .note?')
-    if not maybe_note.endswith(".note"):
-      return False
-
-    LOG('have the right dashes?')
-    if not all(x[1] == '-' for x in enumerate(maybe_note) if x[0] in {8, 13, 18, 23}):
-      return False
-
-    LOG('have hex numbers?')
-    l = [(x[0], x[1], x[1] in '0123456789abcdef') for x in enumerate(maybe_note.removesuffix('.note')) if x[0] not in {8, 13, 18, 23}]
-    if not all(x[2] for x in l):
-      LOG("no " + str(l))
-      return False
-
-    LOG('exists?')
-    if not FLAT.exists(maybe_note):
-      return False
-
-    return True
-
   # NOTE: configuration stuff is in this folder because it's in the ~/notes/ folder
 
   @staticmethod
