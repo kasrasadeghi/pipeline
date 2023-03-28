@@ -31,19 +31,26 @@ class GRAPH:
     return acc
 
   @staticmethod
-  def collect_outgoing(note):
+  def collect_inout(only_cross_note = True):
     acc = dict()
     for note in FLAT.list():
-      acc[note] = {'note': note, 'rewrite': REWRITE.note(note)}
+      data = {'note': note, 'rewrite': REWRITE.note(note)}
+      o = Outgoing(data, only_cross_note=only_cross_note)
+      data['outgoing'] = o.result
+      acc[note] = data
+      # del o
 
     for note, data in acc.items():
-      outgoing = Outgoing(data['rewrite'])
-      acc[note]['outgoing'] = outgoing.result
+      for outgoing in data['outgoing']:
+        source_msg = outgoing['msg']
+        target = outgoing['target']['note']
+        if 'incoming' not in acc[target]:
+          acc[target]['incoming'] = list()
+        acc[target]['incoming'].append({'source-note': note, 'msg': source_msg})
 
-    for note, data in acc.items():
-      source_msg = data['outgoing'][0]
-      target = data['outgoing'][1]['note']
-      acc[target]['incoming'] = {'note': note, 'msg': source_msg}
+    # note[outgoing] = *{msg: msg,target: loc}
+    # loc = {note,date}
+    # note[incoming] (is optional) = {source-note: note,msg: msg}
 
     return acc
 
