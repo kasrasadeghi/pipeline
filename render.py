@@ -22,7 +22,7 @@ class RENDER:
     title = FLAT.title(note)
 
     if not url.fragment:
-      return f"<a href='{note}'>{title}</a>"
+      return f"<a href='/disc/{note}'>{title}</a>"
 
     timestamp = unquote_plus(url.fragment)
 
@@ -42,6 +42,8 @@ class RENDER:
 
     # same note
     x = DATE.pattern_scatter(timestamp)
+    if not x:
+      return f"<a href='/disc/{note}'>{title}</a>"
     hms = f"{x['h']}:{x['m']}:{x['s']}"
     MDY = f"{x['M']} {x['D']} {x['Y']}"
     if note == kwargs['origin_note']:
@@ -80,7 +82,7 @@ class RENDER:
 
     if title:
       title += ' '
-    return f"<a href='{note}#{url.fragment}'>{title}@ {timestamp}</a>"
+    return f"<a href='/disc/{note}#{url.fragment}'>{title}@ {timestamp}</a>"
 
 
   @staticmethod
