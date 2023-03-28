@@ -137,7 +137,7 @@ class REWRITE:
           {title,lines} identity
     """
     if 'blocks' not in section:
-      assert section['title'] == 'METADATA'
+      assert section['title'] in ('METADATA','HTML')
       return section
 
     new_blocks = list()

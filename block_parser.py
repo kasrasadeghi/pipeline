@@ -30,6 +30,8 @@ class PARSER:
     for S in sections:
       if S['title'] == 'METADATA':
         continue
+      if S['title'] == 'HTML':
+        continue
       S['blocks'] = PARSER.parse_section(S['lines'], **kwargs)
       del S['lines']
 

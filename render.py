@@ -225,7 +225,7 @@ class RENDER:
     if section['title'] == 'HTML':
       LOG({'html section': section})
       acc = []
-      for block in section['blocks']:
+      for block in section['lines']:
         for l in block:
           acc.append(l)
       return "\n".join(acc)
