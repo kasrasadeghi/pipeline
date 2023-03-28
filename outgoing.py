@@ -111,10 +111,10 @@ def get_inout():
   from itertools import chain
   result.append(f"{len(inout)} notes with {len(list(chain(*map(lambda v: v['outgoing'], inout.values()))))} references\n")
   for i, (note, data) in enumerate(inout.items()):
-    if len(data['outgoing']) > 0:
-      result.append(f"{i:4} note '{FLAT.title(note)}'\n")
-    else:
-      result.append(f"<span style='color: grey'>{i:4} note '{FLAT.title(note)}'</span>\n")
+    if len(data['outgoing']) > 0 or 'incoming' in data:
+      # result.append(f"{i:4} note '{FLAT.title(note)}'\n")
+      result.append(f"\n<span style='color: purple'>{i:4} note '{FLAT.title(note)}'</span>\n")
+    # else:
 
     if len(data['outgoing']) > 0:
       result.append('  outgoing:')
