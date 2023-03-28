@@ -7,8 +7,9 @@ def block_generator():
     LOG({"searching through note": note})
     non_metadata_sections = list(filter(lambda x: x['title'] != 'METADATA', PARSER.parse_file(FLAT.to_path(note))))
     for S in reversed(non_metadata_sections):
-      for B in S['blocks']:
-        yield note, B
+      if 'blocks' in S:
+        for B in S['blocks']:
+          yield note, B
 
 def msg_generator():
   for f, B in block_generator():

@@ -45,10 +45,15 @@ class DISCUSSION_RENDER:
     date = kwargs.get('timerender', lambda msg_date: DATE.cmd("-d", msg_date, "+%T"))(msg_date)
     msg_indent = kwargs.get('msg_indent', '')
 
-    msg_content = RENDER.line(msg['msg'], **kwargs)
     msg_origin = ''
     if 'origin' in msg:
       msg_origin = '/disc/' + msg['origin']
+      if 'origin_note' not in kwargs:
+        kwargs['origin_note'] = msg['origin']
+    elif 'origin_note' in kwargs:
+      msg_origin = '/disc/' + kwargs['origin_note']
+
+    msg_content = RENDER.line(msg['msg'], **kwargs)
 
     return (
       f'<div id="{msg_date}" class="msg">'
