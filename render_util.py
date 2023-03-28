@@ -99,7 +99,7 @@ class RENDER_UTIL:
 
        details { width: 100%; }
        details > summary {
-         display: block;
+         display: inline-block;  /* to prevent 'list-item' display type*/
        }
        details > summary > div > div > .msg_content {
          border-right: solid 10px #ffa0ab;
