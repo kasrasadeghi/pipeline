@@ -91,6 +91,7 @@ class RENDER_UTIL:
          display: flex;
          flex-direction: row;
          align-items: center;
+         overflow-wrap: anywhere;
        }
        .msg_dash {
          margin: 0 0.5em 0 0.5em;
