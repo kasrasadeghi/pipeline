@@ -26,6 +26,7 @@ kaz_import('rewrite.py')
 kaz_import('render.py')
 kaz_import('render_util.py')
 kaz_import('sidebar.py')
+kaz_import('parser_test.py')
 
 kaz_import('pattern.py')
 kaz_import('date.py')
