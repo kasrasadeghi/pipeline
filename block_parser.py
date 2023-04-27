@@ -49,7 +49,7 @@ class PARSER:
       if "" == line:
         if len(curr_block):
           blocks.append(tree_parser(curr_block, **kwargs))
-        blocks.append([''])
+        blocks.append([])
         curr_block = []
       else:
         curr_block.append(line)

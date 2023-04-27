@@ -37,7 +37,7 @@ class BLOG:
     assert page[0]['title'] == "entry", 'blog root first section must be entry'
 
     for b in page[0]['blocks']:
-      if b == ['']:
+      if b == []:
         continue
       blog_post = b[0]['line']
       if blog_post[0].startswith('#'):

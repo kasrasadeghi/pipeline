@@ -33,7 +33,7 @@ class DUMP:
     if isinstance(block, dict) and {'msg', 'date', 'content'} == block.keys():
       return DUMP.msg(block)
 
-    if block == ['']:
+    if block == []:
       return '\n'
 
     assert len(block) > 0

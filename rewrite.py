@@ -9,7 +9,7 @@ class REWRITE_RESULT:
 # section -> {title: METADATA, lines: *str} | {title,blocks: *block} | {title,roots: *root}
 # root -> {root: 'pre_roots'|'nonfinal'|'final', children: block*}
 # block -> message | newline | *node | *line
-# newline -> ['']
+# newline -> []
 # message -> {msg: *line_content,date,content: str}
 # node -> {value,indent,children:*node,line: *line_content}
 # line -> {line: *line_content}
@@ -80,7 +80,7 @@ class REWRITE:
               { "value": date, "indent": 1, "children": []}
            ]}] if content.startswith('msg: ') and date.startswith('Date: '):
         return {'msg': REWRITE.line(content.removeprefix('msg: ')), 'content': content, 'date': date.removeprefix('Date: ')}
-      case ['']:
+      case []:
         return block
 
     acc = list()

@@ -164,7 +164,7 @@ class RENDER:
         return kwargs.get('render_msg', default_render_msg)(msg)
       case {'line': line}:
         return RENDER.line(line, **kwargs)
-    if block == ['']:
+    if block == []:
       return '<br/>'
 
     acc = []

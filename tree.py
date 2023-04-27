@@ -7,8 +7,8 @@ class TREE:
 
   @staticmethod
   def is_newline(block):
-    """ a newline block looks like this: [''] """
-    return len(block) == 1 and block[0] == ''
+    """ a newline block looks like this: [] """
+    return len(block) == 0
 
   @staticmethod
   def is_line(block):

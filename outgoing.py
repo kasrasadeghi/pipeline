@@ -42,7 +42,7 @@ class Outgoing:
       self.msg(block)
       return
 
-    if block == ['']:
+    if block == []:
       return
 
     assert len(block) > 0
