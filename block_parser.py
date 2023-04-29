@@ -28,12 +28,9 @@ class PARSER:
     sections.append(curr_section)
 
     for S in sections:
-      if S['title'] == 'METADATA':
-        continue
-      if S['title'] == 'HTML':
-        continue
-      S['blocks'] = PARSER.parse_section(S['lines'], **kwargs)
-      del S['lines']
+      if S['title'] not in ('METADATA', 'HTML'):
+        S['blocks'] = PARSER.parse_section(S['lines'], **kwargs)
+        del S['lines']
 
     return sections
 
