@@ -19,9 +19,6 @@ class PARSER:
         sections.append(curr_section)  # end previous section
 
         title = line[len("--- "):-len(" ---")]
-        is_capital = lambda c: 0 <= ord(c) - ord('A') < 26
-        if not all(map(lambda c: c == ' ' or is_capital(c), title)):
-          LOG(f"WARNING: invalid section title '{title}'")
         curr_section = make_section(title)
       else:
         curr_section['lines'].append(line)
