@@ -19,7 +19,7 @@ class TREE_PARSER:
         indent_counts.append(-1)
         continue
       else:
-        if not L.lstrip():
+        if L.lstrip() == '':
           return False
         if "-" != L.lstrip()[0]:
           return False
