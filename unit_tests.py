@@ -89,3 +89,15 @@ def test_parse_all_memory():
   for note in FLAT.list():
     acc[note] = REWRITE.note(note)
   return str(total_size(acc))
+
+@app.route('/test/unit/rewrite_all')
+def test_rewrite_all():
+  for note in FLAT.list():
+    REWRITE.note(note)
+  return 'Done'
+
+@app.route('/test/unit/parse_all')
+def test_parse_all():
+  for note in FLAT.list():
+    PARSER.parse_file(FLAT.to_path(note))
+  return 'Done'
