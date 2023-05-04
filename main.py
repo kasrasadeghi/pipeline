@@ -8,7 +8,8 @@ from flask import Flask, Response, render_template, escape, request, redirect, g
 
 app = Flask(__name__)
 from werkzeug.middleware.profiler import ProfilerMiddleware
-app.wsgi_app = ProfilerMiddleware(app.wsgi_app, stream=None, profile_dir='profile-dumps')
+# app.wsgi_app = ProfilerMiddleware(app.wsgi_app, stream=None, profile_dir='profile-dumps')
+# profiler slows down the app 3x ??
 
 def kaz_import(filepath):
   with open(filepath) as f:
