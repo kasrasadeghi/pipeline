@@ -9,20 +9,12 @@ class PARSER:
     # EXPL: a page is a list of sections, which each have a title and a list of blocks
     # - a block is a list of nodes
     # - a node can be either a line of type 'str', or a parsed tree
-    make_section = lambda title: {"title": title, "lines": list()}
-
-    sections = list()
-    curr_section = make_section("entry")
-
-    for line in content.split('\n'):
-      if line.startswith("--- ") and line.endswith(" ---"):
-        sections.append(curr_section)  # end previous section
-
-        title = line[len("--- "):-len(" ---")]
-        curr_section = make_section(title)
+    sections = [{"title":"entry", "lines":[]}]
+    for l in content.split('\n'):
+      if l.startswith("--- ") and l.endswith(" ---") and len(l) > 9:
+        sections.append({"title": l.removeprefix("--- ").removesuffix(" ---"), "lines":[]})
       else:
-        curr_section['lines'].append(line)
-    sections.append(curr_section)
+        sections[-1]["lines"].append(l)
 
     for S in sections:
       if S['title'] not in ('METADATA', 'HTML'):
