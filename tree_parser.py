@@ -1,96 +1,49 @@
 class TREE_PARSER:
   @staticmethod
-  def process_block(B, **kwargs):
-    if TREE_PARSER.might_be_tree(B, **kwargs):
-      return TREE_PARSER.parse_tree(B, **kwargs)
-    else:
-      return B
+  def process_block(block, **kwargs):
+    def mknd(indent, line):
+      return {"indent":indent, "value":line, "children":[]}
 
-
-  @staticmethod
-  def might_be_tree(B, **kwargs):
-    indent_counts = []
-    if len(B) == 0:
-      return False
-
-    for i, L in enumerate(B):
-      # search for toplevels, will have indent -1
-      # - toplevels start with something other than ' ' and '-' and are _immediately followed_ by a subnode.
-      # - n.b. this even handles toplevels halfway through a block
-      if len(L) != 0 and L[0] not in {' ', '-'}\
-         and len(B) > i + 1 and B[i + 1].startswith("-"):
-        indent_counts.append(-1)
-        continue
+    indent_lines = []
+    for l in block:
+      if l.startswith('- '):
+        indent_lines.append((0, l.removeprefix('- ')))
+      elif l.startswith(' '):
+        indent = len(l) - len(l.lstrip())
+        if indent % 2 != 0:
+          return block  # failure case
+        if not l.lstrip().startswith('- '):
+          return block
+        indent_lines.append((indent // 2, l.lstrip().removeprefix('- ')))
       else:
-        if L.lstrip() == '':
-          return False
-        if "-" != L.lstrip()[0]:
-          return False
+        indent_lines.append((-1, l))
 
-      indent, rest = L.split("-", 1)
-      indent_counts.append(len(indent) // 2)
+    roots = []
+    stack = []
+    found_children = False
+    for indent, l in indent_lines:
+      while stack and stack[-1]["indent"] >= indent:
+        stack.pop()
 
-    prev = None
-    for indent, L in zip(indent_counts, B):
-      # initial is toplevel or zero/0 indent
-      if prev is None \
-         and (indent == 0 or indent == -1):
-        prev = indent
-        continue
+      if not stack:
+        if indent in (-1, 0):
+          node = mknd(indent, l)
+          stack.append(node)
+          roots.append(node)
+          continue
+        else:
+          return block  # failure case
 
-      # child element
-      if prev is not None and indent == prev + 1:
-        prev = indent
-        continue
+      # else, stack has elements on it
+      found_children = True
 
-      # reset to sibling or ancestor
-      if prev is not None and indent <= prev:
-        prev = indent
-        continue
+      node = mknd(indent, l)
+      if stack[-1]["indent"] + 1 != indent:
+        return block  # failure case
+      stack[-1]["children"].append(node)
+      stack.append(node)
 
-      # if no successful condition found, this line has failed
-      LOG(f"ERROR: failed guessing tree-ness on {prev} -> {indent}{L}")
-      return False
+    if not found_children:
+      return block
 
-    return True
-
-  @staticmethod
-  def parse_tree(block, **kwargs):
-    indent_counts = []
-    for L in block:
-      if L[0] != ' ' and L[0] != "-":
-        indent_counts.append({"indent": -1, "content": L})
-      else:
-        indent, rest = L.split("-", 1)
-        assert all(' ' == c for c in indent),  "error with line: " + L
-        indent_counts.append({"indent": len(indent) // 2, "content": rest.lstrip()})
-
-    def make_node(content, children, indent):
-      return {"indent": indent, 'value': content, 'children': children}
-
-    # from: https://github.com/kasrasadeghi/cornerstone-haskell/blob/master/src/Parse.hs#L50-L59
-    def make_children(B):
-      result = []
-      rest = B
-
-      while 0 != len(rest):
-        level, content = rest[0]['indent'], rest[0]['content']
-        rest = rest[1:]
-        # collect children of this node,
-        #   which are the prefix of _rest_ that have a level that is greater than this node
-        acc = []
-        while True:
-          if 0 == len(rest):
-            break
-          if rest[0]['indent'] <= level:
-            break
-          acc.append(rest[0])
-          rest = rest[1:]
-
-        children = make_children(acc)
-        result.append(make_node(content, children, level))
-
-      #   return acc
-      return result
-
-    return make_children(indent_counts)
+    return roots
