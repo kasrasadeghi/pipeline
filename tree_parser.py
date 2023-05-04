@@ -10,6 +10,9 @@ class TREE_PARSER:
   @staticmethod
   def might_be_tree(B, **kwargs):
     indent_counts = []
+    if len(B) == 0:
+      return False
+
     for i, L in enumerate(B):
       # search for toplevels, will have indent -1
       # - toplevels start with something other than ' ' and '-' and are _immediately followed_ by a subnode.

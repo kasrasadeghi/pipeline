@@ -30,18 +30,11 @@ class PARSER:
     tree_parser = kwargs.get('tree_parser', TREE_PARSER.process_block)
 
     blocks = []
-    curr_block = []
-    for line in lines:
-      if "" == line:
-        if len(curr_block):
-          blocks.append(tree_parser(curr_block, **kwargs))
+    for l in lines:
+      if l.strip() == '':
         blocks.append([])
-        curr_block = []
       else:
-        curr_block.append(line)
-
-    # avoids empty blocks at the end of sections
-    if len(curr_block):
-      blocks.append(tree_parser(curr_block, **kwargs))
-
-    return blocks
+        if len(blocks) == 0 or len(blocks[-1]) == 0:
+          blocks.append([])
+        blocks[-1].append(l)
+    return [tree_parser(b, **kwargs) for b in blocks]
