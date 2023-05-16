@@ -1,3 +1,5 @@
+VERSION = "v1.0.1"
+
 import os  # listdir, stat
 import os.path  # isfile
 import sys  # argv
@@ -12,7 +14,9 @@ from werkzeug.middleware.profiler import ProfilerMiddleware
 # profiler slows down the app 3x ??
 
 def kaz_import(filepath):
-  with open(filepath) as f:
+  from pathlib import Path
+  path = Path(__file__).parent.absolute()
+  with open(path / filepath) as f:
     compiled = compile(f.read(), filepath, 'exec')
     exec(compiled, globals())
 
