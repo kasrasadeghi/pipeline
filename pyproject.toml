@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pipeline"
+dynamic = ["version"]
+description = 'a message-based notes system for iterative reflection'
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Kaz Sadeghi", email = "kasra.sadeghi1@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = ["flask"]
+
+[project.urls]
+Documentation = "https://github.com/kasrasadeghi/pipeline#readme"
+Issues = "https://github.com/kasrasadeghi/pipeline/issues"
+Source = "https://github.com/kasrasadeghi/pipeline"
+
+[tool.hatch.version]
+path = "__init__.py"
