@@ -15,6 +15,10 @@ fi
 ## prepare ~/notes folder
 
 mkdir ~/notes
+if ! [ -f ~/notes/notes_config.json ]; then
+  cp ~/pipeline/scripts/example_notes_config.json ~/notes/notes_config.json
+fi
+
 cd ~/notes
 
 # big hack to make pipeline's index page work
@@ -26,11 +30,7 @@ if ! [ -f 4e0ce4ff-1663-49f9-8ced-30f91202ae08.note ]; then
   echo 'Tags: index'  >> 4e0ce4ff-1663-49f9-8ced-30f91202ae08.note
 fi
 
-## get pipeline
-cd
-git clone https://github.com/kasrasadeghi/pipeline
-cd pipeline/
+## run pipeline
 
-cd
-gunicorn -w 1 'pipeline:app'
+# gunicorn -w 1 'pipeline:app'
 # could also 'make open' in pipeline/

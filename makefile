@@ -29,3 +29,6 @@ cert:
 	mkdir cert/
 	openssl req -x509 -newkey rsa:4096 -nodes -out ${public_certificate} -keyout ${private_key} -days 365 -subj "/C=US/ST=Washington/L=Seattle/O=kazematics/OU=PipelineSecurity/CN=Pipeline"\
 	   -addext "subjectAltName=IP:10.50.50.2"
+
+setup:
+	cd scripts && bash setup.sh

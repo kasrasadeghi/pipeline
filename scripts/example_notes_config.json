@@ -1,0 +1,29 @@
+{
+"msg_color": "#243d28"
+
+# dark sky blue
+, "body_background_color": "#101825"
+# dark grey
+# , "body_background_color": "#151515"
+# sky blue
+# , "body_background_color": "#7fa8eb"
+, "tag_style": "color: #f1aa60; font-weight: 500"
+, "msg_timestamp_color": "rgb(57, 146, 138)"
+, "quote_timestamp_color": "rgb(87, 186, 158)"
+
+, "cmd_color": "#bbb"
+
+# commas are prefixed because json doesn't allow trailing commas
+# , "navbar_size": "40px"
+# , "header_color": "#bb6"
+# , "link_button_color": {"main": "orange", "hover": "red"}
+
+# , "nav_button_color": "#611"
+# , "base_text_color": "#ddd"
+# , "input_background_color": "#333"
+
+# , "banner_color": "#aaa"
+# , "sidebar_animation_time": "0.1s"
+# , "desktopview_device_width_threshold": "1034px"
+
+}
