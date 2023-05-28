@@ -3,19 +3,19 @@ private_key=cert/key.pem
 certs=--cert=${public_certificate} --key=${private_key}
 
 withcerts:
-	FLASK_ENV=development FLASK_APP=__init__.py flask run ${certs} --host=0.0.0.0 --port=5000
+	FLASK_DEBUG=1 FLASK_APP=__init__.py flask run ${certs} --host=0.0.0.0 --port=5000
 
 open:
-	FLASK_ENV=development FLASK_APP=__init__.py flask run --host=0.0.0.0 --port=5000
+	FLASK_DEBUG=1 FLASK_APP=__init__.py flask run --host=0.0.0.0 --port=5000
 
 dev:
-	FLASK_ENV=development FLASK_APP=__init__.py flask run --port=5001
+	FLASK_DEBUG=1 FLASK_APP=__init__.py flask run --port=5001
 
 host:
 	FLASK_APP=__init__.py flask run --host=0.0.0.0 --port=5000
 
 shell:
-	FLASK_ENV=development FLASK_APP=__init__.py flask shell
+	FLASK_DEBUG=1 FLASK_APP=__init__.py flask shell
 
 port:
 	sudo netstat -nlp | grep 5000
