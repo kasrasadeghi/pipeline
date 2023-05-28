@@ -12,10 +12,10 @@ class SIDEBAR:
     return f"""
       <aside>
         <div class="sidebar-content">
-          {RENDER_UTIL.button(action='/', name='New Note')}
           {RENDER_UTIL.button(action='/search', name='Search', method='GET')}
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
+          <a class="link-button" id='toggle_time' href='javascript:void(0)' onclick='toggle_time()'>toggle time</a>
           <a class="link-button" href='javascript:void(0)'>
             <input onclick="store_preventing()" type="checkbox" id="prevent-default" name="prevent-default" value="Boat">
             <label for="prevent-default">offline</label>
