@@ -5,6 +5,10 @@ certs=--cert=${public_certificate} --key=${private_key}
 withcerts:
 	FLASK_DEBUG=1 FLASK_APP=__init__.py flask run ${certs} --host=0.0.0.0 --port=5000
 
+# https://stackoverflow.com/questions/29142/getting-ssh-to-execute-a-command-in-the-background-on-target-machine
+onserver:
+	nohup FLASK_DEBUG=1 FLASK_APP=__init__.py flask run --host=0.0.0.0 --port=5000 > out.log 2> err.log < /dev/null &
+
 open:
 	FLASK_DEBUG=1 FLASK_APP=__init__.py flask run --host=0.0.0.0 --port=5000
 
