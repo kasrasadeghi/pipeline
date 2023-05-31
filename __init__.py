@@ -2,7 +2,7 @@ VERSION = "v1.0.1"
 
 import os  # listdir, stat, getpid
 import os.path  # isfile
-import sys  # argv
+import sys  # argv, exit
 import json  # load, dump, dumps
 from subprocess import check_output
 
@@ -78,18 +78,25 @@ kaz_import('tools/profiler.py')
 def main():
   app.run()
 
-def handle_kill():
-  with open('process.pid', 'w+') as f:
-    f.write(', killed at' + str(DATE.now()))
+import signal
+
+def handle_kill(signum, frame):
+  signame = signal.Signals(signum).name
+  with open('process.pid', 'a+') as f:
+    f.write(f"- killed at {DATE.now()} by {signame} ({signum})\n")
+    f.flush()
+  with open('process.pid') as f:
+    print(f.read())
+  sys.exit(1)
 
 def init_handle_kill():
-  import signal
   signal.signal(signal.SIGINT, handle_kill)
   signal.signal(signal.SIGTERM, handle_kill)
 
+with open('process.pid', 'w+') as f:
+  f.write(f"pid {os.getpid()} started at {DATE.now()}\n")  # TODO make this port specific
+init_handle_kill()
+
 # don't run flask app in interactive prompt
 if __name__ == "__main__" and not sys.__stdin__.isatty() and not 'EXEC_IMPORT' in dir():
-  with open('process.pid', 'w+') as f:
-    f.truncate()
-    f.write(str(os.getpid()) + ' started at ' + str(DATE.now()))  # TODO make this port specific
   main()
