@@ -32,6 +32,7 @@ kaz_import('render.py')
 kaz_import('render_util.py')
 kaz_import('sidebar.py')
 kaz_import('api.py')
+kaz_import('quote.py')
 
 kaz_import('pattern.py')
 kaz_import('date.py')

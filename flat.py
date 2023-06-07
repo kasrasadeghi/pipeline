@@ -9,7 +9,7 @@ class FLAT:
       "navbar_size": "40px",
       "header_color": "#bb6",
       "link_button_color": {"main": "orange", "hover": "red"},
-      "msg_color": "#a52a2a",
+      "msg_color": "#243d28",
       "nav_button_color": "#611",
       "base_text_color": "#ddd",
       "input_background_color": "#333",
@@ -19,7 +19,8 @@ class FLAT:
       "desktopview_device_width_threshold": "1117px",
       "tag_style": "color: #000",
       "cmd_color": "#111",
-      "msg_timestamp_color": "rgb(230, 50, 120)"
+      "msg_timestamp_color": "rgb(57, 146, 138)",
+      "quote_timestamp_color": "rgb(240, 80, 160)",
     }
 
   @staticmethod

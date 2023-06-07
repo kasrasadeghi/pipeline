@@ -24,7 +24,7 @@ class RENDER:
     if not url.fragment:
       return f"<a href='/disc/{note}'>{title}</a>"
 
-    timestamp = unquote_plus(url.fragment)
+    timestamp_id = unquote_plus(url.fragment)
 
     # possibilities:
     #
@@ -41,7 +41,7 @@ class RENDER:
     # - whatever @ 10:07:33 on Mar 26 2023
 
     # same note
-    x = DATE.pattern_scatter(timestamp)
+    x = DATE.pattern_scatter(timestamp_id)
     if not x:
       return f"<a href='/disc/{note}'>{title}</a>"
     hms = f"{x['h']}:{x['m']}:{x['s']}"
@@ -77,12 +77,23 @@ class RENDER:
         title     = MDY
         timestamp = hms
       else:
-        # do nothing
+        timestamp = timestamp_id
         pass
 
+    target_msg = QUOTE.message(note, timestamp_id)
+    if target_msg:
+      quote = target_msg['content'].removeprefix('msg: ')
+    else:
+      quote = 'unknown'
+    # assert False
+
+    if quote:
+      return f"<a class='quote-box' href='/disc/{note}#{url.fragment}'>{title} @ {timestamp}: <span class='quote-msg'>{quote}</span></a>"
+
     if title:
-      title += ' '
-    return f"<a href='/disc/{note}#{url.fragment}'>{title}@ {timestamp}</a>"
+      return f"<a href='/disc/{note}#{url.fragment}'>{title} @ {timestamp}</a>"
+
+    return f"<a href='/disc/{note}#{url.fragment}'>@ {timestamp}</a>"
 
 
   @staticmethod

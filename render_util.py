@@ -114,6 +114,10 @@ class RENDER_UTIL:
          display: none;
        }
 
+       /* quote */
+       .quote-box { color: """ + C["quote_timestamp_color"] + """; }
+       .quote-msg { color: white; }
+
        /* banner */
        .banner-box {
          display: flex;
