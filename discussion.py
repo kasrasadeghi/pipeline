@@ -43,7 +43,6 @@ class DISCUSSION_RENDER:
   def msg(msg, **kwargs):
     msg_date = msg['date']
     date = kwargs.get('timerender', lambda msg_date: DATE.cmd("-d", msg_date, "+%T"))(msg_date)
-    msg_indent = kwargs.get('msg_indent', '')
 
     msg_origin = ''
     if 'origin' in msg:
@@ -54,6 +53,10 @@ class DISCUSSION_RENDER:
       msg_origin = '/disc/' + kwargs['origin_note']
 
     msg_content = RENDER.line(msg['msg'], **kwargs)
+    msg_indent = ''
+    if msg_content.startswith('- '):
+      msg_indent = "<span class='msg_dash'><b>-</b></span>"
+      msg_content = msg_content.removeprefix('- ')
 
     return (
       f'<div id="{msg_date}" class="msg">'

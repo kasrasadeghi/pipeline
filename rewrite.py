@@ -115,7 +115,7 @@ class REWRITE:
       match block:
         case {'msg': _} as msg:
           if msg['content'].startswith("msg: - "):
-            msg['msg'][0] = msg['msg'][0].removeprefix('- ')
+            msg['msg'][0] = msg['msg'][0]
             roots[-1]['children'].append(msg)
           else:  # new root
             roots.append({'root': 'nonfinal', 'children': [msg]})

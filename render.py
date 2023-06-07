@@ -209,7 +209,8 @@ class RENDER:
             acc.append("<div class='tags-summary'>" + ' '.join(map(RENDER.line_content,tags)) + "</div>")
           acc.append('</summary>')
         case {'msg': _}:
-          acc.append(DISCUSSION_RENDER.msg(msg, msg_indent="<span class='msg_dash'><b>-</b></span>", **kwargs))
+          assert msg['content'].startswith('msg: - '), 'non-roots should start with a dash ("- ")'
+          acc.append(DISCUSSION_RENDER.msg(msg, **kwargs))
         case _:
           acc.append(RENDER.block(item, **kwargs))
 
