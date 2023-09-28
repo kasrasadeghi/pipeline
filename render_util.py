@@ -212,7 +212,7 @@ class RENDER_UTIL:
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 5px; }
        }
-     </style>""" + FLASK_UTIL.TELEMETRY()
+     </style>"""
 
   @staticmethod
   def kscroll(**kwargs):
