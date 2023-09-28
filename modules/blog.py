@@ -55,7 +55,7 @@ class BLOG:
     node = PARSER.parse_content("".join(lines))
 
     if node[0]['title'] != "entry":
-      ABORT(f"ERROR: parsing entry section from node: {TREE.dump_tree(node)}")
+      ABORT(f"ERROR: parsing entry section from node: {dump_tree(node)}")
 
     blocks = list(filter(lambda x: not TREE.is_newline(x), node[0]['blocks']))
 

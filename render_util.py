@@ -22,7 +22,7 @@ class RENDER_UTIL:
      <style>
 
        /* global font setting */
-       * { font-size: 18px; color: """ + C["base_text_color"] + """; }
+       * { font-size: 14px; color: """ + C["base_text_color"] + """; }
 
        /* forms */
        select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
