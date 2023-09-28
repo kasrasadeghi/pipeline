@@ -24,7 +24,6 @@ class DISCUSSION_RENDER:
       f"<div class='msgbox'>"
       f"{RENDER.content(note)}</div>"
       f"<div class='msgbox' id='message-queue'></div>"
-      f"<script src='/js/disc.js'></script>"
       f'<form onsubmit="handle_msg(event, \'{note}\')" method="post">'
         f'<input class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
       f'</form>'
