@@ -104,7 +104,7 @@ def get_outgoing(note):
   result = "\n".join(map(lambda p: str(p[0]) + '\n -> ' + str(p[1]), o.result))
   return tagwrap('pre', result)
 
-@app.route('/api/graph/inout')
+@app.route('/graph/inout')
 def get_inout():
   result = list()
   inout = GRAPH.collect_inout()
@@ -112,7 +112,6 @@ def get_inout():
   result.append(f"{len(inout)} notes with {len(list(chain(*map(lambda v: v['outgoing'], inout.values()))))} references\n")
   for i, (note, data) in enumerate(inout.items()):
     if len(data['outgoing']) > 0 or 'incoming' in data:
-      # result.append(f"{i:4} note '{FLAT.title(note)}'\n")
       result.append(f"\n<span style='color: purple'>{i:4} note '{FLAT.title(note)}'</span>\n")
     # else:
 
