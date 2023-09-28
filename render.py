@@ -278,13 +278,14 @@ class RENDER:
 
     result = (
       f"<!DOCTYPE hmtl>"
-      f"<html><head>"
+      + f"<html><head>"
         f"<title>{D['title']}</title>"
-        f"{RENDER_UTIL.STYLE()}"
-        "<script src='/js/highlight_selected.js'></script>"
-        "<script src='/js/toggle_time.js'></script>"
-        "<script> render_time() </script>"
-      "</head>"
+        + RENDER_UTIL.STYLE()
+        # + FLASK_UTIL.TELEMETRY()
+        + include_js('toggle_time.js')
+        + include_js('highlight_selected.js')
+        + include_js('disc.js')
+      + "</head>"
       f"<body onload='init_time_display()'>"
         f"{bar}"
         f"<div class=\"content\">"
