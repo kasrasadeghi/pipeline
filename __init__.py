@@ -69,9 +69,12 @@ kaz_import('debug.py')
 kaz_import('pretty.py')
 kaz_import('unit_tests.py')
 
+kaz_import('datecalc.py')
+
 kaz_import('tools/latency.py')
 kaz_import('tools/pagesize.py')
 kaz_import('tools/profiler.py')
+kaz_import('tools/merge.py')
 
 # END IMPORTS
 
