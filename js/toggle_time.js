@@ -32,3 +32,5 @@ function toggle_time() {
   console.log("local storage for 'time_displayed'", window.localStorage.getItem('time_displayed'));
   render_time();
 }
+
+render_time();
