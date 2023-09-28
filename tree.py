@@ -19,7 +19,6 @@ class TREE:
         if len(B) == 1:
           acc.append(FLASK_UTIL.ESCAPE(B))
         else:
-          debug('huh', B, debugmode='ACTIVE')
           acc.append('[')
           for EL in B:
             acc.append(' ' + FLASK_UTIL.ESCAPE(EL))
