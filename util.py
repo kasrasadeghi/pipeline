@@ -8,8 +8,8 @@ class util:
     return p.stdout.decode('utf8')
 
   @staticmethod
-  def sort_mtime(files, cwd='./'):
-    return [p[0] for p in sorted([(f, os.stat(os.path.join(cwd, f)).st_mtime) for f in files], key=lambda p: p[1])]
+  def sort_mtime(files, to_path):
+    return [p[0] for p in sorted([(f, os.stat(to_path(f)).st_mtime) for f in files], key=lambda p: p[1])]
 
   @staticmethod
   def basename(filename):

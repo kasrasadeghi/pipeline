@@ -1,5 +1,6 @@
 class FLAT:
   path = os.path.join(os.path.expanduser('~'), "notes")
+  subrepos = ['phone']
 
   # NOTE: configuration stuff is in this folder because it's in the ~/notes/ folder
 
@@ -35,7 +36,7 @@ class FLAT:
 
   @staticmethod
   def config():
-    if not FLAT.exists('notes_config.json'):
+    if not FLAT.file_exists('notes_config.json'):
       LOG("config doesn't exist")
       return FLAT.default_config()
 
@@ -51,7 +52,7 @@ class FLAT:
 
   @staticmethod
   def note_id_len():
-    return len("4e0ce4ff-1663-49f9-8ced-30f91202ae08.note")
+    return 41 # len("4e0ce4ff-1663-49f9-8ced-30f91202ae08.note")
 
   @staticmethod
   def cmd(args, **kwargs):
@@ -59,28 +60,65 @@ class FLAT:
       kwargs['cwd'] = FLAT.path
     return util.cmd(*args, **kwargs)
 
-  @classmethod
-  def list(cls):
-    return [x for x in os.listdir(cls.path) if x.endswith('.note') and not (x[0] == '#' and x[-1] == '#')]
+  @staticmethod
+  def is_note(x):
+    return x.endswith('.note') and not (x[0] == '#' and x[-1] == '#')
+
+  @staticmethod
+  def repos():
+    return [FLAT.path] + [os.path.join(FLAT.path, subrepo) for subrepo in FLAT.subrepos]
+
+  @staticmethod
+  def repo_of(note):
+    if not (path := FLAT.to_path(note)):
+      return path
+
+    return path.removeprefix(FLAT.path).removesuffix(note).strip('/')
+
+  @staticmethod
+  def list():
+    return [FLAT.from_path(x) for x in FLAT.listabs()]
 
   @staticmethod
   def list_by_mtime():
-    return util.sort_mtime(FLAT.list(), cwd=FLAT.path)[::-1]
+    return [FLAT.from_path(x) for x in util.sort_mtime(FLAT.listabs(), to_path=FLAT.to_path)[::-1]]
 
-  @classmethod
-  def listabs(cls):
-    return list(map(lambda x: cls.path + "/" + x, cls.list()))
+  @staticmethod
+  def listabs():
+    if not hasattr(g, 'listabs'):
+      acc = []
+      for repo in FLAT.repos():
+        for note in os.listdir(repo):
+          if FLAT.is_note(note):
+            acc.append(os.path.join(FLAT.path, repo, note))
+      g.listabs = acc
+    return g.listabs
 
-  @classmethod
-  def to_url(_, note, view="note"):
+  @staticmethod
+  def to_url(note, view="note"):
+    assert FLAT.exists(note)
     return f"/{view}/{note}"
 
-  @classmethod
-  def to_path(cls, note):
-    return cls.path + "/" + note
+  @staticmethod
+  def to_path(note):
+    for n in FLAT.listabs():
+      if n.endswith(note):
+        return n
+    return None
 
-  @classmethod
-  def from_path(cls, path):
+  @staticmethod
+  def make_path(note):
+    if DEVICE.phone():
+      return os.path.join(FLAT.path, 'phone', note)
+    else:
+      return os.path.join(FLAT.path, note)
+
+  @staticmethod
+  def exists(note):
+    return FLAT.to_path(note) is not None
+
+  @staticmethod
+  def from_path(path):
     return util.basename(path)
 
   @staticmethod
@@ -89,6 +127,14 @@ class FLAT:
       if title == FLAT.title(n):
         return n
     return None
+
+  @staticmethod
+  def all_notes_with_title(title):
+    acc = []
+    for n in FLAT.list():
+      if title == FLAT.title(n):
+        acc.append(n)
+    return acc
 
   @staticmethod
   def open_note(note):
@@ -118,8 +164,8 @@ class FLAT:
     return None, url
 
   @staticmethod
-  def exists(note):
-    return os.path.isfile(FLAT.to_path(note))
+  def file_exists(filepath):
+    return os.path.isfile(os.path.join(FLAT.path, filepath))
 
   @staticmethod
   def get_index():
@@ -127,32 +173,33 @@ class FLAT:
 
   @staticmethod
   def init_note(note, title):
-    with open(FLAT.to_path(note), "w+") as f:
+    with open(FLAT.make_path(note), "w+") as f:
       f.write("--- METADATA ---\n"
               f"Date: {DATE.now()}\n"
               f"Title: {title}\n")
       f.flush()
+      del g.listabs
 
   @staticmethod
   def make_new(title):
     with open("/proc/sys/kernel/random/uuid") as uuid:
       note = uuid.read().strip() + ".note"
-    if FLAT.exists(FLAT.to_path(note)):
+    if FLAT.exists(note):
       return "/try-again"
     else:
       FLAT.init_note(note, title)
       return note
 
-  @classmethod
-  def metadata(cls, note):
-    if note.startswith(cls.path):
+  @staticmethod
+  def metadata(note):
+    if note.startswith(FLAT.path):
       path = note
       note = FLAT.from_path(note)
     else:
       path = FLAT.to_path(note)
       note = note
     if not FLAT.exists(note):
-      raise FileNotFoundError(f"cannot parse metadata for note '{note}'")
+      raise FileNotFoundError(f"while parsing metadata, couldn't find note '{note}', see path: '{FLAT.to_path(note)}'")
 
     lines = FLAT.note_read_lines(note)
 
@@ -203,8 +250,8 @@ class FLAT:
       f.flush()
 
 
-  @classmethod
-  def handle_msg(_, note, form):
+  @staticmethod
+  def handle_msg(note, form):
     LOG(note + ': ' + repr(form))
 
     # ignore empty messages
@@ -364,6 +411,14 @@ def tag(tag):
   return FLAT_RENDER.LIST(reversed([x for x in FLAT.list_by_create_date() if 'Tags' in FLAT.metadata(x) and tag in set(FLAT.metadata(x)['Tags'].split())]),
                           title="Tag: " + tag)
 
+
+@app.route("/by-name/<name>")
+def by_name(name):
+  from urllib.parse import unquote_plus
+  name = unquote_plus(name)
+  return FLAT_RENDER.LIST(filter(lambda x: FLAT.title(x) == name, FLAT.list_by_mtime()),
+                          title=name,
+                          colsfunc=lambda x: (FLAT.repo_of(x), FLAT.metadata(x)['Date']))
 
 @app.route("/note/<note>", methods=['GET', 'POST'])
 def get_note(note):

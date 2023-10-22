@@ -4,7 +4,7 @@ class JOURNAL_RENDER:
     """ @param metadata - must be parsed metadata"""
     return (f"<pre>Journal for {DATE.cmd('-d', metadata['Date'], '+%a')}, {metadata['Title']}\n"
             f"- created at {DATE.cmd('-d', metadata['Date'], '+%T %Z')}\n"
-            f'- see the day <a href="/before">before</a> <a href="/after">after</a>'
+            f"- see the day <a href='/before'>before</a> <a href='/by-name/{metadata['Title']}'>others</a> <a href='/after'>after</a>"
             f"</pre>")
 
 class JOURNAL:

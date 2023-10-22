@@ -9,7 +9,7 @@ from subprocess import check_output
 from flask import Flask, Response, render_template, escape, request, redirect, g
 
 app = Flask(__name__)
-from werkzeug.middleware.profiler import ProfilerMiddleware
+# from werkzeug.middleware.profiler import ProfilerMiddleware
 # app.wsgi_app = ProfilerMiddleware(app.wsgi_app, stream=None, profile_dir='profile-dumps')
 # profiler slows down the app 3x ??
 
@@ -22,6 +22,7 @@ def kaz_import(filepath):
 
 # IMPORTS
 
+kaz_import('device.py')
 kaz_import('util.py')
 kaz_import('flask_util.py')
 kaz_import('tree_parser.py')

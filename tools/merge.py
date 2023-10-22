@@ -11,6 +11,6 @@ def list_journals():
       d = {}
       d['m'], d['d'], d['y'] = parts
       d = date_to_nums(d)
-      r.append({'t': m['Title'], 'd': d, 'n': note})
+      r.append({'t': m['Title'], 'd': d, 'n': note, 'p': FLAT.repo_of(note)})
   r.sort(key=lambda x: date_tuple(x['d']))
   return '<pre>' + FLASK_UTIL.ESCAPE(json.dumps(r, indent=2)) + '</pre>'
