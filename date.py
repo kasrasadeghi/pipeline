@@ -86,6 +86,15 @@ class DATE:
     return pattern_scatter(date, 'WWW MMM DD hh:mm:ss ZZZ YYYY', 'WMDhmsZY')
 
   @staticmethod
+  def scatter(date):
+    if len(date) == 28:
+      return pattern_scatter(date, 'WWW mmm DD HH:MM:SS ZZZ YYYY', 'WmDHMSZY')
+    elif len(date) == 29:
+      return pattern_scatter(date, 'WWW mmm DD HH:MM:SS ZZZZ YYYY', 'WmDHMSZY')
+    else:
+      return False
+
+  @staticmethod
   def fastparse_datetime(date, output_pattern):
     """
     'Tue Feb 04 20:59:49 PST 2023'
@@ -96,7 +105,8 @@ class DATE:
     # %d uses zero padding, so '04'
     #                              "+%a %b %e %T %Z %Y"
     #                              "+%a %b %e %H:%M:%S %Z %Y"
-    if (x := pattern_scatter(date, 'WWW mmm DD HH:MM:SS ZZZ YYYY', 'WmDHMSZY')) != False:
+
+    if (x := DATE.scatter(date)) != False:
       match output_pattern:
         # used for a concise timestamp on the page
         case '+%T':

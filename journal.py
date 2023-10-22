@@ -20,7 +20,7 @@ class JOURNAL:
   @staticmethod
   def date_to_title(date_str):
     # date_str -> e.g. "March 8th, 2023", e.g. "March 13rd, 2023" (lol)
-    assert (x := pattern_scatter(date_str, 'WWW mmm DD HH:MM:SS ZZZ YYYY', 'WmDHMSZY')), f"'{date_str}' doesn't match pattern"
+    assert (x := DATE.scatter(date_str)), f"'{date_str}' doesn't match pattern"
     return DATE.abbr_month_to_full(x['m']) + ' ' + x['D'].strip() + DATE.joke_ordinal_day_of_month_suffix(x['D']) + ", " + x['Y']
 
   @staticmethod
