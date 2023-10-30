@@ -46,7 +46,7 @@ class REWRITE:
           # treat all 192.* and 10.* links as links to somewhere within the notes system
           parsed_url = urlparse(url)
           origin = parsed_url.netloc
-          if origin.startswith('192.') or origin.startswith('10.'):
+          if origin.startswith('localhost') or origin.startswith('192.') or origin.startswith('10.'):
             url = {'linktype': 'internal-link', 'link': parsed_url}
           else:
             url = {'linktype': 'simple-link', 'link': url}
