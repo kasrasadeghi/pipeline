@@ -305,7 +305,7 @@ class RENDER_UTIL:
            """
 
   @classmethod
-  def nav(R, *extras) -> list:
+  def nav(R, *extras) -> str:
     navbar = list()
     navbar.append(f'<header>'
                   f'<input type="checkbox" id="toggler" checked style=""/>'

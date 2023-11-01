@@ -272,7 +272,7 @@ class RENDER:
   def base_page(D):
     """ D is a dict with keys: { title, bar, content } """
     if 'bar' not in D or D['bar'] is None or D['bar'] == "":
-      bar = "".join(RENDER_UTIL.nav())
+      bar = RENDER_UTIL.nav()
     else:
       bar = D['bar']
 
