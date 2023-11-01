@@ -7,8 +7,8 @@ class EDIT_RENDER:
     # compose html
     result = (
       """<script>window.addEventListener("load", () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });</script>"""
-      f'<form method="post">'
-        f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/><br/>'
+      f'<form method="post" class="editor_container">'
+        f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/>'
         f'<input class="link-button" type="submit" value="Submit"/>'
       f'</form>'
     )

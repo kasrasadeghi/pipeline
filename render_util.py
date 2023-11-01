@@ -31,7 +31,7 @@ class RENDER_UTIL:
 
        /* body content */
        body { margin: 0; background: """ + C["body_background_color"] + """; }
-       .content { padding: 5px; margin: """ + C["navbar_size"] + """ 1% 1% 1%; height: calc(100vh - """ + C["navbar_size"] + """ - 10px); }
+       .content { padding: 5px; margin: """ + C["navbar_size"] + """ 1% 1% 1%; height: calc(100vh - """ + C["navbar_size"] + """ - 80px); }
 
        /* disc messages */
        .msgbox {
@@ -143,9 +143,15 @@ class RENDER_UTIL:
        }
 
        /* edit */
+       .editor_container {
+         display: flex;
+         flex-direction: column;
+         height: 90%;
+       }
        .editor_textarea {
          background: """ + C["input_background_color"] + """;
-         height: calc(85vh);
+         box-sizing: border-box;
+         height: 100%;
          line-height: 23px;
          resize:none;
          overflow: auto;
