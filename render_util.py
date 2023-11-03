@@ -97,6 +97,7 @@ class RENDER_UTIL:
          margin: 0 0.5em 0 0.5em;
        }
 
+       /* collapsing roots */
        details { width: 100%; }
        details > summary {
          display: inline-block;  /* to prevent 'list-item' display type*/
@@ -107,6 +108,7 @@ class RENDER_UTIL:
        details[open] > summary > div > div > .msg_content {
          border-right: solid 10px #a0abff;
        }
+       /* - only show the tag summary for collapsed tags */
        details > summary > .tags-summary {
          display: true;
        }
@@ -218,6 +220,7 @@ class RENDER_UTIL:
          .msg { flex-direction: row; align-items: baseline; }
          .msg_timestamp { margin: 0px 5px 0px 5px; }
        }
+       """ + RENDER_UTIL.kscroll(foreground="#f88", background="#888") + """
      </style>"""
 
   @staticmethod

@@ -11,6 +11,10 @@ class CONTEXT:
 # the tree renderer, with hooks
 class RENDER:
   @staticmethod
+  def textblock(x):
+    return f'<div style="background: #224; margin: 3px; padding: 6px; border-radius: 10px; font-size: 14px; font-family: Arial, sans-serif; overflow-x: auto" class="kscroll">{x}</div>'
+
+  @staticmethod
   def simple_link(url, **kwargs):
     return f'<a href="{url}">{url}</a>'
 
@@ -184,7 +188,12 @@ class RENDER:
         case {'value': _, 'indent': _, 'children': _, 'line': _}:
           acc.append(RENDER.node(item, **kwargs))
         case {'line': line}:
-          acc.append('<pre>' + RENDER.line(line, **kwargs) + '</pre>')
+          rendered_line = RENDER.line(line, **kwargs)
+          if len(rendered_line) < 100:
+            rendered_line = '<pre>' + rendered_line + '</pre>'
+          else:
+            rendered_line = '<p style="margin:0">' + rendered_line + '</p>'
+          acc.append(rendered_line)
         case _:
           assert False, f"'{item}' is not item in block"
 
@@ -202,31 +211,39 @@ class RENDER:
       case {'root': 'final', 'children': children}:
         details = "<details open>"
 
-    acc = list()
-    acc.append(details)
-
     tags = list()
     for item in children[1:]:
       match item:
         case {'msg': _}:
           tags += TAG.gather(item['content'])
 
+    acc = list()
+    scrollblock = None
     for i, item in enumerate(children):
       match item:
-        case {'msg': _} as msg if i == 0:
-          acc.append('<summary>')
-          acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
-          if tags:
-            acc.append("<div class='tags-summary'>" + ' '.join(map(RENDER.line_content,tags)) + "</div>")
-          acc.append('</summary>')
-        case {'msg': _}:
-          assert msg['content'].startswith('msg: - '), 'non-roots should start with a dash ("- ")'
-          acc.append(DISCUSSION_RENDER.msg(msg, **kwargs))
-        case _:
-          acc.append(RENDER.block(item, **kwargs))
+        case {'msg': _} as msg:
+          if scrollblock:
+            acc.append(RENDER.textblock(''.join(scrollblock)))
+            scrollblock = None
 
-    acc.append('</details>')
-    return ''.join(acc)
+          if i == 0:
+            acc.append('<summary>')
+            acc.append(DISCUSSION_RENDER.msg(item, **kwargs))
+            if tags:
+              acc.append("<div class='tags-summary'>" + ' '.join(map(RENDER.line_content,tags)) + "</div>")
+            acc.append('</summary>')
+          else:
+            assert msg['content'].startswith('msg: - '), 'non-roots should start with a dash ("- ")'
+            acc.append(DISCUSSION_RENDER.msg(msg, **kwargs))
+        case _:
+          if scrollblock == None:
+            scrollblock = []
+          scrollblock.append(RENDER.block(item, **kwargs))
+
+    if scrollblock:
+      acc.append(RENDER.red(''.join(scrollblock)))
+
+    return details + ''.join(acc) + '</details>'
 
   @staticmethod
   def section(section, **kwargs):
