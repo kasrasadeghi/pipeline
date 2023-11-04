@@ -1,3 +1,8 @@
+# disclaimer: this is an extremely out of date module and will take modification
+# for it to actually function.  the idea is that it parses blog posts, renders
+# them to html files in ~/blog, and then rsync that to the server with nginx or
+# whatever on it.
+
 """
 has 2 special notes
 the root/ blog index

@@ -1,4 +1,15 @@
-@app.route('/test/fbconv/<note>')
+# experimental facebook messenger rendering
+# renders conversations that were copy-pasted from facebook messenger
+#
+# parses a prefix like:
+# --- FBCONV ---
+#
+# left: <first>, <first> <last>
+# right: You sent
+#
+# ...
+
+@app.route('/experimental/fbconv/<note>')
 def test_fbconv(note):
 
   speakers = None

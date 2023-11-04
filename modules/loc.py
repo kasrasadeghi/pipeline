@@ -1,3 +1,5 @@
+# show lines of code for the project, separating the modules and tools folders
+
 @app.route("/loc")
 def get_loc():
   core_loc = "core:\n" + util.cmd("tokei", "-f", '-s', 'code', '-e', 'modules', '-e', 'tools')
