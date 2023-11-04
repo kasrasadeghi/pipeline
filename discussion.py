@@ -24,8 +24,18 @@ class DISCUSSION_RENDER:
       f"<div class='msgbox'>"
       f"{RENDER.content(note)}</div>"
       f"<div class='msgbox' id='message-queue'></div>"
+      f"- <a href='javascript:void()' onclick='paste(); return false;'>paste</a>"
+      f"- <a href='javascript:void()' onclick='clearInput(); return false;'>clear</a>"
+      "<script>"
+      "async function paste() {"
+        "let x = await navigator.clipboard.readText();"
+        "document.getElementById('msg_input').value += x;"
+      "}\n"
+      "function clearInput() { document.getElementById('msg_input').value = ''; }\n"
+      "navigator.permissions.query({ name: 'clipboard-read' });"
+      "</script>"
       f'<form onsubmit="handle_msg(event, \'{note}\')" method="post">'
-        f'<input class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
+        f'<input id="msg_input" class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
       f'</form>'
     )
 
