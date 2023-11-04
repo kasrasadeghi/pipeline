@@ -1,4 +1,4 @@
-@app.route('/test/pagesize')
+@app.route('/tool/pagesize')
 def get_pagesize():
   # ideas:
   content = (
@@ -38,7 +38,7 @@ def get_pagesize():
       }
     </script>"""
     "<form onsubmit='test_pagesize()'>"
-      "<input type=text style='color:black' name='path' id='path_input' value='/test/latency/ping'></input>"
+      "<input type=text style='color:black' name='path' id='path_input' value='/tool/latency/ping'></input>"
       "<br/>"
       "<input type=submit style='color:black' value='test pagesize and latency'></input>"
     "</form>"

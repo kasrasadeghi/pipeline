@@ -46,8 +46,9 @@ kaz_import('journal.py')
 kaz_import('edit.py')
 kaz_import('discussion.py')
 
-kaz_import('dump.py')
-kaz_import('outgoing.py')
+# kaz_import('experiment/dump.py')
+# kaz_import('experiment/outgoing.py')
+# kaz_import('experiment/graph.py')
 
 kaz_import('git.py')
 kaz_import('js.py')
@@ -58,9 +59,7 @@ kaz_import('commands/full_sync.py')
 
 kaz_import('commands/ytdl.py')
 
-kaz_import('graph.py')
-
-kaz_import('advanced_tree_parser.py')
+kaz_import('experiment/advanced_tree_parser.py')  # used by modules/blog.py.  unmaintained, uses the old-style parser.
 kaz_import('modules/blog.py')
 kaz_import('modules/fbconv.py')
 kaz_import('modules/quant.py')
@@ -69,7 +68,6 @@ kaz_import('modules/tv_brightness.py')
 
 kaz_import('debug.py')
 kaz_import('pretty.py')
-kaz_import('unit_tests.py')
 
 kaz_import('datecalc.py')
 
@@ -77,6 +75,7 @@ kaz_import('tools/latency.py')
 kaz_import('tools/pagesize.py')
 kaz_import('tools/profiler.py')
 kaz_import('tools/merge.py')
+kaz_import('tools/unit_tests.py')
 
 # END IMPORTS
 

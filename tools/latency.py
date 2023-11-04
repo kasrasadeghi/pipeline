@@ -1,4 +1,4 @@
-@app.route('/test/latency')
+@app.route('/tool/latency')
 def test_latency():
   # ideas:
   # test latency to different endpoints
@@ -9,7 +9,7 @@ def test_latency():
       function test_latency() {
         const start = performance.now();
         console.log('testing latency');
-        fetch('/test/latency/ping')
+        fetch('/tool/latency/ping')
           .then((res) => res.json())
           .then((data) => {
              document.getElementById('latency-result').innerHTML = 'result: ' + (performance.now() - start);
@@ -26,6 +26,6 @@ def test_latency():
   )
   return RENDER.base_page({'title': 'Latency Tester', 'content': content})
 
-@app.route('/test/latency/ping')
+@app.route('/tool/latency/ping')
 def test_latency_ping():
   return {'result': 'pong'}
