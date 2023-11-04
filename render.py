@@ -105,7 +105,6 @@ class RENDER:
 
   @staticmethod
   def note(note, **kwargs):
-    # LOG({'kwargs': kwargs})
     if 'render_note' in kwargs:
       return kwargs['render_note'](note, **kwargs)
     return f'<a href="{FLAT.to_url(note, view="disc")}">{note}</a>'

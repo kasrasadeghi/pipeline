@@ -1,3 +1,7 @@
+# this is a fairly undesigned system to log events that happen within the notes
+# system and render the log on the frontend, so you can inspect a trace of
+# events that happen _within_ the website itself.
+
 import time
 import traceback # format_exc (for printing stacktraces)
 
@@ -90,9 +94,11 @@ def route_debuginfo():
 
 @app.route("/receive_info", methods=['POST'])
 def receive_info():
-  # LOG({'client ip': request.remote_addr})
-  # LOG({'headers': dict(request.headers)})
-  # LOG({'params/args': dict(request.args)})
+  LOG({
+    'client ip': request.remote_addr,
+    'headers': dict(request.headers),
+    'params/args': dict(request.args)
+  })
   return Response('', 204)
 
 
