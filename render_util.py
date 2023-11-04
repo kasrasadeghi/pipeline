@@ -149,6 +149,10 @@ class RENDER_UTIL:
          display: flex;
          flex-direction: column;
          height: 90%;
+         margin: 0px;
+       }
+       #editor_submit-button {
+         margin-top: 5px;
        }
        .editor_textarea {
          background: """ + C["input_background_color"] + """;
@@ -213,6 +217,7 @@ class RENDER_UTIL:
        @media (max-width: """ + C["desktopview_device_width_threshold"] + """) {
          .msg { flex-direction: column; align-items: flex-start; }
          .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
+         .editor_textarea { font-size: 14px; line-height: 20px; }
        }
 
        /* desktop */

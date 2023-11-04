@@ -8,8 +8,8 @@ class EDIT_RENDER:
     result = (
       """<script>window.addEventListener("load", () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });</script>"""
       f'<form method="post" class="editor_container">'
-        f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea><br/>'
-        f'<input class="link-button" type="submit" value="Submit"/>'
+        f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea>'
+        f'<input class="link-button" id="editor_submit-button" type="submit" value="Submit"/>'
       f'</form>'
     )
     return RENDER.base_page({'title': title, 'content': result, 'bar': bar})
