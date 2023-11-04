@@ -282,11 +282,9 @@ class RENDER:
         f"<title>{D['title']}</title>"
         + RENDER_UTIL.STYLE()
         # + FLASK_UTIL.TELEMETRY()
-        + include_js('toggle_time.js')
-        + include_js('highlight_selected.js')
-        + include_js('disc.js')
+        + include_js('highlight_selected.js')  # i know i said no javascript, but this isn't functionality modifying
       + "</head>"
-      f"<body onload='init_time_display()'>"
+      f"<body>"
         f"{bar}"
         f"<div class=\"content\">"
         f"<h1 class='title'>{D['title']}</h1>"
