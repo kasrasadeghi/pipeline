@@ -1,3 +1,10 @@
+# DESC this is an experimental api to render the rewritten note back to a text
+#   file.
+# MOTIVATION could be used in the future to change formatting decisions,
+#   such as datetime format, sections using '---', metadata at the end, etc.
+# STATUS it never ended up looking quite right: there are still extra newlines
+#   and other spacing issues.
+
 class DUMP:
   @staticmethod
   def line_content(lc):

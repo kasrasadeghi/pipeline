@@ -66,7 +66,7 @@ def save_profile_target(dump):
   shutil.copy2(filename, destination)  # copy and preserve metadata
   return 'DONE'
 
-@app.route('/test/profile')
+@app.route('/tool/profile')
 def get_profile_data_viewer():
   # ideas:
   content = (

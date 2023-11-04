@@ -25,22 +25,25 @@ class DATECALC:
       assert d['m'] in [4,6,9,11]
       return 30
 
-def date_tuple(d):
-  return d['y'], d['m'], d['d']
+  @staticmethod
+  def date_tuple(d):
+    return d['y'], d['m'], d['d']
 
-# a, b of type {'m', 'd', 'y' : int}
-def date_before(a, b):
-  return date_tuple(a) < date_tuple(b)
+  # a, b of type {'m', 'd', 'y' : int}
+  @staticmethod
+  def date_before(a, b):
+    return date_tuple(a) < date_tuple(b)
 
-# needed to convert to a datecalc-style dict
-def date_to_nums(d):
-  d['m'] = ['January', 'February', 'March', 'April',
-            'May', 'June', 'July', 'August',
-            'September', 'October', 'November', 'December']\
-           .index(d['m'])
-  d['d'] = int(d['d'].rstrip('stndrdth')) # remove letters from 1st, 2nd, 3rd, 4th
-  d['y'] = int(d['y'])
-  return d
+  # needed to convert to a datecalc-style dict
+  @staticmethod
+  def date_to_nums(d):
+    d['m'] = ['January', 'February', 'March', 'April',
+              'May', 'June', 'July', 'August',
+              'September', 'October', 'November', 'December']\
+             .index(d['m'])
+    d['d'] = int(d['d'].rstrip('stndrdth')) # remove letters from 1st, 2nd, 3rd, 4th
+    d['y'] = int(d['y'])
+    return d
 
 @app.route('/test/daycount')
 def test_daycount():
