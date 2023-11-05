@@ -150,6 +150,9 @@ class FLAT:
     # I think splitlines handles weird cases with empty last lines and empty
     # front matter correctly, actually preserving them instead of randomly
     # chopping them off
+    # ^ this comment might be stale.  i remember that one of readlines() or
+    # spltilines() is incorrect, so i prefer to .split('\n') as that handles the
+    # weird cases mentioned above.
     return FLAT.read_note(note).split('\n')
 
   @staticmethod
