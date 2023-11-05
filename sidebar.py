@@ -12,10 +12,10 @@ class SIDEBAR:
     return f"""
       <aside>
         <div class="sidebar-content">
-          {RENDER_UTIL.button(action='/search', name='Search', method='GET')}
+          {RENDER_UTIL.textform(action='/search', name='Search', method='GET')}
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
-          <a class="link-button" id='toggle_time' href='javascript:void(0)' onclick='toggle_time()'>toggle time</a>
+          {RENDER_UTIL.jsbutton(onclick='toggle_time()', ident='toggle_time', label='toggle time')}
           {RENDER_UTIL.jsbutton(onclick='tvbrightnessup()', ident='tvbrightnessup', label='tv brightness up')}
           {RENDER_UTIL.jsbutton(onclick='tvbrightnessdown()', ident='tvbrightnessdown', label='tv brightness down')}
           <a class="link-button" href='javascript:void(0)'>

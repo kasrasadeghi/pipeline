@@ -307,7 +307,7 @@ class RENDER_UTIL:
   # TODO render a prefix of index inside of the sidebar, using block renderer
 
   @classmethod
-  def button(cls, **kwargs):
+  def textform(cls, **kwargs):
     action  = kwargs['action']
     name    = kwargs['name']
     method  = kwargs.get('method', "POST")  # second argument is default
