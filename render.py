@@ -302,6 +302,7 @@ class RENDER:
         + include_js('toggle_time.js')
         + include_js('highlight_selected.js')
         + include_js('disc.js')
+        + include_js('tv_brightness.js')
       + "</head>"
       f"<body onload='init_time_display()'>"
         f"{bar}"

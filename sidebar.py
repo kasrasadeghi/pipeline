@@ -16,6 +16,8 @@ class SIDEBAR:
           <a class="link-button" href="/yesterday">yesterday</a>
           <a class="link-button" href="/recents">recents</a>
           <a class="link-button" id='toggle_time' href='javascript:void(0)' onclick='toggle_time()'>toggle time</a>
+          {RENDER_UTIL.jsbutton(onclick='tvbrightnessup()', ident='tvbrightnessup', label='tv brightness up')}
+          {RENDER_UTIL.jsbutton(onclick='tvbrightnessdown()', ident='tvbrightnessdown', label='tv brightness down')}
           <a class="link-button" href='javascript:void(0)'>
             <input onclick="store_preventing()" type="checkbox" id="prevent-default" name="prevent-default" value="Boat">
             <label for="prevent-default">offline</label>

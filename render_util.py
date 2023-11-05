@@ -318,6 +318,13 @@ class RENDER_UTIL:
            </form>
            """
 
+  @staticmethod
+  def jsbutton(**kwargs):
+    onclick = kwargs['onclick']
+    ident = kwargs['ident']
+    label = kwargs['label']
+    return f"<a class='link-button' id='{ident}' href='javascript:void(0)' onclick='{onclick}'>{label}</a>"
+
   @classmethod
   def nav(R, *extras) -> str:
     navbar = list()

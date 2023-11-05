@@ -34,7 +34,7 @@ class DATE:
     - used for comparisons and sorting
     """
     # convert the timezone to UTC because datetime in python doesn't handle timezones
-    clean_time = check_output(["date", "-d", time, "-u", "+%a %b %d %T %Z %Y"]).decode('utf8').strip()
+    clean_time = subprocess.check_output(["date", "-d", time, "-u", "+%a %b %d %T %Z %Y"]).decode('utf8').strip()
 
     import datetime
     return datetime.datetime.strptime(clean_time, "%a %b %d %H:%M:%S %Z %Y")

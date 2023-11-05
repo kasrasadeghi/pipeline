@@ -4,7 +4,7 @@ import os  # listdir, stat, getpid
 import os.path  # isfile
 import sys  # argv, exit
 import json  # load, dump, dumps
-from subprocess import check_output
+import subprocess  # check_output, run
 
 from flask import Flask, Response, render_template, escape, request, redirect, g
 
@@ -65,6 +65,7 @@ kaz_import('modules/blog.py')
 kaz_import('modules/fbconv.py')
 kaz_import('modules/quant.py')
 kaz_import('modules/loc.py')
+kaz_import('modules/tv_brightness.py')
 
 kaz_import('debug.py')
 kaz_import('pretty.py')
