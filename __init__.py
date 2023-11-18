@@ -49,7 +49,7 @@ kaz_import('discussion.py')
 
 # kaz_import('experiment/dump.py')
 # kaz_import('experiment/outgoing.py')
-# kaz_import('experiment/graph.py')
+kaz_import('experiment/graph.py')  # used by base /note/ rendering
 
 kaz_import('git.py')
 kaz_import('js.py')
