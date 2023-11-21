@@ -9,7 +9,7 @@ class EDIT_RENDER:
     result = (
       """<script>window.addEventListener("load", () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });</script>"""
       f'<form id="{form_name}" method="post" class="editor_container">'
-        f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea>'
+        f'<textarea name="text" class="editor_textarea">{content}</textarea>'
       f'</form>'
     )
     footer = f'<input class="link-button" form="{form_name}" id="editor_submit-button" type="submit" value="Submit"/>'

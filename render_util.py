@@ -161,11 +161,11 @@ details[open] > summary > .tags-summary {
 .editor_textarea {
   background: var(--input_background_color);
   box-sizing: border-box;
-  height: 100%;
   line-height: 23px;
   resize:none;
   overflow: auto;
   width: -webkit-fill-available;
+  height: calc(var(--main_height) - 100px);
 }
 
 /* buttons */
