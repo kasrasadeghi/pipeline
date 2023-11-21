@@ -2,6 +2,11 @@ BASE_STYLE = """
 /* global font setting */
  * { font-size: 18px; color: var(--base_text_color); }
 
+:root {
+  --main_padding: 10px;
+  --main_height: calc(100dvh - var(--navbar_size) - var(--footer_menu_size) - 2*var(--main_padding));
+}
+
 /* initial layout */
 body {
   margin: 0;
@@ -13,24 +18,27 @@ header {
   position: absolute; top: 0; left: 0;
   height: var(--navbar_size);
   margin: 0px;
+  z-index: 12;
 }
 footer {
   background: #552909;
   width: 100%;
   height: var(--footer_menu_size);
   position: absolute; bottom: 0; left: 0;
+  z-index: 12;
 }
 main {
-  position: absolute; top: var(--navbar_size); left 0;
-  height: calc(100dvh - var(--navbar_size) - 100px - 20px);
-  padding: 10px;
+  position: absolute; top: var(--navbar_size); left: 0;
+  height: var(--main_height);
+  width: -webkit-fill-available;
+  padding: var(--main_padding);
   overflow-y: scroll;
 }
 
 /* colored layout */
 header {
   box-shadow: 0px 0px 11px 2px var(--header_color);
-  background: var(--header_color); z-index: 12;
+  background: var(--header_color);
 }
 header > a, label#toggle-sidebar-menu {
   margin: 5px;
