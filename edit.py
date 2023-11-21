@@ -5,14 +5,15 @@ class EDIT_RENDER:
     content = kwargs['content']
     bar = kwargs['bar']
     # compose html
+    form_name = "editor-form"
     result = (
       """<script>window.addEventListener("load", () => { let el = document.getElementsByTagName("textarea")[0]; el.scrollTop = el.scrollHeight });</script>"""
-      f'<form method="post" class="editor_container">'
+      f'<form id="{form_name}" method="post" class="editor_container">'
         f'<textarea name="text" class="editor_textarea" rows="100">{content}</textarea>'
-        f'<input class="link-button" id="editor_submit-button" type="submit" value="Submit"/>'
       f'</form>'
     )
-    return RENDER.base_page({'title': title, 'content': result, 'bar': bar})
+    footer = f'<input class="link-button" form="{form_name}" id="editor_submit-button" type="submit" value="Submit"/>'
+    return RENDER.base_page({'title': title, 'content': result, 'bar': bar, 'footer': footer})
 
 
 @app.route("/edit/<note>", methods=['GET', 'POST'])

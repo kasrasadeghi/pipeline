@@ -18,25 +18,37 @@ class DISCUSSION:
 
 
 class DISCUSSION_RENDER:
+  def textfield(note, **kwargs):
+    textfield = (f"<div class='action-menu'>"
+        "<div class='sidebar-buttons'>"
+        f"<a class='link-button' href='javascript:void()' onclick='paste(); return false;'>paste</a>"
+        f"<a class='link-button' href='javascript:void()' onclick='clearInput(); return false;'>clear</a>"
+        "</div>"
+        f'<form style="margin:0" onsubmit="handle_msg(event, \'{note}\')" method="post">'
+          f'<input id="msg_input" class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
+        f'</form>'
+        "</div>"
+        """<script>
+        async function paste() {
+          let x = await navigator.clipboard.readText();
+          document.getElementById('msg_input').value += x;
+        }
+        function clearInput() { document.getElementById('msg_input').value = ''; }
+        navigator.permissions.query({ name: 'clipboard-read' });
+        </script>""")
+    return textfield
 
-  def content(note):
+  def content(note, **kwargs):
     return (
-      f"<div class='msgbox'>"
-      f"{RENDER.content(note)}</div>"
-      f"<div class='msgbox' id='message-queue'></div>"
-      f"- <a href='javascript:void()' onclick='paste(); return false;'>paste</a>"
-      f"- <a href='javascript:void()' onclick='clearInput(); return false;'>clear</a>"
-      "<script>"
-      "async function paste() {"
-        "let x = await navigator.clipboard.readText();"
-        "document.getElementById('msg_input').value += x;"
-      "}\n"
-      "function clearInput() { document.getElementById('msg_input').value = ''; }\n"
-      "navigator.permissions.query({ name: 'clipboard-read' });"
-      "</script>"
-      f'<form onsubmit="handle_msg(event, \'{note}\')" method="post">'
-        f'<input id="msg_input" class="msg_input" autocomplete="off" autofocus type="text" name="msg">'
-      f'</form>'
+      f"<div id='discussion_messages'>"
+        f"<div class='msglist'>"
+        f"{RENDER.content(note)}</div>"
+        f"<div class='msglist' id='message-queue'></div>"
+        """<script>
+          const scrollingElement = document.getElementById('main');
+          scrollingElement.scrollTop = scrollingElement.scrollHeight;
+        </script>"""
+      f"</div>"
     )
 
   @staticmethod
@@ -45,8 +57,9 @@ class DISCUSSION_RENDER:
     bar = RENDER_UTIL.nav(f'<a href="/note/{note}">note</a>'
                           f'<a href="/edit/{note}">edit</a>')
     content = DISCUSSION_RENDER.content(note, **kwargs)
+    textfield = DISCUSSION_RENDER.textfield(note, **kwargs)
 
-    return RENDER.base_page({'title': title, 'bar': bar, 'content': content})
+    return RENDER.base_page({'title': title, 'bar': bar, 'content': content, 'footer': textfield})
 
   @staticmethod
   def msg(msg, **kwargs):
@@ -92,3 +105,141 @@ def get_disc(note):
 
   # default case: handle rendering
   return DISCUSSION_RENDER.MAIN(note)
+
+@app.route('/huh')
+def get_huh():
+  return """
+  <style>
+body {
+  margin: 0;
+}
+footer {
+  background: red;
+  width: 100%;
+  height: 100px;
+  position: absolute; bottom: 0; left: 0;
+}
+header {
+  height: 100px;
+  width: 100%;
+  background: blue;
+  position: absolute; top: 0; left: 0;
+}
+main {
+  height: calc(100dvh - 100px/*top*/ - 100px/*bottom*/ - 20px/*2x padding*/);
+  margin-top: 100px;
+  margin-bottom: 100px;
+  padding: 10px;
+  background: purple;
+  overflow-y: scroll;
+}
+#msgbox {
+  margin: 5px;
+  width: -webkit-fill-available;
+}
+button {
+  margin: 5px;
+}
+</style>
+<body>
+  <header><h1>title</h1></header>
+  <main>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p> huh </p>
+    <p style='margin: 0'> huh </p>
+  </main>
+  <footer>
+    <button>huh</button>
+    <form method="post">
+      <input id="msgbox" autocomplete="off" autofocus type="text" name="msg">
+    </form>
+  </footer>
+</body>"""

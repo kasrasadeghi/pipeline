@@ -22,19 +22,54 @@ class RENDER_UTIL:
      <style>
 
        /* global font setting */
-       * { font-size: 18px; color: """ + C["base_text_color"] + """; }
+        * { font-size: 18px; color: """ + C["base_text_color"] + """; }
+
+       /* initial layout */
+body {
+  margin: 0;
+  background: """ + C["body_background_color"] + """;
+}
+header {
+  display: flex; align-items: center;
+  height: 100px; /* """ + C['navbar_size'] + """ */
+  width: 100%;
+  position: absolute; top: 0; left: 0;
+  margin: 0px;
+}
+footer {
+  background: #552909;
+  width: 100%;
+  height: 100px; /* """ + C['disc_menu_size'] + """ */
+  position: absolute; bottom: 0; left: 0;
+}
+main {
+  position: absolute; top: 100px /*""" + C['navbar_size'] + """*/; left 0;
+  height: calc(100dvh - 100px - 100px - 10px); /* i don't know why this is 1x and not 2x padding */
+  padding: 10px;
+  overflow-y: scroll;
+}
+       header {
+         box-shadow: 0px 0px 11px 2px """ + C["header_color"] + """;
+         background: """ + C["header_color"] + """; z-index: 12;
+       }
+       header > a, label#toggle-sidebar-menu {
+         margin: 5px;
+         padding: 0px 5px;
+         color: """ + C["nav_button_color"] + """;
+       }
 
        /* forms */
        select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
        input[type=text].msg_input { color: """ + C["base_text_color"] + """}
-       input[type=checkbox] { width: 18px; height: 18px; margin: 1 3 1 3; padding: 0 }
+       input[type=checkbox] { width: 18px; height: 18px; margin: 1px 3px 1px 3px; padding: 0 }
 
-       /* body content */
-       body { margin: 0; background: """ + C["body_background_color"] + """; }
-       .content { padding: 5px; margin: """ + C["navbar_size"] + """ 1% 1% 1%; height: calc(100vh - """ + C["navbar_size"] + """ - 80px); }
+       main {
+
+         padding: 5px;
+       }
 
        /* disc messages */
-       .msgbox {
+       .msglist {
          margin: 0px;
          display: flex;
          flex-direction: column;
@@ -59,20 +94,6 @@ class RENDER_UTIL:
        /* tags */
        emph.tag { """ + C['tag_style'] + """; }
        emph.cmd { color: """ + C['cmd_color'] + """; }
-
-       /* render base_page header */
-       header {
-         display: flex; align-items: center;
-         position: fixed; top: 0px; width: 100%; height: """ + C["navbar_size"] + """;
-         background: """ + C["header_color"] + """; z-index: 12;
-         margin: 0px;
-         box-shadow: 0px 0px 11px 2px """ + C["header_color"] + """;
-       }
-       header > a, label#toggle-sidebar-menu {
-         margin: 5px;
-         padding: 0px 5px;
-         color: """ + C["nav_button_color"] + """;
-       }
 
        /* note title */
        h1.title {
@@ -148,11 +169,12 @@ class RENDER_UTIL:
        .editor_container {
          display: flex;
          flex-direction: column;
-         height: 90%;
+         height: 100%;
          margin: 0px;
        }
        #editor_submit-button {
          margin-top: 5px;
+         width: 100%;
        }
        .editor_textarea {
          background: """ + C["input_background_color"] + """;
@@ -177,8 +199,26 @@ class RENDER_UTIL:
        .link-button:hover, .link-button:focus { border-color: """ + C["link_button_color"]['hover'] + """; outline: none; }
        .link-button:active { color: """ + C["link_button_color"]['hover'] + """; }
 
+       .sidebar-buttons {
+         display:flex;
+         width: 100%;
+         flex-wrap: wrap;
+         flex-direction: row;
+       }
+
        /* disc input */
-       .msg_input { background: """ + C["input_background_color"] + """;width: -webkit-fill-available; margin: 5px}
+       #msg_input {
+         background: """ + C["input_background_color"] + """;
+         margin: 5px;
+         width: -webkit-fill-available;
+       }
+
+       .disc-buttons {
+         display:flex;
+         width: 100%;
+         flex-wrap: wrap;
+         flex-direction: row;
+       }
 
        /* sidebar */
        .unselectable {
@@ -310,10 +350,10 @@ class RENDER_UTIL:
   def textform(cls, **kwargs):
     action  = kwargs['action']
     name    = kwargs['name']
-    method  = kwargs.get('method', "POST")  # second argument is default
+    method  = kwargs.get('method', "POST")  # POST is default
     return f"""
            <form action="{action}" method="{method}">
-             <input class="msg_input" type="text" name="content">
+             <input class="text-input" type="text" name="content">
              <input class="link-button" type="submit" value="{name}"/>
            </form>
            """
@@ -349,6 +389,10 @@ class RENDER_UTIL:
               "<span class='banner'>" + title + "</span>" +
               "<div class='banner-bar'></div>" +
             "</div>")
+
+  @staticmethod
+  def collapse(show, content):
+    return f"""<details><summary>{show}</summary>{content}</details>"""
 
   @staticmethod
   def pre(s):

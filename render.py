@@ -240,7 +240,7 @@ class RENDER:
           scrollblock.append(RENDER.block(item, **kwargs))
 
     if scrollblock:
-      acc.append(RENDER.red(''.join(scrollblock)))
+      acc.append(RENDER.textblock(''.join(scrollblock)))
 
     return details + ''.join(acc) + '</details>'
 
@@ -291,6 +291,9 @@ class RENDER:
       bar = RENDER_UTIL.nav()
     else:
       bar = D['bar']
+    footer = D.get('footer', '')
+    if footer:
+      footer = f"<footer>{footer}</footer>"
 
     result = (
       f"<!DOCTYPE hmtl>"
@@ -304,10 +307,12 @@ class RENDER:
         + include_js('tv_brightness.js')
       + "</head>"
       f"<body onload='init_time_display()'>"
+        f"{footer}"
         f"{bar}"
-        f"<div class=\"content\">"
-        f"<h1 class='title'>{D['title']}</h1>"
-        f"<main id='main'>{D['content']}</main>"
-      f"</div></body></html>"
+        f"<main id='main'>"
+          f"<h1 class='title'>{D['title']}</h1>"
+          f"{D['content']}"
+        "</main>"
+      f"</body></html>"
     )
     return Response(result, mimetype="text/html")

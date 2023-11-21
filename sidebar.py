@@ -13,15 +13,17 @@ class SIDEBAR:
       <aside>
         <div class="sidebar-content">
           {RENDER_UTIL.textform(action='/search', name='Search', method='GET')}
-          <a class="link-button" href="/yesterday">yesterday</a>
-          <a class="link-button" href="/recents">recents</a>
-          {RENDER_UTIL.jsbutton(onclick='toggle_time()', ident='toggle_time', label='toggle time')}
-          {RENDER_UTIL.jsbutton(onclick='tvbrightnessup()', ident='tvbrightnessup', label='tv brightness up')}
-          {RENDER_UTIL.jsbutton(onclick='tvbrightnessdown()', ident='tvbrightnessdown', label='tv brightness down')}
-          <a class="link-button" href='javascript:void(0)'>
-            <input onclick="store_preventing()" type="checkbox" id="prevent-default" name="prevent-default" value="Boat">
-            <label for="prevent-default">offline</label>
-          </a>
+          <div class='sidebar-buttons'>
+            <a class="link-button" href="/yesterday">yesterday</a>
+            <a class="link-button" href="/recents">recents</a>
+            {RENDER_UTIL.jsbutton(onclick='toggle_time()', ident='toggle_time', label='toggle time')}
+            {RENDER_UTIL.jsbutton(onclick='tvbrightnessup()', ident='tvbrightnessup', label='tv brightness up')}
+            {RENDER_UTIL.jsbutton(onclick='tvbrightnessdown()', ident='tvbrightnessdown', label='tv brightness down')}
+            <a class="link-button" href='javascript:void(0)'>
+              <input onclick="store_preventing()" type="checkbox" id="prevent-default" name="prevent-default" value="Boat">
+              <label for="prevent-default">offline</label>
+            </a>
+          </div>
           <br/>
           <p id='updated-at'> error getting geolocation data </p>
           <button onclick="getLocation()">refresh</button>

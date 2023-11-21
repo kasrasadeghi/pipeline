@@ -7,6 +7,7 @@ class FLAT:
   @staticmethod
   def default_config():
     return {
+      "disc_menu_size": "100px",
       "navbar_size": "40px",
       "header_color": "#bb6",
       "link_button_color": {"main": "orange", "hover": "red"},
