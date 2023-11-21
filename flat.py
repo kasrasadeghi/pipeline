@@ -7,10 +7,11 @@ class FLAT:
   @staticmethod
   def default_config():
     return {
-      "disc_menu_size": "100px",
+      "footer_menu_size": "100px",
       "navbar_size": "40px",
       "header_color": "#bb6",
-      "link_button_color": {"main": "orange", "hover": "red"},
+      "link_button_main_color": "orange",
+      "link_button_hover_color": "red",
       "msg_color": "#243d28",
       "nav_button_color": "#611",
       "base_text_color": "#ddd",
@@ -19,7 +20,7 @@ class FLAT:
       "banner_color": "#aaa",
       "sidebar_animation_time": "0.1s",
       "desktopview_device_width_threshold": "1117px",
-      "tag_style": "color: #000",
+      "tag_color": "#000",
       "cmd_color": "#111",
       "msg_timestamp_color": "rgb(57, 146, 138)",
       "quote_timestamp_color": "rgb(240, 80, 160)",

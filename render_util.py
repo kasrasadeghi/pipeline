@@ -1,3 +1,247 @@
+BASE_STYLE = """
+/* global font setting */
+ * { font-size: 18px; color: var(--base_text_color); }
+
+/* initial layout */
+body {
+  margin: 0;
+  background: var(--body_background_color);
+}
+header {
+  display: flex; align-items: center;
+  width: 100%;
+  position: absolute; top: 0; left: 0;
+  height: var(--navbar_size);
+  margin: 0px;
+}
+footer {
+  background: #552909;
+  width: 100%;
+  height: var(--footer_menu_size);
+  position: absolute; bottom: 0; left: 0;
+}
+main {
+  position: absolute; top: var(--navbar_size); left 0;
+  height: calc(100dvh - var(--navbar_size) - 100px - 20px);
+  padding: 10px;
+  overflow-y: scroll;
+}
+
+/* colored layout */
+header {
+  box-shadow: 0px 0px 11px 2px var(--header_color);
+  background: var(--header_color); z-index: 12;
+}
+header > a, label#toggle-sidebar-menu {
+  margin: 5px;
+  padding: 0px 5px;
+  color: var(--nav_button_color);
+}
+
+/* forms */
+select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
+input[type=text].msg_input { color: var(--base_text_color) }
+input[type=checkbox] { width: 18px; height: 18px; margin: 1px 3px 1px 3px; padding: 0 }
+
+/* disc messages */
+.msglist {
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  align-items: flex-start;
+  font-feature-settings: "liga" 0;
+}
+.msg { display: flex; margin: 3px; font-family: monospace; }
+.msg_timestamp { border-radius: 18px; color: var(--msg_timestamp_color); }
+.msg_content {
+  padding: 7px 12px 8px 12px;
+  border-radius: 18px;
+  background: var(--msg_color); color: rgb(250, 250, 250);
+}
+pre { margin: 0px; color: var(--base_text_color); }
+
+/* selecting specific messages */
+.selected { width: 100%; background: #0cc4; border-radius: 18px }
+.selected > .msg_timestamp { color: #ddd; }
+
+/* tags */
+emph.tag { color: var(--tag_color); font-weight: 500; }
+emph.cmd { color: var(--cmd_color); }
+
+/* note title */
+h1.title {
+  margin-left: 1em; padding-left: 10px; padding-bottom: 6px; padding-right: 10px;
+  border-left: 2px white solid; border-bottom: 2px white solid;
+}
+
+/* debug */
+span.mono {
+  font-feature-settings: "liga" 0;
+  font-family: monospace;
+}
+
+/* disc roots */
+.msg_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+.msg_dash {
+  margin: 0 0.5em 0 0.5em;
+}
+
+/* collapsing roots */
+details { width: 100%; }
+details > summary {
+  display: inline-block;  /* to prevent 'list-item' display type*/
+}
+details > summary > div > div > .msg_content {
+  border-right: solid 10px #ffa0ab;
+}
+details[open] > summary > div > div > .msg_content {
+  border-right: solid 10px #a0abff;
+}
+/* - only show the tag summary for collapsed tags */
+details > summary > .tags-summary {
+  display: true;
+}
+details[open] > summary > .tags-summary {
+  display: none;
+}
+
+/* quote */
+.quote-box { color: var(--quote_timestamp_color); }
+.quote-msg { color: white; }
+
+/* banner */
+.banner-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: -webkit-fill-available;
+  margin-top: 15px;
+}
+.banner {
+  border: solid var(--banner_color);
+  padding: 3px 7px 3px 5px;
+  min-width: fit-content;
+}
+.banner-bar {
+  width: -webkit-fill-available;
+  height: 3px;
+  background: var(--banner_color);
+}
+.banner-bar-left {
+  height: 3px;
+  min-width: 30px;
+  background: var(--banner_color);
+}
+
+/* edit */
+.editor_container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0px;
+}
+#editor_submit-button {
+  margin-top: 5px;
+  width: 100%;
+}
+.editor_textarea {
+  background: var(--input_background_color);
+  box-sizing: border-box;
+  height: 100%;
+  line-height: 23px;
+  resize:none;
+  overflow: auto;
+  width: -webkit-fill-available;
+}
+
+/* buttons */
+.link-button {
+  background: none;
+  color: var(--link_button_main_color);
+  cursor: pointer;
+  font-family: monospace;
+  border: var(--link_button_main_color) 1px solid;
+  margin: 2px;
+  padding: 6px 6px 4px 6px;
+}
+.link-button:hover, .link-button:focus { border-color: var(--link_button_hover_color); outline: none; }
+.link-button:active { color: var(--link_button_hovercolor); }
+
+.sidebar-buttons {
+  display:flex;
+  width: 100%;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+/* disc input */
+#msg_input {
+  background: var(--input_background_color);
+  margin: 5px;
+  width: -webkit-fill-available;
+}
+
+.disc-buttons {
+  display:flex;
+  width: 100%;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+/* sidebar */
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+input#toggler {
+  visibility: hidden;
+}
+
+input#toggler:checked ~ aside {
+  transition: all var(--sidebar_animation_time) ease-in 0s;
+  transform: translateX(-100%);
+}
+
+aside {
+  top: 40px;
+  position: fixed;
+  z-index: 15;
+  width: 100%;
+  height: -webkit-fill-available;
+  background-color: #000a;
+  transition: all var(--sidebar_animation_time) ease-in 0s;
+}
+
+div.sidebar-content {
+  margin: 5%;
+}
+
+/* phones */
+@media (max-width: $desktopview_device_width_threshold) {
+  .msg { flex-direction: column; align-items: flex-start; }
+  .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
+  .editor_textarea { font-size: 14px; line-height: 20px; }
+}
+
+/* desktop */
+@media (min-width: $desktopview_device_width_threshold) {
+  .msg { flex-direction: row; align-items: baseline; }
+  .msg_timestamp { margin: 0px 5px 0px 5px; }
+}
+
+"""
+
 class RENDER_UTIL:
   @classmethod
   def STYLE(_):
@@ -6,6 +250,13 @@ class RENDER_UTIL:
     # .msg: overflow: hidden; max-width: 100%;
 
     C = FLAT.default_config() | FLAT.config()
+
+    # make a css variable like --example for each var in config C
+    # used like var(--example) in css
+    css_vars = ":root {\n" + "\n".join(f"  --{name}: {value};" for name, value in C.items()) + "\n}"
+
+    # you can't have css vars in media queries
+    style = css_vars + BASE_STYLE.replace('$desktopview_device_width_threshold', C['desktopview_device_width_threshold'])
 
     meta_tags = ", ".join([
       'height=device-height',
@@ -17,256 +268,8 @@ class RENDER_UTIL:
       'target-densitydpi=device-dpi'
     ])
 
-    return """
-     <meta name="viewport" content=" """ + meta_tags + """ ">
-     <style>
-
-       /* global font setting */
-        * { font-size: 18px; color: """ + C["base_text_color"] + """; }
-
-       /* initial layout */
-body {
-  margin: 0;
-  background: """ + C["body_background_color"] + """;
-}
-header {
-  display: flex; align-items: center;
-  height: 100px; /* """ + C['navbar_size'] + """ */
-  width: 100%;
-  position: absolute; top: 0; left: 0;
-  margin: 0px;
-}
-footer {
-  background: #552909;
-  width: 100%;
-  height: 100px; /* """ + C['disc_menu_size'] + """ */
-  position: absolute; bottom: 0; left: 0;
-}
-main {
-  position: absolute; top: 100px /*""" + C['navbar_size'] + """*/; left 0;
-  height: calc(100dvh - 100px - 100px - 10px); /* i don't know why this is 1x and not 2x padding */
-  padding: 10px;
-  overflow-y: scroll;
-}
-       header {
-         box-shadow: 0px 0px 11px 2px """ + C["header_color"] + """;
-         background: """ + C["header_color"] + """; z-index: 12;
-       }
-       header > a, label#toggle-sidebar-menu {
-         margin: 5px;
-         padding: 0px 5px;
-         color: """ + C["nav_button_color"] + """;
-       }
-
-       /* forms */
-       select, option, input[type=button], input[type=button], button, input[type=text] { color: black }
-       input[type=text].msg_input { color: """ + C["base_text_color"] + """}
-       input[type=checkbox] { width: 18px; height: 18px; margin: 1px 3px 1px 3px; padding: 0 }
-
-       main {
-
-         padding: 5px;
-       }
-
-       /* disc messages */
-       .msglist {
-         margin: 0px;
-         display: flex;
-         flex-direction: column;
-         align-content: stretch;
-         align-items: flex-start;
-         font-feature-settings: "liga" 0;
-       }
-       .msg { display: flex; margin: 3px; font-family: monospace; }
-       .msg_timestamp { border-radius: 18px; color: """ + C["msg_timestamp_color"] + """; }
-       .msg_content {
-         padding: 7px 12px 8px 12px;
-         border-radius: 18px;
-         background: """ + C["msg_color"] + """; color: rgb(250, 250, 250);
-       }
-       pre { margin: 0px; color: """ + C["base_text_color"] + """; }
-
-       /* selecting specific messages */
-       :target { scroll-margin-top: """ + C["navbar_size"] + """; }
-       .selected { width: 100%; background: #0cc4; border-radius: 18px }
-       .selected > .msg_timestamp { color: #ddd; }
-
-       /* tags */
-       emph.tag { """ + C['tag_style'] + """; }
-       emph.cmd { color: """ + C['cmd_color'] + """; }
-
-       /* note title */
-       h1.title {
-         margin-left: 1em; padding-left: 10px; padding-bottom: 6px; padding-right: 10px;
-         border-left: 2px white solid; border-bottom: 2px white solid;
-       }
-
-       /* debug */
-       span.mono {
-         font-feature-settings: "liga" 0;
-         font-family: monospace;
-       }
-
-       /* disc roots */
-       .msg_container {
-         display: flex;
-         flex-direction: row;
-         align-items: center;
-         overflow-wrap: anywhere;
-       }
-       .msg_dash {
-         margin: 0 0.5em 0 0.5em;
-       }
-
-       /* collapsing roots */
-       details { width: 100%; }
-       details > summary {
-         display: inline-block;  /* to prevent 'list-item' display type*/
-       }
-       details > summary > div > div > .msg_content {
-         border-right: solid 10px #ffa0ab;
-       }
-       details[open] > summary > div > div > .msg_content {
-         border-right: solid 10px #a0abff;
-       }
-       /* - only show the tag summary for collapsed tags */
-       details > summary > .tags-summary {
-         display: true;
-       }
-       details[open] > summary > .tags-summary {
-         display: none;
-       }
-
-       /* quote */
-       .quote-box { color: """ + C["quote_timestamp_color"] + """; }
-       .quote-msg { color: white; }
-
-       /* banner */
-       .banner-box {
-         display: flex;
-         flex-direction: row;
-         align-items: center;
-         width: -webkit-fill-available;
-         margin-top: 15px;
-       }
-       .banner {
-         border: solid """ + C["banner_color"] + """;
-         padding: 3px 7px 3px 5px;
-         min-width: fit-content;
-       }
-       .banner-bar {
-         width: -webkit-fill-available;
-         height: 3px;
-         background: """ + C["banner_color"] + """;
-       }
-       .banner-bar-left {
-         height: 3px;
-         min-width: 30px;
-         background: """ + C["banner_color"] + """;
-       }
-
-       /* edit */
-       .editor_container {
-         display: flex;
-         flex-direction: column;
-         height: 100%;
-         margin: 0px;
-       }
-       #editor_submit-button {
-         margin-top: 5px;
-         width: 100%;
-       }
-       .editor_textarea {
-         background: """ + C["input_background_color"] + """;
-         box-sizing: border-box;
-         height: 100%;
-         line-height: 23px;
-         resize:none;
-         overflow: auto;
-         width: -webkit-fill-available;
-       }
-
-       /* buttons */
-       .link-button {
-         background: none;
-         color: """ + C["link_button_color"]['main'] + """;
-         cursor: pointer;
-         font-family: monospace;
-         border: """ + C["link_button_color"]['main'] + """ 1px solid;
-         margin: 2px;
-         padding: 6px 6px 4px 6px;
-       }
-       .link-button:hover, .link-button:focus { border-color: """ + C["link_button_color"]['hover'] + """; outline: none; }
-       .link-button:active { color: """ + C["link_button_color"]['hover'] + """; }
-
-       .sidebar-buttons {
-         display:flex;
-         width: 100%;
-         flex-wrap: wrap;
-         flex-direction: row;
-       }
-
-       /* disc input */
-       #msg_input {
-         background: """ + C["input_background_color"] + """;
-         margin: 5px;
-         width: -webkit-fill-available;
-       }
-
-       .disc-buttons {
-         display:flex;
-         width: 100%;
-         flex-wrap: wrap;
-         flex-direction: row;
-       }
-
-       /* sidebar */
-       .unselectable {
-         -webkit-touch-callout: none;
-         -webkit-user-select: none;
-         -khtml-user-select: none;
-         -moz-user-select: none;
-         -ms-user-select: none;
-         user-select: none;
-       }
-
-       input#toggler {
-         visibility: hidden;
-       }
-
-       input#toggler:checked ~ aside {
-         transition: all """ + C["sidebar_animation_time"] + """ ease-in 0s;
-         transform: translateX(-100%);
-       }
-
-       aside {
-         top: 40px;
-         position: fixed;
-         z-index: 15;
-         width: 100%;
-         height: -webkit-fill-available;
-         background-color: #000a;
-         transition: all """ + C["sidebar_animation_time"] + """ ease-in 0s;
-       }
-
-       div.sidebar-content {
-         margin: 5%;
-       }
-
-       /* phones */
-       @media (max-width: """ + C["desktopview_device_width_threshold"] + """) {
-         .msg { flex-direction: column; align-items: flex-start; }
-         .msg_timestamp { margin: 0px 0px 0px 13px; padding: 5px 0px 1px 0px; }
-         .editor_textarea { font-size: 14px; line-height: 20px; }
-       }
-
-       /* desktop */
-       @media (min-width: """ + C["desktopview_device_width_threshold"] + """) {
-         .msg { flex-direction: row; align-items: baseline; }
-         .msg_timestamp { margin: 0px 5px 0px 5px; }
-       }
-       """ + RENDER_UTIL.kscroll(foreground="#f88", background="#888") + """
-     </style>"""
+    return (f'<meta name="viewport" content="{meta_tags}">'
+            f'<style>{style}\n{RENDER_UTIL.kscroll(foreground="#f88", background="#888")}</style>')
 
   @staticmethod
   def kscroll(**kwargs):
