@@ -32,7 +32,7 @@ main {
   height: var(--main_height);
   width: -webkit-fill-available;
   padding: var(--main_padding);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 /* colored layout */
@@ -151,12 +151,11 @@ details[open] > summary > .tags-summary {
 .editor_container {
   display: flex;
   flex-direction: column;
-  height: 100%;
   margin: 0px;
 }
 #editor_submit-button {
-  margin-top: 5px;
-  width: 100%;
+  margin: 10px;
+  width: -webkit-fill-available;
 }
 .editor_textarea {
   background: var(--input_background_color);
@@ -165,7 +164,7 @@ details[open] > summary > .tags-summary {
   resize:none;
   overflow: auto;
   width: -webkit-fill-available;
-  height: calc(var(--main_height) - 100px);
+  height: calc(var(--main_height) - 70px);
 }
 
 /* buttons */
