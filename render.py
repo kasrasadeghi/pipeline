@@ -295,6 +295,12 @@ class RENDER:
     if footer:
       footer = f"<footer>{footer}</footer>"
 
+    title = D.get('title')
+    if title is not None:
+      title = f"<h1 class='title'>{D['title']}</h1>"
+    else:
+      title = ''
+
     result = (
       f"<!DOCTYPE hmtl>"
       + f"<html><head>"
@@ -307,12 +313,12 @@ class RENDER:
         + include_js('tv_brightness.js')
       + "</head>"
       f"<body onload='init_time_display()'>"
-        f"{footer}"
         f"{bar}"
         f"<main id='main'>"
-          f"<h1 class='title'>{D['title']}</h1>"
+          f"{title}"
           f"{D['content']}"
         "</main>"
+        f"{footer}"
       f"</body></html>"
     )
     return Response(result, mimetype="text/html")

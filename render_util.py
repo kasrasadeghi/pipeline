@@ -164,7 +164,7 @@ details[open] > summary > .tags-summary {
   resize:none;
   overflow: auto;
   width: -webkit-fill-available;
-  height: calc(var(--main_height) - 70px);
+  height: var(--main_height);
 }
 
 /* buttons */
