@@ -221,7 +221,7 @@ input#toggler:checked ~ aside {
 }
 
 aside {
-  top: 40px;
+  top: var(--navbar_size);
   position: fixed;
   z-index: 15;
   width: 100%;
