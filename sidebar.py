@@ -14,8 +14,8 @@ class SIDEBAR:
         <div class="sidebar-content">
           {RENDER_UTIL.textform(action='/search', name='Search', method='GET')}
           <div class='sidebar-buttons'>
-            <a class="link-button" href="/yesterday">yesterday</a>
-            <a class="link-button" href="/recents">recents</a>
+            {RENDER_UTIL.button('yesterday')}
+            {RENDER_UTIL.button('recents')}
             {RENDER_UTIL.jsbutton(onclick='toggle_time()', ident='toggle_time', label='toggle time')}
             {RENDER_UTIL.jsbutton(onclick='tvbrightnessup()', ident='tvbrightnessup', label='tv brightness up')}
             {RENDER_UTIL.jsbutton(onclick='tvbrightnessdown()', ident='tvbrightnessdown', label='tv brightness down')}

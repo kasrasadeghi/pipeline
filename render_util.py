@@ -375,6 +375,12 @@ class RENDER_UTIL:
     label = kwargs['label']
     return f"<a class='link-button' id='{ident}' href='javascript:void(0)' onclick='{onclick}'>{label}</a>"
 
+  @staticmethod
+  def button(title, link=None):
+    if link is None:
+      link = '/' + title
+    return f'<a class="link-button" href="{link}">{title}</a>'
+
   @classmethod
   def nav(R, *extras) -> str:
     navbar = list()
