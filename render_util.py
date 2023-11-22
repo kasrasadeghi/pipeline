@@ -300,12 +300,12 @@ class RENDER_UTIL:
        }
     """
 
-  @classmethod
-  def ANSI(R):
+  @staticmethod
+  def ANSI():
     return '\x1B['
 
-  @classmethod
-  def _parse_color(R, s):
+  @staticmethod
+  def _parse_color(s):
     original = s
 
     acc = list()
@@ -347,7 +347,7 @@ class RENDER_UTIL:
 
     return "".join(acc)
 
-  # TODO CONSIDER making an "uncolored" function, that takes away the ascii
+  # TODO CONSIDER making an "decolor" function, that takes away the ascii
   #               codes OR the coloring spans from a string
 
   @classmethod

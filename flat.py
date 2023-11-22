@@ -7,7 +7,7 @@ class FLAT:
   @staticmethod
   def default_config():
     return {
-      "footer_menu_size": "100px",
+      "footer_menu_size": "100px",  # has to at least be big enough to contain the contents
       "navbar_size": "40px",
       "header_color": "#bb6",
       "link_button_main_color": "orange",
