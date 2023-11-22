@@ -211,25 +211,6 @@ details[open] > summary > .tags-summary {
   user-select: none;
 }
 
-input#toggler {
-  visibility: hidden;
-}
-
-input#toggler:checked ~ aside {
-  transition: all var(--sidebar_animation_time) ease-in 0s;
-  transform: translateX(-100%);
-}
-
-aside {
-  top: var(--navbar_size);
-  position: fixed;
-  z-index: 15;
-  width: 100%;
-  height: -webkit-fill-available;
-  background-color: #000a;
-  transition: all var(--sidebar_animation_time) ease-in 0s;
-}
-
 div.sidebar-content {
   margin: 5%;
 }
@@ -385,9 +366,7 @@ class RENDER_UTIL:
   def nav(R, *extras) -> str:
     navbar = list()
     navbar.append(f'<header>'
-                  f'<input type="checkbox" id="toggler" checked style=""/>'
                   + SIDEBAR.render() +
-                  f'<label id="toggle-sidebar-menu" class="unselectable" for="toggler">&lt;menu</label>'
                   f'<a style="" href="/">root</a>'
                   f'<a href="/today">journal</a>'
                   f'<a href="/git/menu">git</a>')

@@ -1,6 +1,6 @@
 class SIDEBAR:
-  @classmethod
-  def render(cls):
+  @staticmethod
+  def render():
     view, note = FLASK_UTIL.CURRENT_NOTE()
     forward_link_list = []
     if note.endswith('.note') and view == 'disc':
@@ -10,6 +10,24 @@ class SIDEBAR:
       return f'<li class="link-button"><a style="margin-top: 20px" href="{FLAT.to_url(note, view="disc")}">{FLAT.title(note)}</a></li>'
 
     return f"""
+      <style>
+      input#toggler:checked ~ aside {{
+        transition: all var(--sidebar_animation_time) ease-in 0s;
+        transform: translateX(-100%);
+      }}
+
+      aside {{
+        top: var(--navbar_size);
+        position: fixed;
+        z-index: 15;
+        width: 100%;
+        height: -webkit-fill-available;
+        background-color: #000a;
+        transition: all var(--sidebar_animation_time) ease-in 0s;
+      }}
+      </style>
+      <input type="checkbox" id="toggler" checked style='display: none'/>
+      <label id="toggle-sidebar-menu" class="unselectable" for="toggler">&lt;menu</label>
       <aside>
         <div class="sidebar-content">
           {RENDER_UTIL.textform(action='/search', name='Search', method='GET')}
