@@ -213,8 +213,11 @@ class RENDER:
     tags = list()
     for item in children[1:]:
       match item:
-        case {'msg': _}:
-          tags += TAG.gather(item['content'])
+        case {'msg': [*line_parts]}:
+          for lp in line_parts:
+            match lp:
+              case {'tag': _}:
+                tags.append(lp)
 
     acc = list()
     scrollblock = None
