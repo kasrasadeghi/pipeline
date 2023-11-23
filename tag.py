@@ -1,4 +1,5 @@
 class TAG:
+  @staticmethod
   def gather(content):
     def is_tag(x):
       match x:
@@ -8,6 +9,7 @@ class TAG:
           return False
     return list(filter(is_tag, TAG.parse(content)))
 
+  @staticmethod
   def parse(content):
     acc = list()
 
@@ -18,48 +20,70 @@ class TAG:
       content = content[cmdlen:]
 
     tag = None
-    rest = None
-    for c in content:
-      if c.isupper():
-        # print('u ' + c, word, rest)
-
-        if tag:
-          tag += c
-        else:
-          tag = c
+    plain = None
+    def acc_plain(c):
+      nonlocal plain
+      if plain:
+        plain += c
       else:
-        # print('  ' + c, word, rest)
+        plain = c
 
-        if tag:
-          if len(tag) == 1:
-            if rest:
-              rest += tag
-            else:
-              rest = tag
-            tag = None
+    def flush_plain():
+      nonlocal plain
+      nonlocal acc
+      if plain:
+        acc.append(plain)
+        plain = None
+
+    def acc_tag(c):
+      nonlocal tag
+      if tag:
+        tag += c
+      else:
+        tag = c
+
+    def flush_tag():
+      nonlocal tag
+      nonlocal acc
+      if tag:
+        acc.append({'tag': tag})
+        tag = None
+
+    def acc_current(c):
+      nonlocal tag
+      nonlocal plain
+      if not tag and not plain:
+        acc_plain(c)
+      elif tag:
+        tag += c
+      elif plain:
+        plain += c
+
+    # actual parsing loop doing the work
+    for c in content:
+      if c in '-_':
+        acc_current(c)
+        continue
+      if not c.isupper():
+        flush_tag()
+        acc_plain(c)
+      else:
+        flush_plain()
+        acc_tag(c)
+
+    flush_plain()
+    flush_tag()
+
+    # ignore tags that are one character long
+    result = []
+    for el in acc:
+      match el:
+        case {'tag': t} as x:
+          if len(t) == 1:
+            result.append(t)
           else:
-            # we should delay pushing 'rest' until we're sure we're parsing a tag
-            # we can delay it all the way until we're pushing the tag itself
-            if rest:
-              acc.append(rest)
-              rest = None
-            acc.append({'tag': tag})
-            tag = None
-        if rest:
-          rest += c
-        else:
-          rest = c
+            result.append(x)
+        case _ as p:
+          result.append(p)
 
-    # print('end', word, rest)
-
-    if rest:
-      acc.append(rest)
-      rest = None
-
-    if tag:
-      acc.append({'tag': tag})
-      tag = None
-
-    # print('end', word, rest)
-
-    return acc
+    return result
