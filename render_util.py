@@ -190,6 +190,13 @@ details[open] > summary > .tags-summary {
   flex-direction: row;
 }
 
+.routine-buttons {
+  display:flex;
+  width: 150px;
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+
 /* disc input */
 #msg_input {
   background: var(--input_background_color);

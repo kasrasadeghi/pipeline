@@ -73,6 +73,7 @@ kaz_import('pretty.py')
 kaz_import('datecalc.py')
 
 kaz_import('experiment/notebook.py')
+kaz_import('experiment/routine.py')
 
 kaz_import('tools/latency.py')
 kaz_import('tools/pagesize.py')
