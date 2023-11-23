@@ -20,8 +20,10 @@ class ROUTINE:
           block_items = []
           for item in items:
             match item:
+              # lines without children
               case {'line': _, 'content': line}:
                 block_items.append(line)
+              # lines with children
               case {'indent': _, 'value': line, 'children': _, 'line': _}:
                 block_items.append(line)
               case _:
@@ -32,12 +34,43 @@ class ROUTINE:
 
     return routine_menus
 
+  def PARSE_disc_msgs_for_tags(note_uuid):
+    note = REWRITE.note(note_uuid)
+    from collections import defaultdict
+    tag_counts = defaultdict(int)
+
+    # message accumulator
+    msg_acc = []
+    for section in note:
+      if section['title'] in ('entry', 'DISCUSSION'):
+        for root in section['roots']:
+          for child in root['children']:
+            match child:
+              case {'msg': _, 'content': _, 'date': _} as msg:
+                msg_acc.append(msg)
+
+    # consider looking for substrings if they are not simple tags
+    # like 'factorio planner'
+    # might also work for 'READ HN' vs 'FILTER HN'
+    for msg in msg_acc:
+      for line_part in msg['msg']:
+        match line_part:
+          case {'tag': tag}:
+            tag_counts[tag] += 1
+          case _ as x:
+            pass # LOG({'non tag part of message': x})
+
+    return "<pre>" + PRETTY.DUMP(tag_counts) + "</pre>"
+
   def RENDER_item(name):
     return f"<a class='link-button' href='javascript:void(0)'>{name}</a>"
 
   def RENDER_menu_page(note):
+
+    content = ROUTINE.PARSE_disc_msgs_for_tags(note)
+
     routine_menus = ROUTINE.PARSE_menus_from_file(ROUTINE.get_routine_uuid())
-    content = '<div class="routine-menu-collection">'
+    content += '<div class="routine-menu-collection">'
     for block in routine_menus:
       content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item) for item in block) + "</div>"
     content += "</div>"
