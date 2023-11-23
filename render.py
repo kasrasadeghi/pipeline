@@ -296,7 +296,7 @@ class RENDER:
       footer = f"<footer>{footer}</footer>"
 
     title = D.get('title')
-    if title is not None:
+    if D.get('title-render', True):
       title = f"<h1 class='title'>{D['title']}</h1>"
     else:
       title = ''

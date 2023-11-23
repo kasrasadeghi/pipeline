@@ -13,7 +13,7 @@ class EDIT_RENDER:
       f'</form>'
     )
     footer = f'<input class="link-button" form="{form_name}" id="editor_submit-button" type="submit" value="Submit"/>'
-    return RENDER.base_page({'title': None, 'content': result, 'bar': bar, 'footer': footer})
+    return RENDER.base_page({'title': title, 'content': result, 'bar': bar, 'footer': footer, 'title-render': False})
 
 
 @app.route("/edit/<note>", methods=['GET', 'POST'])
