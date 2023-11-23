@@ -23,7 +23,7 @@ class DISCUSSION_RENDER:
         "<div class='sidebar-buttons'>"
         f"<a class='link-button' href='javascript:void()' onclick='paste(); return false;'>paste</a>"
         f"<a class='link-button' href='javascript:void()' onclick='clearInput(); return false;'>clear</a>"
-        f"{ROUTINE.RENDER_menu_button()}"
+        f"{ROUTINE.RENDER_menu_button(note)}"
         "</div>"
         f'<form style="margin:0" onsubmit="handle_msg(event, \'{note}\')" method="post">'
           f'<input id="msg_input" class="msg_input" autocomplete="off" autofocus type="text" name="msg">'

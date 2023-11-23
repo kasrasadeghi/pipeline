@@ -2,21 +2,14 @@ class ROUTINE:
   def get_routine_uuid():
     return "7e3e5fea-300a-4a97-ab10-ee6c687f647f.note"
 
-  def RENDER_menu_button():
-    return RENDER_UTIL.button('routine')
+  def RENDER_menu_button(note):
+    return RENDER_UTIL.button('routine', f"/routine/{note}") # show the current number of checkmarks
 
-  def PARSE_routine_file():
-    return REWRITE.note(ROUTINE.get_routine_uuid())
+  def PARSE_menus_from_file(routine_note_uuid):
+    routine_note = REWRITE.note(routine_note_uuid)
+    blocks = routine_note[0]['blocks']
 
-  def RENDER_routine_item(name):
-    # return f"<a class='link-button' href='javascript:void(0)'>{name}</a>"
-    return PRETTY.DUMP(name)
-
-  def RENDER_menu_page():
-    note = ROUTINE.PARSE_routine_file()
-    blocks = note[0]['blocks']
-
-    acc = []
+    routine_menus = []
     for block in blocks:
       match block:
         case []: # newline
@@ -28,18 +21,28 @@ class ROUTINE:
           for item in items:
             match item:
               case {'line': _, 'content': line}:
-                block_items.append({'routine-item': line})
+                block_items.append(line)
               case {'indent': _, 'value': line, 'children': _, 'line': _}:
-                block_items.append({'routine-item': line})
+                block_items.append(line)
               case _:
-                block_items.append({'item': item})
-          acc.append(block_items)
+                pass # block_items.append({'item': item})
+          routine_menus.append(block_items)
         case _ as x:
-          acc.append({'block': x})
-    # content = "<div class='routine-buttons'>" + "\n".join(acc) + "</div>"
-    content = "<pre>" + PRETTY.DUMP(acc) + "</pre>"
+          pass # routine_menus.append({'block': x})
+
+    return routine_menus
+
+  def RENDER_item(name):
+    return f"<a class='link-button' href='javascript:void(0)'>{name}</a>"
+
+  def RENDER_menu_page(note):
+    routine_menus = ROUTINE.PARSE_menus_from_file(ROUTINE.get_routine_uuid())
+    content = '<div class="routine-menu-collection">'
+    for block in routine_menus:
+      content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item) for item in block) + "</div>"
+    content += "</div>"
     return RENDER.base_page({'title': 'Routine', 'content': content})
 
-@app.route('/routine')
-def get_routine_page():
-  return ROUTINE.RENDER_menu_page()
+@app.route('/routine/<note>')
+def get_routine_page(note):
+  return ROUTINE.RENDER_menu_page(note)

@@ -190,9 +190,24 @@ details[open] > summary > .tags-summary {
   flex-direction: row;
 }
 
+:root {
+  --routine_menu_width: 150px;
+}
+
 .routine-buttons {
   display:flex;
-  width: 150px;
+  width: var(--routine_menu_width);
+  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 5px;
+  margin: 5px;
+  border: solid var(--banner_color);
+}
+
+.routine-menu-collection {
+  display: flex;
+  height: calc(var(--main_height) - 100px);
+  align-items: flex-start;
   flex-wrap: wrap;
   flex-direction: column;
 }
