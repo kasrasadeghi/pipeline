@@ -40,10 +40,13 @@ header {
   box-shadow: 0px 0px 11px 2px var(--header_color);
   background: var(--header_color);
 }
-header > a, label#toggle-sidebar-menu {
+header > a, label#sidebar-toggler_label {
   margin: 5px;
-  padding: 0px 5px;
+  padding: 0px 5px 0 0;
   color: var(--nav_button_color);
+}
+header > label#sidebar-toggler_label {
+  margin-left: 15px;
 }
 
 /* forms */

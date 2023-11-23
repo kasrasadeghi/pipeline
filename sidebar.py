@@ -9,9 +9,13 @@ class SIDEBAR:
     def render_forward(note):
       return f'<li class="link-button"><a style="margin-top: 20px" href="{FLAT.to_url(note, view="disc")}">{FLAT.title(note)}</a></li>'
 
+    toggler_name = "sidebar-toggler"
+    label_name = toggler_name + "_label"
+
     return f"""
       <style>
-      input#toggler:checked ~ aside {{
+
+      input#{toggler_name}:checked ~ aside {{
         transition: all var(--sidebar_animation_time) ease-in 0s;
         transform: translateX(-100%);
       }}
@@ -26,8 +30,8 @@ class SIDEBAR:
         transition: all var(--sidebar_animation_time) ease-in 0s;
       }}
       </style>
-      <input type="checkbox" id="toggler" checked style='display: none'/>
-      <label id="toggle-sidebar-menu" class="unselectable" for="toggler">&lt;menu</label>
+      <label id="{label_name}" class="nav-button unselectable" for="{toggler_name}">&lt;menu</label>
+      <input type="checkbox" id="{toggler_name}" checked style='display: none'/>
       <aside>
         <div class="sidebar-content">
           {RENDER_UTIL.textform(action='/search', name='Search', method='GET')}
