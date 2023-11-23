@@ -76,20 +76,23 @@ class REWRITE:
             node{value,indent,children} ->node{value,indent,children,_line_}  // added line
     """
     match block:
+      # single node i.e. [node] -> [node] | msg{msg,content,date}
       case [{ "value": content, "indent": 0, "children": [
               { "value": date, "indent": 1, "children": []}
            ]}] if content.startswith('msg: ') and date.startswith('Date: '):
         return {'msg': REWRITE.line(content.removeprefix('msg: ')), 'content': content, 'date': date.removeprefix('Date: ')}
+      # single newline, identity
       case []:
         return block
 
     acc = list()
     for item in block:
       match item:
+        # node{value,indent,children} ->node{value,indent,children,_line_}  // added line
         case {'value': _, 'indent': _, 'children': _}:
           acc.append(REWRITE.node(item))
         case str():
-          acc.append({'line': REWRITE.line(item)})
+          acc.append({'line': REWRITE.line(item), 'content': item})
         case _:
           assert False
     return acc

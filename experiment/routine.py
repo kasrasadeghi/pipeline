@@ -9,7 +9,8 @@ class ROUTINE:
     return REWRITE.note(ROUTINE.get_routine_uuid())
 
   def RENDER_routine_item(name):
-    return f"<a class='link-button' href='javascript:void(0)'>{name}</a>"
+    # return f"<a class='link-button' href='javascript:void(0)'>{name}</a>"
+    return PRETTY.DUMP(name)
 
   def RENDER_menu_page():
     note = ROUTINE.PARSE_routine_file()
@@ -18,17 +19,25 @@ class ROUTINE:
     acc = []
     for block in blocks:
       match block:
-        case [{'line': line}]:
-          match line:
-            case [{'tag': routine_item}]:
-              acc.append(ROUTINE.RENDER_routine_item(routine_item))
-            case _:
-              pass # acc.append(str({'line': line}))
         case []: # newline
           pass
+        case [{'line': _, 'content': '---'}]:
+          break # on ---
+        case [*items]:
+          block_items = []
+          for item in items:
+            match item:
+              case {'line': _, 'content': line}:
+                block_items.append({'routine-item': line})
+              case {'indent': _, 'value': line, 'children': _, 'line': _}:
+                block_items.append({'routine-item': line})
+              case _:
+                block_items.append({'item': item})
+          acc.append(block_items)
         case _ as x:
-          pass # acc.append(str({'block': x}))
-    content = "<div class='routine-buttons'>" + "\n".join(acc) + "</div>"
+          acc.append({'block': x})
+    # content = "<div class='routine-buttons'>" + "\n".join(acc) + "</div>"
+    content = "<pre>" + PRETTY.DUMP(acc) + "</pre>"
     return RENDER.base_page({'title': 'Routine', 'content': content})
 
 @app.route('/routine')
