@@ -60,21 +60,36 @@ class ROUTINE:
           case _ as x:
             pass # LOG({'non tag part of message': x})
 
-    return "<pre>" + PRETTY.DUMP(tag_counts) + "</pre>"
+    return tag_counts
 
-  def RENDER_item(name):
-    return f"<a class='link-button' href='javascript:void(0)'>{name}</a>"
+  def RENDER_item(name, tag_counts, tags_used):
+    if name in tag_counts:
+      tags_used.add(name)
+      return f"<a class='link-button' href='javascript:void(0)'>{name} {tag_counts[name]}</a>"
+    else:
+      return f"<a class='link-button' style='color: #70e078' href='javascript:void(0)'>{name}</a>"
 
   def RENDER_menu_page(note):
+    # add counts per routine item, for things like brushing '1/2'
+    # or add separate brushes, one for morning, one for night
 
-    content = ROUTINE.PARSE_disc_msgs_for_tags(note)
+    tag_counts = ROUTINE.PARSE_disc_msgs_for_tags(note)
+    tags_used = set()
 
-    routine_menus = ROUTINE.PARSE_menus_from_file(ROUTINE.get_routine_uuid())
-    content += '<div class="routine-menu-collection">'
+    routine_uuid = ROUTINE.get_routine_uuid()
+    routine_menus = ROUTINE.PARSE_menus_from_file(routine_uuid)
+    content = '<div class="routine-menu-collection">'
     for block in routine_menus:
-      content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item) for item in block) + "</div>"
+      content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used) for item in block) + "</div>"
+
+    tags_leftover = tag_counts.keys() - tags_used
+    content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used) for item in ['MISC', *tags_leftover]) + "</div>"
     content += "</div>"
-    return RENDER.base_page({'title': 'Routine', 'content': content})
+
+    bar = RENDER_UTIL.nav(f'<a href="/disc/{note}">back to note</a>',
+                          f'<a href="/edit/{routine_uuid}">edit routine</a>')
+
+    return RENDER.base_page({'title': 'Routine', 'content': content, 'bar': bar})
 
 @app.route('/routine/<note>')
 def get_routine_page(note):

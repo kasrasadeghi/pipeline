@@ -191,7 +191,7 @@ details[open] > summary > .tags-summary {
 }
 
 :root {
-  --routine_menu_width: 150px;
+  --routine_menu_width: 180px;
 }
 
 .routine-buttons {
