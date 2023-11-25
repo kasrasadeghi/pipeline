@@ -19,71 +19,40 @@ class TAG:
       acc.append({'cmd': content[:cmdlen]})
       content = content[cmdlen:]
 
-    tag = None
-    plain = None
-    def acc_plain(c):
-      nonlocal plain
-      if plain:
-        plain += c
+    i = 0
+    while i < len(content):
+      if content[i].isupper():
+        uppercase_prefix = content[i]
+        i += 1
+        # parse uppercase prefix, including intermediate dashes and underscores
+        while i < len(content) and (
+            content[i].isupper() or (content[i] in '-_' and i+1 < len(content) and content[i+1].isupper())
+        ):
+          uppercase_prefix += content[i]
+          i += 1
+
+        # it doesn't count as a tag if it's not long enough (at least 2 chars long),
+        # just parse plain text until we hit a tag
+        if len(uppercase_prefix) < 2:
+          non_uppercase_prefix = uppercase_prefix
+          while i < len(content) and not content[i].isupper():
+            non_uppercase_prefix += content[i]
+            i += 1
+          acc.append(non_uppercase_prefix)
+        else:
+          acc.append({'tag': uppercase_prefix})
       else:
-        plain = c
+        non_uppercase_prefix = content[i]
+        i += 1
+        while i < len(content) and not content[i].isupper():
+          non_uppercase_prefix += content[i]
+          i += 1
+        acc.append(non_uppercase_prefix)
 
-    def flush_plain():
-      nonlocal plain
-      nonlocal acc
-      if plain:
-        acc.append(plain)
-        plain = None
+    return acc
 
-    def acc_tag(c):
-      nonlocal tag
-      if tag:
-        tag += c
-      else:
-        tag = c
-
-    def flush_tag():
-      nonlocal tag
-      nonlocal acc
-      if tag:
-        acc.append({'tag': tag})
-        tag = None
-
-    def acc_current(c):
-      nonlocal tag
-      nonlocal plain
-      if not tag and not plain:
-        acc_plain(c)
-      elif tag:
-        tag += c
-      elif plain:
-        plain += c
-
-    # actual parsing loop doing the work
-    for c in content:
-      if c in '-_':
-        acc_current(c)
-        continue
-      if not c.isupper():
-        flush_tag()
-        acc_plain(c)
-      else:
-        flush_plain()
-        acc_tag(c)
-
-    flush_plain()
-    flush_tag()
-
-    # ignore tags that are one character long
-    result = []
-    for el in acc:
-      match el:
-        case {'tag': t} as x:
-          if len(t) == 1:
-            result.append(t)
-          else:
-            result.append(x)
-        case _ as p:
-          result.append(p)
-
-    return result
+# tests:
+# SnaKeCaSE teST -> SE ST
+# HUH- TEST -> HUH TEST, not the -
+# TEST--but -> TEST, not the --
+# I think a lot about PIPELINE -> PIPELINE, not the 'I'
