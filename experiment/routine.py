@@ -88,12 +88,19 @@ class ROUTINE:
     # TODO see if any of the routine elements are multiword or if they're lowercase, in which case we need to search by substring instead of by line_part
 
     for block in routine_menus:
-      content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used) for item in block) + "</div>"
+      content += "<div class='routine-buttons'>"
+      for item in block:
+        content += '\n' + ROUTINE.RENDER_item(item, tag_counts, tags_used)
+      content += "</div>"
 
     tags_leftover = tag_counts.keys() - tags_used
     tags_used_eventually = set()
-    content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used_eventually) for item in ['MISC', *tags_leftover]) + "</div>"
-    content += "</div>"
+    content += "<div class='routine-buttons'>"
+    for item in ['MISC', *tags_leftover]:
+       content += '\n' + ROUTINE.RENDER_item(item, tag_counts, tags_used_eventually)
+    content += "</div>"  # routine-buttons
+
+    content += "</div>"  # routine-menu-collection
 
     bar = RENDER_UTIL.nav(f'<a href="/disc/{note}">back to note</a>',
                           f'<a href="/edit/{routine_uuid}">edit routine</a>')
