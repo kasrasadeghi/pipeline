@@ -79,17 +79,26 @@ class ROUTINE:
     routine_uuid = ROUTINE.get_routine_uuid()
     routine_menus = ROUTINE.PARSE_menus_from_file(routine_uuid)
     content = '<div class="routine-menu-collection">'
+
+    all_routine_elements = set()
+    for block in routine_menus:
+      for item in block:
+        all_routine_elements.add(item)
+
+    # TODO see if any of the routine elements are multiword or if they're lowercase, in which case we need to search by substring instead of by line_part
+
     for block in routine_menus:
       content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used) for item in block) + "</div>"
 
     tags_leftover = tag_counts.keys() - tags_used
-    content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used) for item in ['MISC', *tags_leftover]) + "</div>"
+    tags_used_eventually = set()
+    content += "<div class='routine-buttons'>" + "\n".join(ROUTINE.RENDER_item(item, tag_counts, tags_used_eventually) for item in ['MISC', *tags_leftover]) + "</div>"
     content += "</div>"
 
     bar = RENDER_UTIL.nav(f'<a href="/disc/{note}">back to note</a>',
                           f'<a href="/edit/{routine_uuid}">edit routine</a>')
 
-    return RENDER.base_page({'title': 'Routine', 'content': content, 'bar': bar})
+    return RENDER.base_page({'title': 'Routine ' + str(len(tags_used)) + " / " + str(len(all_routine_elements)), 'content': content, 'bar': bar})
 
 @app.route('/routine/<note>')
 def get_routine_page(note):
