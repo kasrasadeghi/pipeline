@@ -87,19 +87,25 @@ class ROUTINE:
     # TODO see if any of the routine elements are multiword or if they're lowercase, in which case we need to search by substring instead of by line_part
 
     for block in routine_menus:
-      content += "<div class='routine-buttons'>"
       for item in block:
         if item in tag_counts:
           tags_used.add(item)
+
+    for block in routine_menus:
+      content += "<div class='routine-buttons'>"
+      for item in block:
         content += '\n' + ROUTINE.RENDER_item(item, tag_counts)
       content += "</div>"
 
     tags_leftover = tag_counts.keys() - tags_used
     tags_used_eventually = set()
     content += "<div class='routine-buttons'>"
+
     for item in ['MISC', *tags_leftover]:
       if item in tag_counts:
         tags_used_eventually.add(item)
+
+    for item in ['MISC', *tags_leftover]:
       content += '\n' + ROUTINE.RENDER_item(item, tag_counts)
     content += "</div>"  # routine-buttons
 
