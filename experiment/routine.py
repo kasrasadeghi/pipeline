@@ -62,12 +62,11 @@ class ROUTINE:
 
     return tag_counts
 
-  def RENDER_item(name, tag_counts, tags_used):
-    if name in tag_counts:
-      tags_used.add(name)
-      return f"<a class='link-button' href='javascript:void(0)'>{name} {tag_counts[name]}</a>"
+  def RENDER_item(item, tag_counts):
+    if item in tag_counts:
+      return f"<a class='link-button' href='javascript:void(0)'>{item} {tag_counts[item]}</a>"
     else:
-      return f"<a class='link-button' style='color: #70e078' href='javascript:void(0)'>{name}</a>"
+      return f"<a class='link-button' style='color: #70e078' href='javascript:void(0)'>{item}</a>"
 
   def RENDER_menu_page(note):
     # add counts per routine item, for things like brushing '1/2'
@@ -90,14 +89,18 @@ class ROUTINE:
     for block in routine_menus:
       content += "<div class='routine-buttons'>"
       for item in block:
-        content += '\n' + ROUTINE.RENDER_item(item, tag_counts, tags_used)
+        if item in tag_counts:
+          tags_used.add(item)
+        content += '\n' + ROUTINE.RENDER_item(item, tag_counts)
       content += "</div>"
 
     tags_leftover = tag_counts.keys() - tags_used
     tags_used_eventually = set()
     content += "<div class='routine-buttons'>"
     for item in ['MISC', *tags_leftover]:
-       content += '\n' + ROUTINE.RENDER_item(item, tag_counts, tags_used_eventually)
+      if item in tag_counts:
+        tags_used_eventually.add(item)
+      content += '\n' + ROUTINE.RENDER_item(item, tag_counts)
     content += "</div>"  # routine-buttons
 
     content += "</div>"  # routine-menu-collection
