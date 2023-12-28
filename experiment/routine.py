@@ -96,8 +96,6 @@ class ROUTINE:
 
     content = '<div class="routine-menu-collection">'
 
-    # TODO see if any of the routine elements are multiword or if they're lowercase, in which case we need to search by substring instead of by line_part
-
     for block in routine_menus:
       content += "<div class='routine-buttons'>"
       for item in block:
