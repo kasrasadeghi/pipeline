@@ -197,12 +197,25 @@ details[open] > summary > .tags-summary {
 .routine-buttons {
   display:flex;
   width: var(--routine_menu_width);
-  flex-wrap: wrap;
   flex-direction: column;
   padding: 5px;
   margin: 5px;
+  overflow-y: auto; /* scrollbar if needed */
   border: solid var(--banner_color);
+  box-shadow: 0px 0px 11px 2px var(--header_color);
 }
+
+.routine-button {
+  background: none;
+  color: var(--link_button_main_color);
+  cursor: pointer;
+  font-family: monospace;
+  margin: 2px;
+  padding: 6px 6px 4px 6px;
+}
+/* .routine-button:hover, .routine-button:focus { border-color: var(--link_button_hover_color); outline: none; }
+   .routine-button:active { color: var(--link_button_hovercolor); }
+*/
 
 .routine-menu-collection {
   display: flex;

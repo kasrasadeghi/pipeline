@@ -64,9 +64,9 @@ class ROUTINE:
 
   def RENDER_item(item, tag_counts):
     if item in tag_counts:
-      return f"<a class='link-button' href='javascript:void(0)'>{item} {tag_counts[item]}</a>"
+      return f"<a class='routine-button' href='javascript:void(0)'>{item} {tag_counts[item]}</a>"
     else:
-      return f"<a class='link-button' style='color: #70e078' href='javascript:void(0)'>{item}</a>"
+      return f"<a class='routine-button' style='color: #70e078' href='javascript:void(0)'>{item}</a>"
 
   def RENDER_menu_page(note):
     # add counts per routine item, for things like brushing '1/2'
@@ -77,19 +77,26 @@ class ROUTINE:
 
     routine_uuid = ROUTINE.get_routine_uuid()
     routine_menus = ROUTINE.PARSE_menus_from_file(routine_uuid)
-    content = '<div class="routine-menu-collection">'
 
     all_routine_elements = set()
     for block in routine_menus:
       for item in block:
         all_routine_elements.add(item)
 
-    # TODO see if any of the routine elements are multiword or if they're lowercase, in which case we need to search by substring instead of by line_part
-
     for block in routine_menus:
       for item in block:
         if item in tag_counts:
           tags_used.add(item)
+
+    tags_leftover = tag_counts.keys() - tags_used
+    tags_used_eventually = set()
+    for item in ['MISC', *tags_leftover]:
+      if item in tag_counts:
+        tags_used_eventually.add(item)
+
+    content = '<div class="routine-menu-collection">'
+
+    # TODO see if any of the routine elements are multiword or if they're lowercase, in which case we need to search by substring instead of by line_part
 
     for block in routine_menus:
       content += "<div class='routine-buttons'>"
@@ -97,14 +104,7 @@ class ROUTINE:
         content += '\n' + ROUTINE.RENDER_item(item, tag_counts)
       content += "</div>"
 
-    tags_leftover = tag_counts.keys() - tags_used
-    tags_used_eventually = set()
     content += "<div class='routine-buttons'>"
-
-    for item in ['MISC', *tags_leftover]:
-      if item in tag_counts:
-        tags_used_eventually.add(item)
-
     for item in ['MISC', *tags_leftover]:
       content += '\n' + ROUTINE.RENDER_item(item, tag_counts)
     content += "</div>"  # routine-buttons
