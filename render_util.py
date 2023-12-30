@@ -425,7 +425,7 @@ class RENDER_UTIL:
 
   @staticmethod
   def collapse(show, content):
-    return f"""<details><summary>{show}</summary>{content}</details>"""
+    return f"""<details><summary style='width:-webkit-fill-available'>{show}</summary>{content}</details>"""
 
   @staticmethod
   def pre(s):
