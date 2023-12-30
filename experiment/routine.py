@@ -3,7 +3,7 @@ class ROUTINE:
     return "7e3e5fea-300a-4a97-ab10-ee6c687f647f.note"
 
   def RENDER_menu_button(note):
-    return RENDER_UTIL.button('routine', f"/routine/{note}") # show the current number of checkmarks
+    return RENDER_UTIL.button('routine ' + ROUTINE.score(note), f"/routine/{note}") # show the current number of checkmarks
 
   def PARSE_menus_from_file(routine_note_uuid):
     routine_note = REWRITE.note(routine_note_uuid)
@@ -83,16 +83,11 @@ class ROUTINE:
       for item in block:
         all_routine_elements.add(item)
 
-    for block in routine_menus:
-      for item in block:
-        if item in tag_counts:
-          tags_used.add(item)
+    for item in all_routine_elements:
+      if item in tag_counts:
+        tags_used.add(item)
 
     tags_leftover = tag_counts.keys() - tags_used
-    tags_used_eventually = set()
-    for item in ['MISC', *tags_leftover]:
-      if item in tag_counts:
-        tags_used_eventually.add(item)
 
     content = '<div class="routine-menu-collection">'
 
@@ -113,6 +108,24 @@ class ROUTINE:
                           f'<a href="/edit/{routine_uuid}">edit routine</a>')
 
     return RENDER.base_page({'title': 'Routine ' + str(len(tags_used)) + " / " + str(len(all_routine_elements)), 'content': content, 'bar': bar})
+
+  def score(note) -> str:
+    tag_counts = ROUTINE.PARSE_disc_msgs_for_tags(note)
+    tags_used = set()
+
+    routine_uuid = ROUTINE.get_routine_uuid()
+    routine_menus = ROUTINE.PARSE_menus_from_file(routine_uuid)
+
+    all_routine_elements = set()
+    for block in routine_menus:
+      for item in block:
+        all_routine_elements.add(item)
+
+    for item in all_routine_elements:
+      if item in tag_counts:
+        tags_used.add(item)
+
+    return str(len(tags_used)) + " / " + str(len(all_routine_elements))
 
 @app.route('/routine/<note>')
 def get_routine_page(note):
