@@ -269,13 +269,13 @@ div.sidebar-content {
 """
 
 class RENDER_UTIL:
-  @classmethod
-  def STYLE(_):
+  @staticmethod
+  def STYLE(overrides):
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
     # .msg_content: overflow: hidden; text-overflow: ellipsis;
     # .msg: overflow: hidden; max-width: 100%;
 
-    C = FLAT.default_config() | FLAT.config()
+    C = FLAT.default_config() | FLAT.config() | overrides
 
     # make a css variable like --example for each var in config C
     # used like var(--example) in css

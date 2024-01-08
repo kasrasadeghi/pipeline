@@ -294,9 +294,13 @@ class RENDER:
       bar = RENDER_UTIL.nav()
     else:
       bar = D['bar']
+
+    style_overrides = {}
     footer = D.get('footer', '')
     if footer:
       footer = f"<footer>{footer}</footer>"
+    else:
+      style_overrides['footer_menu_size'] = '0px'
 
     title = D.get('title')
     if D.get('title-render', True):
@@ -308,7 +312,7 @@ class RENDER:
       f"<!DOCTYPE hmtl>"
       + f"<html><head>"
         f"<title>{D['title']}</title>"
-        + RENDER_UTIL.STYLE()
+        + RENDER_UTIL.STYLE(style_overrides)
         # + FLASK_UTIL.TELEMETRY()
         + include_js('toggle_time.js')
         + include_js('highlight_selected.js')
