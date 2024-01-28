@@ -6,7 +6,8 @@ import sys  # argv, exit
 import json  # load, dump, dumps
 import subprocess  # check_output, run
 
-from flask import Flask, Response, render_template, escape, request, redirect, g
+from flask import Flask, Response, render_template, request, redirect, g
+from markupsafe import escape
 
 app = Flask(__name__)
 # from werkzeug.middleware.profiler import ProfilerMiddleware
