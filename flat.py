@@ -1,6 +1,6 @@
 class FLAT:
   path = os.path.join(os.path.expanduser('~'), "notes")
-  subrepos = ['phone']
+  subrepos = ['core', 'phone']
 
   # NOTE: configuration stuff is in this folder because it's in the ~/notes/ folder
 
@@ -68,7 +68,7 @@ class FLAT:
 
   @staticmethod
   def repos():
-    return [FLAT.path] + [os.path.join(FLAT.path, subrepo) for subrepo in FLAT.subrepos]
+    return [os.path.join(FLAT.path, subrepo) for subrepo in FLAT.subrepos]
 
   @staticmethod
   def repo_of(note):
@@ -109,11 +109,8 @@ class FLAT:
     return None
 
   @staticmethod
-  def make_path(note):
-    if DEVICE.phone():
-      return os.path.join(FLAT.path, 'phone', note)
-    else:
-      return os.path.join(FLAT.path, note)
+  def make_new_path(note):
+    return os.path.join(FLAT.path, DEVICE.repo_name(), note)
 
   @staticmethod
   def exists(note):
@@ -178,7 +175,7 @@ class FLAT:
 
   @staticmethod
   def init_note(note, title):
-    with open(FLAT.make_path(note), "w+") as f:
+    with open(FLAT.make_new_path(note), "w+") as f:
       f.write("--- METADATA ---\n"
               f"Date: {DATE.now()}\n"
               f"Title: {title}\n")
