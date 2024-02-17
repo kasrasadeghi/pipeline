@@ -135,7 +135,7 @@ class RENDER:
       case {'cmd': cmd}:
         return '<emph class="cmd">' + cmd + '</emph>'
       case str():
-        return content
+        return FLASK_UTIL.ESCAPE(content)
       case {'link': _, 'linktype': _} as link:
         return ': ' + RENDER.link(link, **kwargs)
       case _:
