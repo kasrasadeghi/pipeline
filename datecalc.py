@@ -1,3 +1,4 @@
+# used for things like the Journal dates from journal.py
 class DATECALC:
   @staticmethod
   def daycount(d):
@@ -44,6 +45,29 @@ class DATECALC:
     d['d'] = int(d['d'].rstrip('stndrdth')) # remove letters from 1st, 2nd, 3rd, 4th
     d['y'] = int(d['y'])
     return d
+
+# compatible with date.py's pattern_scatter
+# 'Tue Feb 04 20:59:49 PST 2023'
+# 'WWW mmm DD HH:MM:SS ZZZ YYYY'
+class DATETIME:
+  @staticmethod
+  def to_nums(d):
+    d['Y'] = int(d['Y'])
+    d['m'] = ['Jan', 'Feb', 'Mar', 'Apr',
+              'May', 'Jun', 'Jul', 'Aug',
+              'Sep', 'Oct', 'Nov', 'Dec']\
+             .index(d['m'])
+    d['D'] = int(d['D'])
+    d['H'] = int(d['H'])
+    d['M'] = int(d['M'])
+    d['S'] = int(d['S'])
+
+    # TODO handle timezone: have to get the previous day sometimes, maybe, then add it to hours
+    return d
+
+  @staticmethod
+  def nums_to_tuple(t):
+    return t['Y'], t['m'], t['D'], t['H'], t['M'], t['S']
 
 @app.route('/test/daycount')
 def test_daycount():

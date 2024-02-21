@@ -45,7 +45,7 @@ class RENDER:
     # - whatever @ 10:07:33 on Mar 26 2023
 
     # same note
-    x = DATE.pattern_scatter(timestamp_id)
+    x = DATE.scatter(timestamp_id)
     if not x:
       return f"<a href='/disc/{note}'>{title}</a>"
     hms = f"{x['h']}:{x['m']}:{x['s']}"

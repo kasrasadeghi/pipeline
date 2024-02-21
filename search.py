@@ -1,5 +1,5 @@
 def block_generator():
-  notes = FLAT.list_by_mtime()
+  notes = FLAT.list()
 
   LOG({"file count": len(notes)})
 
@@ -18,7 +18,7 @@ def msg_generator():
               { "value": date, "indent": 1, "children": []}
            ]}]:
         if content.startswith('msg: ') and date.startswith('Date: '):
-          yield {'content': content, 'block': B, 'origin': f}
+          yield {'content': content, 'date': date.removeprefix('Date: '), 'block': B, 'origin': f}
 
 def render_msg_from_generator(msg_gen_result):
   return DISCUSSION_RENDER.msg(REWRITE.block(msg_gen_result['block']) | {'origin': msg_gen_result['origin']})
@@ -54,12 +54,19 @@ def get_search_with_query(query):
   g.request_start = time.time()
   for msg in msg_generator():
     if query.lower() in msg['content'].lower():
-      if current_note != msg['origin']:
-        acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
-        current_note = msg['origin']
       msg_count += 1
-      acc.append(render_msg_from_generator(msg))
-  content = "".join(acc)
+      acc.append(msg)
+
+  acc.sort(reverse=True, key=lambda msg: DATETIME.nums_to_tuple(DATETIME.to_nums(DATE.scatter(msg['date']))))
+
+  render_acc = list()
+  for msg in acc:
+    if current_note != msg['origin']:
+      render_acc.append(RENDER_UTIL.banner(FLAT.title(msg['origin'])))
+      current_note = msg['origin']
+    render_acc.append(render_msg_from_generator(msg))
+
+  content = "".join(render_acc)
 
   return SEARCH.RENDER(
     content,

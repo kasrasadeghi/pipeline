@@ -82,10 +82,6 @@ class DATE:
     return {1:"st", 2:"nd", 3:"rd"}.get(int(day_of_month[-1]), "th")
 
   @staticmethod
-  def pattern_scatter(date):
-    return pattern_scatter(date, 'WWW MMM DD hh:mm:ss ZZZ YYYY', 'WMDhmsZY')
-
-  @staticmethod
   def scatter(date):
     if len(date) == 28:
       return pattern_scatter(date, 'WWW mmm DD HH:MM:SS ZZZ YYYY', 'WmDHMSZY')
