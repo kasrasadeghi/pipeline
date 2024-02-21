@@ -82,6 +82,11 @@ class FLAT:
     return [FLAT.from_path(x) for x in FLAT.listabs()]
 
   @staticmethod
+  def list_repo(repo_name):
+    assert repo_name in FLAT.subrepos, f"repo '{repo_name}' not found in '{FLAT.subrepos}'"
+    return [note for note in os.listdir(os.path.join(FLAT.path, repo_name)) if FLAT.is_note(note)]
+
+  @staticmethod
   def list_by_mtime():
     return [FLAT.from_path(x) for x in util.sort_mtime(FLAT.listabs(), to_path=FLAT.to_path)[::-1]]
 

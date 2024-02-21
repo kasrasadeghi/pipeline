@@ -22,3 +22,14 @@ def get_raw_note(note):
   if 'localhost' in origin.netloc:
     response.headers['Access-Control-Allow-Origin'] = FLASK_UTIL.HEADERS()['Origin']
   return response
+
+@app.route('/api/list/<repo>')
+def get_notes_list(repo):
+  # get notes for a specific repo, bound to a tenant
+  response = Response(json.dumps(FLAT.list_repo(repo)), mimetype='text/json')
+
+  from urllib.parse import urlparse
+  origin = urlparse(FLASK_UTIL.HEADERS()['Origin'])
+  if 'localhost' in origin.netloc:
+    response.headers['Access-Control-Allow-Origin'] = FLASK_UTIL.HEADERS()['Origin']
+  return response
