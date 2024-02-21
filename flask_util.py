@@ -17,6 +17,10 @@ class FLASK_UTIL:
     return view, note
 
   @staticmethod
+  def HEADERS():
+    return request.headers
+
+  @staticmethod
   def TELEMETRY():
     return f"""<script>
        fetch("https://{request.headers['Host']}/receive_info",
