@@ -265,12 +265,10 @@ div.sidebar-content {
   .msg { flex-direction: row; align-items: baseline; }
   .msg_timestamp { margin: 0px 5px 0px 5px; }
 }
-
 """
 
 class RENDER_UTIL:
-  @staticmethod
-  def STYLE(overrides):
+  def style_content(overrides):
     # old font size: clamp(2vmin, 1rem + 2vw, 24px);
     # .msg_content: overflow: hidden; text-overflow: ellipsis;
     # .msg: overflow: hidden; max-width: 100%;
@@ -283,7 +281,10 @@ class RENDER_UTIL:
 
     # you can't have css vars in media queries
     style = css_vars + BASE_STYLE.replace('$desktopview_device_width_threshold', C['desktopview_device_width_threshold'])
+    return style + RENDER_UTIL.kscroll(foreground="#f88", background="#888")
 
+  @staticmethod
+  def STYLE(overrides):
     meta_tags = ", ".join([
       'height=device-height',
       'width=device-width',
@@ -293,9 +294,8 @@ class RENDER_UTIL:
       'user-scalable=no',
       'target-densitydpi=device-dpi'
     ])
-
     return (f'<meta name="viewport" content="{meta_tags}">'
-            f'<style>{style}\n{RENDER_UTIL.kscroll(foreground="#f88", background="#888")}</style>')
+            f'<style>{RENDER_UTIL.style_content(overrides)}</style>')
 
   @staticmethod
   def kscroll(**kwargs):
@@ -303,21 +303,21 @@ class RENDER_UTIL:
     background = kwargs.get('background', "#333")
     size = kwargs.get('size', "10px");
     return """
-       .kscroll {
-         /* Foreground, Background */
-         scrollbar-color: """ + (foreground + " " + background) + """;
-       }
-       .kscroll::-webkit-scrollbar {
-         width: """ + size + """; /* Mostly for vertical scrollbars */
-         height: """ + size + """; /* Mostly for horizontal scrollbars */
-       }
-       .kscroll::-webkit-scrollbar-thumb {
-         background: """ + foreground + """;
-       }
-       .kscroll::-webkit-scrollbar-track {
-         background: """ + background + """;
-       }
-    """
+.kscroll {
+  /* Foreground, Background */
+  scrollbar-color: """ + (foreground + " " + background) + """;
+}
+.kscroll::-webkit-scrollbar {
+  width: """ + size + """; /* Mostly for vertical scrollbars */
+  height: """ + size + """; /* Mostly for horizontal scrollbars */
+}
+.kscroll::-webkit-scrollbar-thumb {
+  background: """ + foreground + """;
+}
+.kscroll::-webkit-scrollbar-track {
+  background: """ + background + """;
+}
+"""
 
   @staticmethod
   def ANSI():
@@ -430,3 +430,7 @@ class RENDER_UTIL:
   @staticmethod
   def pre(s):
     return "<pre>" + str(s) + "</pre>"
+
+@app.route('/api/style.css')
+def route_style():
+  return Response(response=RENDER_UTIL.style_content({}), mimetype='text/plain')
