@@ -43,7 +43,7 @@ class FLASK_UTIL:
   def ESCAPE(s):
     return str(escape(s))
 
-
+@app.route("/sitemap")
 @app.route("/site-map")
 def site_map():
   from flask import url_for
