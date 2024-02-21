@@ -79,7 +79,7 @@ kaz_import('experiment/routine.py')
 kaz_import('tools/latency.py')
 kaz_import('tools/pagesize.py')
 kaz_import('tools/profiler.py')
-kaz_import('tools/merge.py')
+#kaz_import('tools/merge.py')
 kaz_import('tools/unit_tests.py')
 
 # END IMPORTS
