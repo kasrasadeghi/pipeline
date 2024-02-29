@@ -4,7 +4,7 @@ BASE_STYLE = """
 
 :root {
   --main_padding: 10px;
-  --main_height: calc(100dvh - var(--navbar_size) - var(--footer_menu_size) - 2*var(--main_padding));
+  --main_height: calc(100dvh - var(--navbar_size) - var(--footer_menu_size) - 2 * var(--main_padding));
 }
 
 /* initial layout */
